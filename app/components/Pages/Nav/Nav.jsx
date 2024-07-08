@@ -17,7 +17,7 @@ export default async function Nav(){
     //     exp: date.setSeconds(date.getSeconds() + 20),
     // }
     
-    // let h = Objects.encDec(JSON.stringify(obS), `${au}+${process.env.Y}+${uid}`)
+    // let h = Objects.encDec(JSON.stringify(obS), `${au}+${process.env.API_Y}+${uid}`)
     // let obf = JavaScriptObfuscator.obfuscate(
     //     `
     //         let _0xK = async (id) => {

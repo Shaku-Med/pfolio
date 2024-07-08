@@ -22,7 +22,7 @@ export async function POST(request, response) {
     if (headers().get('referer') === what) {
       if (a && body && typeof body === 'object') {
       let au = headers().get('user-agent').split(/\s+/).join('');
-      let d = JSON.parse(Objects.encDec(body.a, `${au}+${process.env.Y}+${a}`, true))
+      let d = JSON.parse(Objects.encDec(body.a, `${au}+${process.env.API_Y}+${a}`, true))
       if (d) {
         if (new Date(d.exp) > new Date()) {
           return unAuth();

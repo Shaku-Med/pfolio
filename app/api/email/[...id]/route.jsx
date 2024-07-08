@@ -4,12 +4,12 @@ import { headers } from "next/headers"
 import nodemailer from 'nodemailer'
 
 let transport = nodemailer.createTransport({
-    host: `${process.env.HOST}`,
+    host: `${process.env.API_HOST}`,
     port: 587,
     secure: false,
     auth: {
-        user: `${process.env.USER}`,
-        pass: `${process.env.PASS}`,
+        user: `${process.env.API_USER}`,
+        pass: `${process.env.API_PASS}`,
     },
 });
 
@@ -32,7 +32,7 @@ export async function POST(request, response) {
 
     if (a && body && typeof body === 'object') {
     let au = headers().get('user-agent').split(/\s+/).join('');
-    let d = JSON.parse(Objects.encDec(body.a, `${au}+${process.env.Y}+${a}`, true))
+    let d = JSON.parse(Objects.encDec(body.a, `${au}+${process.env.API_Y}+${a}`, true))
     if (d) {
       if (au === d.uid) {
           
@@ -47,8 +47,8 @@ export async function POST(request, response) {
         let ip = headers().get('true-client-ip') ? headers().get('true-client-ip') : headers().get('cf-connecting-ip') ? headers().get('cf-connecting-ip') : headers().get('x-forwarded-for') ? headers().get('x-forwarded-for') : headers().get('remote-addr') ? headers().get('remote-addr') : `NO IP FOUND`;
 
         await transport.sendMail({
-            from: '"Medzy | PortFolio" '+ process.env.USER +'',
-            to: process.env.TO,
+            from: '"Medzy | PortFolio" '+ process.env.API_USER +'',
+            to: process.env.API_TO,
             subject: body.subject,
             text: `New message from your website...`,                                                                                                                                                   // Could have used MAP.
             html: ` <h1>Respond Name: <br> ${body.name}</h1> <h2>Respond Email: <br> ${body.email}</h2>  <br> <hr> ${body.message} <br> <hr> <h2>Date: ${body.date}</h2> <hr> <h1>DEVICE INFO: </h1> <p>${JSON.stringify(body.device).replace(formatRegex, (matched) => formatReplace[matched])}</p> <hr> <h1>IP ADDRESS: <br> ${ip}</h1> <br> <hr>`

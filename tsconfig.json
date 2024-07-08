@@ -36,7 +36,8 @@
     "app/components/Pages/Home/Projects/Item.jsx",
     "app/api/v/[id].jsx",
     "app/components/Pages/Nav/Nav_pv.jsx",
-    "app/components/Pages/Nav/Nav_pv.jsx"
+    "app/components/Pages/Nav/Nav_pv.jsx",
+    "app/Featured/[id]/page.jsx"
   ],
   "exclude": [
     "node_modules"

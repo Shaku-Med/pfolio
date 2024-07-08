@@ -18,7 +18,7 @@ export default async function Home() {
         uid: au,
     }
     
-    let h = Objects.encDec(JSON.stringify(obS), `${au}+${process.env.Y}+${uid}`)
+    let h = Objects.encDec(JSON.stringify(obS), `${au}+${process.env.API_Y}+${uid}`)
 
     return (
         <>
