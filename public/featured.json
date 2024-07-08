@@ -1,0 +1,185 @@
+[{
+        "title": "ToonJoy",
+        "description": "A web community where users can watch movies, react, and discuss with fellow movie enthusiasts, fostering a shared experience and creating a vibrant space for film lovers to engage and connect.",
+        "featured": true,
+        "ranking": 1,
+        "id": 1,
+        "project": "https://toonjoy.org",
+        "position": "left",
+        "languages": [
+            "Next.js",
+            "Node.js",
+            "React.js",
+            "Python",
+            "Firebase"
+        ],
+        "code": "https://github.com/Shaku-Med/toonjoy",
+        "image": {
+            "src": "../toonjoy.png",
+            "alt": "Toonjoy Image"
+        },
+        "time": "Mar 20 2024",
+        "about": {
+            "security": "ToonJoy prioritizes the security and privacy of its users. We implement robust encryption protocols on every HTTP request to ensure that all data transmitted between your browser and our servers is protected from unauthorized access and tampering. Our application uses state-of-the-art encryption standards to maintain the confidentiality and integrity of user information, making your interactions on ToonJoy secure and trustworthy."
+        }
+    },
+    {
+        "title": "Chatzy - The Ultimate Random Chat App",
+        "description": "Discover a cutting-edge realtime networking platform where you can chat with people online for free. Join now for instant connections and global conversations.",
+        "featured": true,
+        "ranking": 2,
+        "id": 2,
+        "position": "right",
+        "project": "https://clp-one.vercel.app",
+        "languages": [
+            "WebRTC",
+            "Web Socket",
+            "React.js",
+            "Crypto",
+            "AWS"
+        ],
+        "links": [{
+                "type": "info",
+                "iconClass": "bi bi-info-circle"
+            },
+            {
+                "type": "external",
+                "iconClass": "bi bi-box-arrow-up-right"
+            }
+        ],
+        "image": {
+            "src": "../clp.png",
+            "alt": "Chatzy"
+        },
+        "time": "Feb 17 2023",
+        "about": {
+            "security": "When you talk of security, chatzy holds the key to that. Join our community and explore more about chatzy."
+        }
+    },
+    {
+        "title": "Music",
+        "description": "A web music player that you can play, and download he song for free. It doesn't protect your from copyright.",
+        "featured": true,
+        "ranking": 6,
+        "id": 4,
+        "position": "left",
+        "code": "https://github.com/Shaku-Med/music",
+        "project": "https://msic.vercel.app",
+        "video": "../music.mp4",
+        "languages": [
+            "HTML, CSS",
+            "REST API",
+            "Spotify Api"
+        ],
+        "links": [{
+                "type": "info",
+                "iconClass": "bi bi-info-circle"
+            },
+            {
+                "type": "external",
+                "iconClass": "bi bi-box-arrow-up-right"
+            }
+        ],
+        "image": {
+            "src": "../music.png",
+            "alt": ""
+        },
+        "time": "June 5 2024",
+        "about": {
+            "security": "It's an open source platform. user information needed. It's friendly to clone (IFRAMING) as it doesn't collect any user login data."
+        }
+    },
+    {
+        "title": "Telegram _ web",
+        "description": "A realtime chatting application that can do realtime video chat, send messages and more.",
+        "featured": true,
+        "ranking": 8,
+        "id": 7,
+        "position": "right",
+        "code": "https://github.com/Shaku-Med/Telegram_Clone_Web?tab=readme-ov-file",
+        "languages": [
+            "edux",
+            "nodejs",
+            "mongodb",
+            "reactjs",
+            "webrtc",
+            "Socket",
+            "expressjs"
+        ],
+        "links": [{
+                "type": "info",
+                "iconClass": "bi bi-info-circle"
+            },
+            {
+                "type": "external",
+                "iconClass": "bi bi-box-arrow-up-right"
+            }
+        ],
+        "image": {
+            "src": "../telegram_web.png",
+            "alt": ""
+        },
+        "time": "July 18 2022",
+        "about": {
+            "security": "50% security level. Clone repo and try it."
+        }
+    },
+    {
+        "title": "Telegram Mobile Clone",
+        "description": "Telegram Clone built with React Native from scratch.",
+        "featured": true,
+        "ranking": 9,
+        "id": 10,
+        "position": "left",
+        "code": "https://github.com/Shaku-Med/Telegram_app",
+        "languages": [
+            "React Native"
+        ],
+        "links": [{
+                "type": "info",
+                "iconClass": "bi bi-info-circle"
+            },
+            {
+                "type": "external",
+                "iconClass": "bi bi-box-arrow-up-right"
+            }
+        ],
+        "image": {
+            "src": "../tel.png",
+            "alt": ""
+        },
+        "time": "Feb 18 2024",
+        "about": {
+            "security": "..."
+        }
+    },
+    {
+        "title": "Kachabazar",
+        "description": "Online Food shopping website designed from scratch using React.",
+        "featured": true,
+        "ranking": 9,
+        "id": 20,
+        "position": "right",
+        "project": "https://kachabazar-psi.vercel.app",
+        "languages": [
+            "React.JS"
+        ],
+        "links": [{
+                "type": "info",
+                "iconClass": "bi bi-info-circle"
+            },
+            {
+                "type": "external",
+                "iconClass": "bi bi-box-arrow-up-right"
+            }
+        ],
+        "image": {
+            "src": "../res.png",
+            "alt": ""
+        },
+        "time": "July 23 2021",
+        "about": {
+            "security": "..."
+        }
+    }
+]

@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/components/Pages/Home/Projects/Item.jsx",
+    "app/components/Pages/Home/Projects/Item.jsx",
+    "app/api/v/[id].jsx",
+    "app/components/Pages/Nav/Nav_pv.jsx",
+    "app/components/Pages/Nav/Nav_pv.jsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

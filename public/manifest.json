@@ -1,0 +1,52 @@
+{
+    "short_name": "Medzy",
+    "name": "Medzy",
+    "icons": [{
+            "src": "https://medzyamara.com/fav_16.png",
+            "sizes": "16x16",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "https://medzyamara.com/fav_32.png",
+            "type": "image/png",
+            "sizes": "32x32"
+        },
+        {
+            "src": "https://medzyamara.com/fav_180.png",
+            "type": "image/png",
+            "sizes": "180x180"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "72x72"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "96x96"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "128x128"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "144x144"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "https://medzyamara.com/favicon.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone"
+}
