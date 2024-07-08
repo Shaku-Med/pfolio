@@ -14,7 +14,7 @@ let transport = nodemailer.createTransport({
 });
 
 // 
-export let dynamic = 'force-dynamic'
+// export let dynamic = 'force-dynamic'
 
 export async function POST(request, response) {
   try {
