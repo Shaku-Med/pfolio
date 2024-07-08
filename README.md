@@ -4,7 +4,6 @@
 - **Phone:** +1 (929) 587-5383
 - **Email:** [amaramohamedb@gmail.com](mailto:amaramohamedb@gmail.com)
 - **Website:** [www.medzyamara.com](https://www.medzyamara.com)
-- **Address:** 30 Ebbitts Street, Staten Island, NY
 - **GitHub:** [github.com/Shaku-Med](https://github.com/Shaku-Med)
 - **LinkedIn:** [linkedin.com/in/mohamed-amara-b84447247](https://www.linkedin.com/in/mohamed-amara-b84447247/)
 - **Twitter:** [x.com/medzy_app](https://x.com/medzy_app)
