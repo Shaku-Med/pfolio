@@ -3,7 +3,7 @@ import Objects from "@/app/Functions/Object";
 import { headers } from "next/headers"
 //
 
-export let dynamic = 'force-dynamic'
+// export let dynamic = 'force-dynamic'
 
 export async function POST(request, response) {
   try {
