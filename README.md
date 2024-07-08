@@ -1,7 +1,6 @@
 # Mohamed Amara
 
 ## Contact
-- **Phone:** +1 (929) 587-5383
 - **Email:** [amaramohamedb@gmail.com](mailto:amaramohamedb@gmail.com)
 - **Website:** [www.medzyamara.com](https://www.medzyamara.com)
 - **GitHub:** [github.com/Shaku-Med](https://github.com/Shaku-Med)
