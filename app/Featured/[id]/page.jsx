@@ -1,29 +1,13 @@
-import Footer from '@/app/components/Pages/Footer/Footer'
-import Item from '@/app/components/Pages/Home/Projects/Item'
-import { Metadata, ResolvingMetadata } from 'next'
-import Link from 'next/link'
-import React from 'react'
+import Footer from '@/app/components/Pages/Footer/Footer';
+import Item from '@/app/components/Pages/Home/Projects/Item';
+import { Metadata, ResolvingMetadata } from 'next';
+import Link from 'next/link';
+import React from 'react';
 
-
-type Props = {
-    params: { id: string }
-    searchParams: { [key: string]: string | string[] | undefined }
-}
-
-type Project = {
-    id: number;
-    featured: boolean;
-    ranking: number;
-};
-
-const fnc = async (
-    featured: boolean,
-    id: string | number | undefined,
-    projects: Project[]
-): Promise<Project[]> => {
+const fnc = async (featured, id, projects) => {
     try {
         const response = await fetch(`https://medzyamara.com/featured.json`, { cache: 'no-store' });
-        const data: Project[] = await response.json();
+        const data = await response.json();
 
         if (data) {
             if (featured) {
@@ -39,7 +23,7 @@ const fnc = async (
                     return data.filter((project) => project.featured).sort((a, b) => a.ranking - b.ranking);
                 }
             } else {
-                return []
+                return [];
             }
         } else {
             return [];
@@ -51,14 +35,11 @@ const fnc = async (
     return [];
 };
 
-export async function generateMetadata(
-    { params, searchParams }: Props,
-    parent: ResolvingMetadata
-): Promise<Metadata> {
-    const id = params.id
-    let projects: Project[] = []
-    let d = await fnc(true, id, projects)
-    // 
+const generateMetadata = async ({ params, searchParams }, parent) => {
+    const id = params.id;
+    let projects = [];
+    let d = await fnc(true, id, projects);
+    
     if (d.length > 0) {
         return {
             title: `${d[0].title} | Medzy Amara`,
@@ -83,16 +64,15 @@ export async function generateMetadata(
                     }
                 ]
             },
-        }
-    }
-    else {
+        };
+    } else {
         return {
             title: `Featured Project`
-        }
+        };
     }
-}
+};
 
-const Component = async function Component({ params }: any) {
+const Component = ({ params }) => {
     return (
         <>
             <div className="clsmbd fixed top-0 left-0 overflow-auto w-full h-full">
@@ -100,7 +80,7 @@ const Component = async function Component({ params }: any) {
                 <Footer />
             </div>
         </>
-    )
+    );
 };
 
 Component.displayName = "Component";
