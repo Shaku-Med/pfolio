@@ -70,6 +70,6 @@ export async function POST(request, response) {
     }
   }
   catch (e) {
-     return Response.json({success: false, error: e}, {status: 500})
+     return Response.json({success: false, error: e, env: process.env}, {status: 500})
   }
 };
