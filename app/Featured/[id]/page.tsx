@@ -92,7 +92,7 @@ export async function generateMetadata(
     }
 }
 
-export default async function ({ params }: any) {
+const Component = async function Component({ params }: any) {
     return (
         <>
             <div className="clsmbd fixed top-0 left-0 overflow-auto w-full h-full">
@@ -101,4 +101,8 @@ export default async function ({ params }: any) {
             </div>
         </>
     )
-}
+};
+
+Component.displayName = "Component";
+
+export default Component;
