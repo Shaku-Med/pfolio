@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     {
       type: `image/x-icon`,
       url: `https://medzyamara.com/favicon.ico`,
-      rel: `icon`
+      rel: `shortcut icon`
     },
     {
       rel: `apple-touch-icon`,
