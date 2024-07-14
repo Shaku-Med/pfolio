@@ -38,7 +38,7 @@
     "app/components/Pages/Nav/Nav_pv.jsx",
     "app/components/Pages/Nav/Nav_pv.jsx",
     "app/Featured/[id]/page.jsx"
-  ],
+, "app/not-found.tssx", "app/not-found.jsx"  ],
   "exclude": [
     "node_modules"
   ]
