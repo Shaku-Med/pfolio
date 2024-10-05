@@ -52,7 +52,7 @@ export default async function Nav(){
     return (
         <>
             <Link href={`../`} className="logopart navvs  left-12 fixed max-[600px]:top-5 top-10 flex items-center justify-center gap-1">
-                <img src={`https://medzyamara.com/fav.svg`} className="loaidnfd rounded-full bg-[var(--muted)] dark:bg-[var(--mainBg)] h-16 min-w-16 w-16 min-h-16 flex items-center justify-center text-xl" />
+                <img src={`https://medzyamara.dev/fav.svg`} className="loaidnfd rounded-full bg-[var(--muted)] dark:bg-[var(--mainBg)] h-16 min-w-16 w-16 min-h-16 flex items-center justify-center text-xl" />
             </Link>
             
             <div className="clbtns navvs fixed max-[600px]:top-5 top-10 right-12">

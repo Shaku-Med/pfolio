@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: "Explore Medzy Amara's portfolio showcasing projects, skills, and achievements in computer science.",
     images: [
       {
-        url: `https://medzyamara.com/favicon.ico`,
+        url: `https://medzyamara.dev/favicon.ico`,
       }
     ],
     title: "Medzy Amara | Portfolio",
@@ -41,28 +41,28 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     images: [
       {
-        url: `https://medzyamara.com/apple-touch-icon.png`,
+        url: `https://medzyamara.dev/apple-touch-icon.png`,
       }
     ]
   },
   icons: [
     {
       type: `image/x-icon`,
-      url: `https://medzyamara.com/favicon.ico`,
+      url: `https://medzyamara.dev/favicon.ico`,
       rel: `shortcut icon`
     },
     {
       rel: `apple-touch-icon`,
-      url: `https://medzyamara.com/apple-touch-icon.png`,
+      url: `https://medzyamara.dev/apple-touch-icon.png`,
       type: `image/png`
     },
     {
       rel: `apple-touch-icon-pre`,
-      url: `https://medzyamara.com/apple-touch-icon-precomposed.png`,
+      url: `https://medzyamara.dev/apple-touch-icon-precomposed.png`,
       type: `image/png`
     }
   ],
-  manifest: `https://medzyamara.com/manifest.json`,
+  manifest: `https://medzyamara.dev/manifest.json`,
   publisher: `Medzy Amara || Mohamed Amara`,
   creator: `Medzy Amara || Mohamed Amara`,
   category: `portfolio`,

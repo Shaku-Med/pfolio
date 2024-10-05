@@ -9,7 +9,7 @@ export const metadata: Metadata = {
         description: `Hey there! I'm Mohamed, and I love creating stuff that lives on devices and the internet. My journey into software development kicked off in 2019 during the COVID-19 pandemic. I began with Python and, over time, explored various areas, getting hooked on programming. This curiosity led me to dive into app development, web development, and machine learning.`,
         images: [
             {
-                url: `https://medzyamara.com/me1.jpg`,
+                url: `https://medzyamara.dev/me1.jpg`,
             }
         ],
         title: `Medzy Amara | Portfolio`,
@@ -19,19 +19,19 @@ export const metadata: Metadata = {
         card: `summary_large_image`,
         images: [
             {
-                url: `https://medzyamara.com/me1.jpg`,
+                url: `https://medzyamara.dev/me1.jpg`,
             }
         ]
     },
     icons: [
         {
             rel: `apple-touch-icon`,
-            url: `https://medzyamara.com/me1.jpg`,
+            url: `https://medzyamara.dev/me1.jpg`,
             type: `image/png`
         },
         {
             rel: `apple-touch-icon-pre`,
-            url: `https://medzyamara.com/me1.jpg`,
+            url: `https://medzyamara.dev/me1.jpg`,
             type: `image/png`
         }
     ],
