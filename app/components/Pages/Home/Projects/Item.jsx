@@ -5,7 +5,7 @@ import Info from './Info';
 
 let fnc = async (featured, id, projects) => {
     try {
-        let ft = await fetch(`https://medzyamara.com/featured.json`, { cache: `no-store` });
+        let ft = await fetch(`https://medzyamara.dev/featured.json`, { cache: `no-store` });
         let dt = await ft.json();
         if (dt) {
             if (featured) {
@@ -112,7 +112,7 @@ const FeaturedComponent = async ({ featured, id, projects }) => {
                         <>
                             <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                                    <img className="mx-auto h-40 w-auto" src="https://medzyamara.com/favicon.ico" alt="Project not found" />
+                                    <img className="mx-auto h-40 w-auto" src="https://medzyamara.dev/favicon.ico" alt="Project not found" />
                                     <h2 className="mt-6 text-center text-3xl leading-9 font-extrabold opacity-[.6]">
                                         Oops! Project not found
                                     </h2>

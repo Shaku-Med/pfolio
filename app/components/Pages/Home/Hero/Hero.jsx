@@ -47,7 +47,7 @@ let Hero = () => {
                             <Logo className={` bottom-[40px] w-full h-full left-[-50px]`} />
                         </div>
                         <div className="ahinkeas  top-[0rem] z-[1000000000] max-[800px]:h-[20rem] max-[800px]:w-[20rem] h-[25rem] w-[25rem]">
-                            <img className={` w-full h-full object-cover`} src="https://medzyamara.com/me.jpg" alt="" />
+                            <img className={` w-full h-full object-cover`} src="https://medzyamara.dev/me.jpg" alt="" />
                         </div>
                     </div>
                 </div>

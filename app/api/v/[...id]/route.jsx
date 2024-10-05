@@ -17,7 +17,7 @@ export async function POST(request, response) {
       }, { status: 401 })
     };
 
-    let what = process.env.NODE_ENV === 'production' ? `https://medzyamara.com/` : `http://localhost:3000/`;
+    let what = process.env.NODE_ENV === 'production' ? `https://medzyamara.dev/` : `http://localhost:3000/`;
 
     if (headers().get('referer') === what) {
       if (a && body && typeof body === 'object') {

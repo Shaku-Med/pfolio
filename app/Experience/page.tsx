@@ -9,7 +9,7 @@ export const metadata: Metadata = {
         description: "Database System & Cyber Security Intern (CodePath) & Computer Lab Assistant",
         images: [
             {
-                url: `https://medzyamara.com/me1.jpg`,
+                url: `https://medzyamara.dev/me1.jpg`,
             }
         ],
         title: "Medzy Amara | Portfolio",
@@ -19,19 +19,19 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         images: [
             {
-                url: `https://medzyamara.com/me1.jpg`,
+                url: `https://medzyamara.dev/me1.jpg`,
             }
         ]
     },
     icons: [
         {
             rel: `apple-touch-icon`,
-            url: `https://medzyamara.com/me1.jpg`,
+            url: `https://medzyamara.dev/me1.jpg`,
             type: `image/png`
         },
         {
             rel: `apple-touch-icon-pre`,
-            url: `https://medzyamara.com/me1.jpg`,
+            url: `https://medzyamara.dev/me1.jpg`,
             type: `image/png`
         }
     ],

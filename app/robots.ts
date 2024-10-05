@@ -11,6 +11,6 @@ export default function robots(): MetadataRoute.Robots {
                 userAgent: ['Applebot', 'Bingbot'],
             },
         ],
-        sitemap: 'https://medzyamara.com/sitemap.xml',
+        sitemap: 'https://medzyamara.dev/sitemap.xml',
     }
 }

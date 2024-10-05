@@ -6,7 +6,7 @@ import React from 'react';
 
 const fnc = async (featured, id, projects) => {
     try {
-        const response = await fetch(`https://medzyamara.com/featured.json`, { cache: 'no-store' });
+        const response = await fetch(`https://medzyamara.dev/featured.json`, { cache: 'no-store' });
         const data = await response.json();
 
         if (data) {
@@ -48,7 +48,7 @@ const generateMetadata = async ({ params, searchParams }, parent) => {
                 description: `${d[0].description}`,
                 images: [
                     {
-                        url: `https://medzyamara.com/${d[0].image.src.split('../')[1]}`,
+                        url: `https://medzyamara.dev/${d[0].image.src.split('../')[1]}`,
                     }
                 ],
                 title: `${d[0].title} | Medzy Amara`,
@@ -60,7 +60,7 @@ const generateMetadata = async ({ params, searchParams }, parent) => {
                 card: "summary_large_image",
                 images: [
                     {
-                        url: `https://medzyamara.com/${d[0].image.src.split('../')[1]}`,
+                        url: `https://medzyamara.dev/${d[0].image.src.split('../')[1]}`,
                     }
                 ]
             },

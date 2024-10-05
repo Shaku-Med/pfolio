@@ -86,7 +86,7 @@ let About = () => {
                             </div>
                             <div className="ctain ahinkeas">
                                 <div className="imgPth sapAnim h-[300px] w-[300px] overflow-hidden">
-                                    <img className={` w-full sapAnim h-full object-cover object-top`} src={`https://medzyamara.com/me1.jpg`} alt="" />
+                                    <img className={` w-full sapAnim h-full object-cover object-top`} src={`https://medzyamara.dev/me1.jpg`} alt="" />
                                 </div>
                             </div>
                         </div>
