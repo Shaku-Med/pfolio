@@ -5,7 +5,7 @@ let Resume = () => {
     return (
         <>
             <div  className={`profHm remay mainHITE bg-[var(--mainBg)] p-2 flex items-center justify-between flex-col h-full bd overflow-hidden`}>
-                <div className={`MlTpt w-full max-w-[1000px] h-full`}>
+                <div className={`MlTpt transition-all min-[1400px]:max-w-[80%] w-full max-w-[1000px] h-full`}>
                     <h1 className={`bildAb sapAnim text-[var(--txt)] text-5xl font-bold p-4 capitalize mt-2 mb-2`}>
                         experience
                     </h1>

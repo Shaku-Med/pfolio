@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from 'react';
 
 const StarField = ({gid}) => {
   const canvasRef = useRef(null);
-  const numStars = 3000;
+  const numStars = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
   const speed = 5;
-  const maxDepth = 1500;
+  const maxDepth = Math.floor(Math.random() * (30000 - 1500 + 1)) + 1500;
   const starColors = ["#FFFFFF", "#FFDDC1", "#FFC0CB", "#121212", "#B0E0E6"];
   let stars = [];
   let mouseX = 0;
@@ -95,6 +95,8 @@ const StarField = ({gid}) => {
     setCanvasSize();
     initStars();
     requestAnimationFrame(updateAndDrawStars);
+    // 
+    console.log(window.innerWidth)
 
     return () => {
       window.removeEventListener('resize', setCanvasSize);
