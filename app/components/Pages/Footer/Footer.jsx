@@ -5,7 +5,7 @@ let Footer = () => {
     return (
         <>
             <footer className="relative w-full mt-10 p-5 bg-[var(--basebg)]">
-                <div className="w-full px-8 mx-auto max-w-7xl">
+                <div className="w-full transition-all min-[1400px]:max-w-[80%] px-8 mx-auto max-w-7xl">
                     <div className="grid justify-between grid-cols-1 gap-4 md:grid-cols-2">
                         <h5 className="block mb-6 font-sans text-2xl text-[var(--txt)] antialiased font-semibold leading-snug tracking-normal">
                             Medzy | Mohamed
