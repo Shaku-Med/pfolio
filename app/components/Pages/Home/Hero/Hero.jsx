@@ -4,7 +4,7 @@ import Logo from '@/app/Logo'
 import StarField from './StarField'
 // 
 let Hero = () => {
-    let t = Math.floor(Math.random() * (6 - 1 + 1))
+    let t = Math.floor(Math.random() * (14 - 1 + 1)) // the most useless calculation 😄. 14 - 1 + 1...
     return (
         <div id='home' className={`aidnodfnoda flex h-full w-full bd relative`}>
             <div className="starWars absolute top-0 left-0 w-full h-full">
