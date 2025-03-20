@@ -39,17 +39,20 @@ export default async function Home() {
                     <div id='contact' className="aidfnoad snap-start ">
                         <Contact sid={uid} h={h} />
                     </div>
-                    <div className='aidfnoad snap-start'>
-                    <iframe 
-                        style={{ borderRadius: '12px' }} 
+                    <div class="flex flex-col space-y-4 w-full max-w-lg p-6">
+                    <div class="text-lg font-medium text-gray-800">Do you know I do music too?</div>
+                    <div class="w-full overflow-hidden shadow-lg rounded-xl">
+                        <iframe 
                         src="https://open.spotify.com/embed/artist/0n7maaPRkmcz9CEJupVCT1?utm_source=generator" 
                         width="100%" 
                         height="152" 
                         frameBorder="0" 
                         allowFullScreen 
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                        loading="lazy" 
-                        />
+                        loading="lazy"
+                        style="border-radius: 12px;"
+                        ></iframe>
+                    </div>
                     </div>
                     <div id='footer' className="aidfnoad snap-start ">
                         <Footer />
