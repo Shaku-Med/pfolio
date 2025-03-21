@@ -23,7 +23,7 @@ let Hero = () => {
                                 <span className={`mt-[-35px] sapAnim max-[900px]:mt-[-25px]`}>Amara.</span>
                             </h1>
                             <div className="aidnfoda sapAnim font-light text-lg max-[800px]:text-sm">
-                                <div>As a passionate software engineering student,</div>
+                                <div>I'm a passionate <b>Software developer</b></div>
                                 <div>I specialize in crafting innovative, user-centric tools.</div>
                             </div>
                             <div className="pLt mt-2">
@@ -33,10 +33,10 @@ let Hero = () => {
 
                         <div className="skiLs transition-all min-[1400px]:scale-[1.2] transition-all min-[1400px]:mt-[-20px] w-full brd justify-between p-2 flex items-start gap-2 text-sm max-[800px]:text-xs">
                             <div className="lefMpath">
-                                Highly skilled at progressive <br /> enhancement, design systems <br /> & UI Engineering.
+                                Highly skilled at progressive <br /> enhancement, design systems <br /> & ML.
                             </div>
                             <div className="rPts">
-                                Proven experience building <br /> successful products for clients <br /> acrosss several countries.
+                                Proven experience building <br /> successful products for clients <br /> across several countries.
                             </div>
                         </div>
 
