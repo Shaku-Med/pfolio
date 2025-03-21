@@ -39,7 +39,7 @@ let About = () => {
                                     Education
                                 </div>
                                 <div className="bach sapAnim px-10 opacity-[.6]">
-                                    Bachelor of Science in Computer Science (2022 - 2026)
+                                    Bachelor of Science in Computer Science (2022)
                                 </div>
                             </div>
                             <div className="ntxt_x">
