@@ -12,7 +12,7 @@ const Load = () => {
                     <div className="orbe" style={{ '--index': 4 }}></div>
                 </div>
                     <div className="appLogo absolute w-20">
-                        <img style={{background: 'transparent'}} src="../favicon.ico" alt="" />
+                        <img style={{background: 'transparent'}} src="../Icons/web/icon-512.png" alt="" />
                     </div>
             </div>
         </>

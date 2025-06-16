@@ -1,101 +1,126 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import 'animate.css';
-import Nav from "./components/Pages/Nav/Nav";
-import NextTopLoader from 'nextjs-toploader'
-import Tost from './Toastify/Toast'
-// 
-const inter = Inter({ subsets: ["latin"] });
+import { Geist, Geist_Mono } from "next/font/google";
+import { cookies, headers } from "next/headers";
+import SEO from "@/helper/seo";
+import './globals.css'
+import ViewportManager from './components/ViewportManager';
+import CustomCursor from './components/CustomCursor';
+import Theme from './components/Theme';
+import { ContextProviderWrapper } from "@/components/Context/ContextProvider";
+import NavProvider from "@/components/Context/NavProvider";
+import { Toaster } from "@/components/ui/sonner";
+import { ChatProvider } from "@/app/components/Context/ChatContext";
+import { EncryptCombine } from "./Auth/Lock/Combine";
+import { getClientIP } from "./Auth/Functions/GetIp";
+import { encrypt } from "./Auth/Lock/Enc";
+import { MessageProvider } from "@/context/MessageContext";
+import MessageStatus from "@/components/ui/MessageStatus";
+import IsAuth from "./admin/Auth/IsAuth";
+
+export const metadata: Metadata = {...SEO()}
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif']
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  fallback: ['monospace']
+});
 
 export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  minimumScale: 1,
   maximumScale: 1,
-  userScalable: true,
-  viewportFit: "cover",
+  initialScale: 1,
+  width: 'device-width',
+  userScalable: false,
+  viewportFit: 'cover'
 }
 
-export const metadata: Metadata = {
-  title: "Medzy Amara | Portfolio",
-  description: "Explore Medzy Amara's portfolio showcasing projects, skills, and achievements in computer science.",
-  keywords: "Medzy Amara, computer science student, portfolio, projects, skills, achievements",
-  authors: [
-    {
-      name: `Medzy Amara`,
-      url: `https://facebook.com/medzy.amara.1`
+let GetSocketToken = async (h: any) => {
+  try {
+    let ip = await getClientIP(h)
+    let authorization = EncryptCombine([`${ip}`], [`${process.env.REQUEST_TOKEN}`], {
+      expiresIn: `5m`,
+      algorithm: `HS512`
+    })
+    if(!authorization){
+      return null
     }
-  ],
-  openGraph: {
-    description: "Explore Medzy Amara's portfolio showcasing projects, skills, and achievements in computer science.",
-    images: [
-      {
-        url: `https://medzyamara.dev/favicon.ico`,
-      }
-    ],
-    title: "Medzy Amara | Portfolio",
-  },
-  twitter: {
-    site: "@medzyamara",
-    card: "summary_large_image",
-    images: [
-      {
-        url: `https://medzyamara.dev/apple-touch-icon.png`,
-      }
-    ]
-  },
-  icons: [
-    {
-      type: `image/x-icon`,
-      url: `https://medzyamara.dev/favicon.ico`,
-      rel: `shortcut icon`
-    },
-    {
-      rel: `apple-touch-icon`,
-      url: `https://medzyamara.dev/apple-touch-icon.png`,
-      type: `image/png`
-    },
-    {
-      rel: `apple-touch-icon-pre`,
-      url: `https://medzyamara.dev/apple-touch-icon-precomposed.png`,
-      type: `image/png`
-    }
-  ],
-  manifest: `https://medzyamara.dev/manifest.json`,
-  publisher: `Medzy Amara || Mohamed Amara`,
-  creator: `Medzy Amara || Mohamed Amara`,
-  category: `portfolio`,
-};
 
-export default function RootLayout({
+    let f = await fetch(`${process.env.ACCESS_URL}/token`, {
+      method: `GET`,
+      headers: {
+        'authorization': `Bearer ${authorization}`,
+        ...Object.fromEntries(h.entries())
+      },
+    })
+    let d = await f.json()
+    if(f.ok){
+      return d.token
+    }
+    else {
+      return null
+    }
+  }
+  catch (e) {
+    // console.log(e)
+    return null
+  }
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{
+  nav,
+  footer,
+}: {
   children: React.ReactNode;
-}>) {
+  nav: React.ReactNode;
+  footer: React.ReactNode;
+}) {
+  let c = await cookies()
+  let h = await headers()
+  let theme: 'light' | 'dark' | 'system' = 'system'
+  // 
+  let socketAuth = EncryptCombine({
+    ua: h.get('user-agent')?.split(/\s+/).join(''),
+    ip: await getClientIP(h)
+  }, [process.env.SOCKET_ID], {
+    expiresIn: `10m`,
+    algorithm: 'HS512'
+  })
+  let socketToken = await GetSocketToken(h)
+
+  let isAdmin: any = await IsAuth(true)
+  let user_id = isAdmin ? isAdmin?.user_id : c.get('id')?.value
+
   return (
-    <html className={`animate__backInUp`} lang="en">
-      <body className={`${inter.className} flex items-center justify-between flex-col`}>
-
-        <meta name="theme-color" content="#f7f7f7" media="(prefers-color-scheme: light)"></meta>
-        <meta name="theme-color" content="#070707" media="(prefers-color-scheme: dark)"></meta>
-
-        <link rel="preconnect" href="https://fonts.googleapis.com"></link>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""></link>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"></link>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></link>
-        {/*  */}
-
-        <div className="poSH fixed top-0 left-0 w-full z-[10000000000000]">
-          <NextTopLoader color={`var(--txt)`} showSpinner={false} />
-        </div>
-        {/*  */}
-        <Nav />
-        {/*  */}
-        {children}
-        {/*  */}
-        <Tost />
+    <html suppressHydrationWarning suppressContentEditableWarning lang="en" className="scroll-smooth">
+      <body className={`${geistSans.variable} ${geistMono.variable} ${theme} overflow-x-hidden antialiased`}>
+          <ContextProviderWrapper socketToken={socketToken} socketAuth={socketAuth} user_id={user_id}>
+            <ChatProvider>
+              <MessageProvider>
+                <NavProvider/>
+                <Theme theme={theme} />
+                <CustomCursor />
+                {/* <ViewportManager /> */}
+                {nav}
+                {children}
+                {footer}
+                <MessageStatus />
+              </MessageProvider>
+            </ChatProvider>
+          </ContextProviderWrapper>
+        <Toaster theme={`${theme}`} style={{
+          zIndex: `100000000000001`
+        }} richColors position={`bottom-center`}/>
       </body>
     </html>
   );
-};
+}
