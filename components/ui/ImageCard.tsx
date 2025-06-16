@@ -477,7 +477,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
               )}
             </div>
           </div>
-          
+{/*           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-muted/50 flex-shrink-0">
@@ -513,7 +513,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
                 Block User
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </div>
       </div>
 

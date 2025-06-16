@@ -982,3 +982,7 @@ img {
   top: 0 !important;
   left: 0 !important;
 }
+
+.allow_copy_image img {
+  pointer-events: all !important;
+}

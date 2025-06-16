@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Calendar, Users, Activity, TrendingUp, Eye, MessageCircle, Clock, FileText } from 'lucide-react'
+import ProjectGallery from './ProjectGallery'
+import { useState } from 'react'
 
 interface ProjectFile {
   customName?: string
@@ -11,11 +13,35 @@ interface ProjectFile {
 }
 
 interface Project {
+  id: string
+  title: string
+  description: string
+  date: string
+  programmingLanguages: string[]
+  thumbnail?: {
+    url: string
+    totalChunks: number
+  }
+  sourceCodeLinks?: {
+    id: string
+    url: string
+    label: string
+  }[]
+  previewLinks?: {
+    id: string
+    url: string
+    label: string
+  }[]
   status: 'completed' | 'in-progress' | 'on-hold'
+  featured: boolean
+  user_id: string
+  team: string[]
+  priority: string
+  category: string
+  technologies: string[]
   view: number
   comments: number
   created_at: string
-  date: string
   updated_at?: string
   duration: string
   teamSize: number
@@ -30,6 +56,7 @@ interface ProjectMetricsProps {
 }
 
 export function ProjectMetrics({ project }: ProjectMetricsProps) {
+  const [isGalleryOpen, setIsGalleryOpen] = useState<number | null>(null)
   const getProgressValue = (status: string) => {
     switch (status) {
       case 'completed': return 100
@@ -175,29 +202,36 @@ export function ProjectMetrics({ project }: ProjectMetricsProps) {
       </Card>
 
       {project.project_files && project.project_files.length > 0 && (
-        <Card className="bg-card/10 backdrop-blur-lg rounded-3xl">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl">
-              <Activity className="h-5 w-5 sm:h-6 sm:w-6" />
-              Project Gallery
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {project.project_files.map((file: ProjectFile, index: number) => (
-              <div key={index} className="flex hover:scale-102 cursor-pointer transition-all duration-300 items-center justify-between p-3 rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-4 w-4" />
-                  <span className="text-sm font-medium line-clamp-1">
-                    {file.customName || `File ${index + 1}`}
-                  </span>
+        <>
+          <Card className="bg-card/10 backdrop-blur-lg rounded-3xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl">
+                <Activity className="h-5 w-5 sm:h-6 sm:w-6" />
+                Project Gallery
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {project.project_files.map((file: ProjectFile, index: number) => (
+                <div key={index} className="flex hover:scale-102 cursor-pointer transition-all duration-300 items-center justify-between p-3 rounded-lg border" onClick={() => setIsGalleryOpen(index)}>
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4" />
+                    <span className="text-sm font-medium line-clamp-1">
+                      {file.customName || `File ${index + 1}`}
+                    </span>
+                  </div>
+                  <Badge variant="outline">
+                    {file.fileType?.split('/')[0] || 'File'}
+                  </Badge>
                 </div>
-                <Badge variant="outline">
-                  {file.fileType?.split('/')[0] || 'File'}
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+          {
+            isGalleryOpen !== null && (
+              <ProjectGallery setIsGalleryOpen={setIsGalleryOpen} isGalleryOpen={isGalleryOpen} project={project}/>
+            )
+          }
+        </>
       )}
     </div>
   )

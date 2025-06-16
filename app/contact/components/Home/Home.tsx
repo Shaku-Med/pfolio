@@ -110,7 +110,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
       opacity: 1,
       y: 0,
       transition: {
-        type: 'spring',
+        type: "spring" as const,
         stiffness: 100,
         damping: 12
       }
@@ -124,7 +124,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
       scale: 1,
       rotateY: 0,
       transition: {
-        type: 'spring',
+        type: "spring" as const,
         stiffness: 100,
         damping: 15
       }
@@ -133,7 +133,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
       scale: 1.05,
       rotateY: 5,
       transition: {
-        type: 'spring',
+        type: "spring" as const,
         stiffness: 400,
         damping: 10
       }
@@ -146,7 +146,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
       rotate: 360,
       transition: {
         duration: 0.8,
-        ease: 'easeInOut'
+        ease: "easeInOut" as const
       }
     }
   }
@@ -212,7 +212,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
                       >
                         <MessageCircle className="w-10 h-10 text-primary-foreground" />
                       </motion.div>
-                      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                      {/* <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
                           <button className="absolute -top-2 -right-2 w-8 h-8 bg-muted-foreground hover:bg-foreground text-background rounded-full flex items-center justify-center transition-colors">
                             <HelpCircle className="w-4 h-4" />
@@ -277,7 +277,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
                             </Button>
                           </div>
                         </DialogContent>
-                      </Dialog>
+                      </Dialog> */}
                     </div>
                     <h2 className="text-3xl font-bold text-foreground mb-4">Live Chat</h2>
                     <p className="text-muted-foreground text-lg leading-relaxed">
@@ -285,7 +285,16 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
                     </p>
                   </div>
                   
-                  <div className="space-y-6">
+                  {/* Make a feature not available for now */}
+                  <div className='w-full h-full flex justify-center border border-red-500 px-4 py-10 bg-red-500/10 rounded-xl items-center text-center'>
+                    <p className='text-muted-foreground text-lg leading-relaxed'>
+                      This feature is not available for now.
+                      <br />
+                      It's coming soon!
+                    </p>
+                  </div>
+
+                  {/* <div className="space-y-6">
                     <motion.button
                       variants={buttonVariants}
                       whileHover="hover"
@@ -311,7 +320,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
                         <span className="text-sm text-green-600 font-medium">Usually online</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </motion.div>
@@ -343,7 +352,7 @@ const ContactHome: React.FC<ContactHomeProps> = ({ token }) => {
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
-                      href="mailto:your-email@example.com"
+                      href="mailto:amaramohamedb@gmail.com"
                       className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 px-8 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group/btn"
                     >
                       <Mail className="w-6 h-6 group-hover/btn:animate-bounce" />

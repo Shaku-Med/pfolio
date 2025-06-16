@@ -427,7 +427,7 @@ export function FileUpload({
     formData.append('fileType', file.type);
 
     // Upload the main file first
-    const response = await fetch('http://192.168.1.92:3002/upload', {
+    const response = await fetch('https://fileserver.medzyamara.dev/upload', {
       method: 'POST',
       body: formData,
       credentials: 'include',
@@ -488,7 +488,7 @@ export function FileUpload({
           thumbnailFormData.append('owner_id', outsideAdmin ? localStorage.getItem(`c_usr`) : isAdmin ? isAdmin?.user_id : Cookies.get('id') || '');
           thumbnailFormData.append('index', i.toString());
 
-          const thumbnailResponse = await fetch('http://192.168.1.92:3002/upload', {
+          const thumbnailResponse = await fetch('https://fileserver.medzyamara.dev/upload', {
             method: 'POST',
             body: thumbnailFormData,
             credentials: 'include',
@@ -563,7 +563,7 @@ export function FileUpload({
           thumbnailFormData.append('owner_id', outsideAdmin ? localStorage.getItem(`c_usr`) : isAdmin ? isAdmin?.user_id : Cookies.get('id') || '');
           thumbnailFormData.append('index', i.toString());
 
-          const thumbnailResponse = await fetch('http://192.168.1.92:3002/upload', {
+          const thumbnailResponse = await fetch('https://fileserver.medzyamara.dev/upload', {
             method: 'POST',
             body: thumbnailFormData,
             credentials: 'include',
@@ -658,7 +658,7 @@ export function FileUpload({
       formData.append('index', i.toString());
       formData.append('fileType', file.type);
 
-      const response = await fetch('http://192.168.1.92:3002/upload', {
+      const response = await fetch('https://fileserver.medzyamara.dev/upload', {
         method: 'POST',
         body: formData,
         credentials: 'include',
