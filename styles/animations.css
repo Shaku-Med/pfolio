@@ -1,0 +1,68 @@
+@keyframes heartPulse {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  30% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+  60% { transform: scale(1.1) rotate(-10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+}
+
+@keyframes heartGlow {
+  0%, 100% { box-shadow: 0 0 0px var(--heart-color-40); }
+  50% { box-shadow: 0 0 60px var(--heart-color-80); }
+}
+
+@keyframes particleExplode {
+  0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 1; }
+  20% { transform: translate(var(--x), var(--y)) scale(1.5) rotate(180deg); opacity: 1; }
+  50% { transform: translate(var(--x), var(--y)) scale(1) rotate(360deg); opacity: 0.8; }
+  80% { transform: translate(var(--x), var(--y)) scale(0.5) rotate(540deg); opacity: 0.3; }
+  100% { transform: translate(var(--x), var(--y)) scale(0) rotate(720deg); opacity: 0; }
+}
+
+@keyframes shockwave {
+  0% { transform: scale(0) rotate(0deg); opacity: 0.8; }
+  30% { transform: scale(3) rotate(180deg); opacity: 0.6; }
+  70% { transform: scale(5) rotate(360deg); opacity: 0.3; }
+  100% { transform: scale(8) rotate(540deg); opacity: 0; }
+}
+
+@keyframes conicSpin {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  25% { transform: scale(1.5) rotate(90deg); opacity: 0.7; }
+  50% { transform: scale(2.5) rotate(180deg); opacity: 0.4; }
+  100% { transform: scale(4) rotate(270deg); opacity: 0; }
+}
+
+@keyframes radialBloom {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(2) rotate(-90deg); opacity: 0.3; }
+  100% { transform: scale(3) rotate(-180deg); opacity: 0; }
+}
+
+.heart-main {
+  animation: heartPulse 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.heart-glow {
+  animation: heartGlow 1.5s ease-in-out infinite alternate;
+}
+
+.particle {
+  animation: particleExplode 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.shockwave {
+  animation: shockwave 1.5s ease-out forwards;
+}
+
+.shockwave-1 { animation-delay: 0s; }
+.shockwave-2 { animation-delay: 0.1s; }
+.shockwave-3 { animation-delay: 0.2s; }
+.shockwave-4 { animation-delay: 0.3s; }
+
+.conic-spin {
+  animation: conicSpin 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.radial-bloom {
+  animation: radialBloom 1.2s ease-out 0.2s forwards;
+} 

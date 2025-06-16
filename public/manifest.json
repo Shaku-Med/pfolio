@@ -1,52 +1,156 @@
 {
-    "short_name": "Medzy",
-    "name": "Medzy",
-    "icons": [{
-            "src": "https://medzyamara.dev/fav_16.png",
-            "sizes": "16x16",
-            "type": "image/x-icon"
-        },
-        {
-            "src": "https://medzyamara.dev/fav_32.png",
-            "type": "image/png",
-            "sizes": "32x32"
-        },
-        {
-            "src": "https://medzyamara.dev/fav_180.png",
-            "type": "image/png",
-            "sizes": "180x180"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "72x72"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "96x96"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "128x128"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "144x144"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "192x192"
-        },
-        {
-            "src": "https://medzyamara.dev/favicon.png",
-            "type": "image/png",
-            "sizes": "512x512"
-        }
-    ],
+    "name": "Mohamed Amara - Portfolio",
+    "short_name": "M. Amara",
+    "description": "Software Developer and Computer Science student at College of Staten Island. Specializing in AI/ML development, web applications, mobile apps, and desktop solutions. Available for hire.",
     "start_url": "/",
-    "display": "standalone"
-}
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en-US",
+    "dir": "ltr",
+    "categories": ["productivity", "business", "education"],
+    "icons": [
+      {
+        "src": "/Icons/web/icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/Icons/web/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/Icons/web/icon-192-maskable.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "/Icons/web/icon-512-maskable.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "/Icons/web/apple-touch-icon.png",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "any"
+      }
+    ],
+    "screenshots": [
+      {
+        "src": "/Icons/web/screenshots/desktop-portfolio.png",
+        "sizes": "1280x720",
+        "type": "image/png",
+        "form_factor": "wide",
+        "label": "Mohamed Amara's portfolio home screen on desktop"
+      },
+      {
+        "src": "/Icons/web/screenshots/mobile-projects.png",
+        "sizes": "414x896",
+        "type": "image/png",
+        "form_factor": "narrow",
+        "label": "Projects showcase on mobile"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "View Projects",
+        "short_name": "Projects",
+        "description": "Explore my software projects and AI/ML work",
+        "url": "/projects",
+        "icons": [
+          {
+            "src": "/Icons/web/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          }
+        ]
+      },
+      {
+        "name": "Contact Me",
+        "short_name": "Contact",
+        "description": "Get in touch for opportunities",
+        "url": "/contact",
+        "icons": [
+          {
+            "src": "/Icons/web/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          }
+        ]
+      },
+      {
+        "name": "Resume",
+        "short_name": "Resume",
+        "description": "View my professional resume",
+        "url": "/resume",
+        "icons": [
+          {
+            "src": "/Icons/web/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          }
+        ]
+      },
+      {
+        "name": "Skills",
+        "short_name": "Skills",
+        "description": "Technical skills and expertise",
+        "url": "/skills",
+        "icons": [
+          {
+            "src": "/Icons/web/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          }
+        ]
+      }
+    ],
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "edge_side_panel": {
+      "preferred_width": 400
+    },
+    "launch_handler": {
+      "client_mode": "navigate-existing"
+    },
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+    "protocol_handlers": [
+      {
+        "protocol": "web+portfolio",
+        "url": "/handle?url=%s"
+      }
+    ],
+    "file_handlers": [
+      {
+        "action": "/contact",
+        "accept": {
+          "application/pdf": [".pdf"],
+          "text/plain": [".txt"],
+          "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+        }
+      }
+    ],
+    "share_target": {
+      "action": "/contact",
+      "method": "POST",
+      "enctype": "multipart/form-data",
+      "params": {
+        "title": "title",
+        "text": "text",
+        "url": "url",
+        "files": [
+          {
+            "name": "files",
+            "accept": ["application/pdf", "text/plain", "image/*"]
+          }
+        ]
+      }
+    },
+    "background_color": "#000"
+  }
