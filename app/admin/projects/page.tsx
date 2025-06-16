@@ -34,6 +34,7 @@ export interface Project {
   priority: string;
   category: string;
   technologies: string[];
+  project_files?: any[]
 }
 
 export interface Skill {

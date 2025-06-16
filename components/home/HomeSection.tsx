@@ -364,11 +364,13 @@ const HomeSection: React.FC<HomeSectionProps> = ({skills, posts}) => {
               </div>
               
               <div className="flex justify-center items-center mt-8 gap-4 z-[100]">
-                <Button variant="outline" className="group rounded-2xl px-6 py-3 transition-all duration-300">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  View My Posts
-                  <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <Link href="/posts">
+                  <Button variant="outline" className="group rounded-2xl px-6 py-3 transition-all duration-300">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    View My Posts
+                    <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
                 
                 <TooltipProvider>
                   <Tooltip>

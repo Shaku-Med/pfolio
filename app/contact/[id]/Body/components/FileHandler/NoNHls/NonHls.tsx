@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { Message as MessageType } from '@/app/contact/[id]/context/types'
+import { cn } from '@/lib/utils'
 
 interface NonHlsProps {
     message?: MessageType
@@ -103,7 +104,12 @@ const NonHls = ({ message, isPreview = false, endpoint = '/api/chat/messages/fil
 
         if (fileType.startsWith('image/')) {
             return (
-                <div className={`relative group overflow-hidden ${isPreview ? 'w-full h-full' : 'rounded-2xl border border-gray-200'}`}>
+                <div className={
+                    cn(
+                        'w-full h-full object-contain',
+                        className
+                    )
+                }>
                     <img 
                         src={fileUrl} 
                         alt="Preview" 

@@ -125,7 +125,7 @@ export const ContextProviderWrapper = ({ children, socketToken, socketAuth, user
           return;
         }
       }
-      obJ()
+      // obJ()
     } catch (error) {
       console.error(error);
     }

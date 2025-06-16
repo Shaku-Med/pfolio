@@ -287,7 +287,7 @@ const Nav: React.FC<NavProps> = () => {
               <div className="hidden lg:flex items-center space-x-3">
                 <TimeDisplay />
 
-                <NotificationButton count={notifications} />
+                {/* <NotificationButton count={notifications} /> */}
 
                 <div className="flex items-center space-x-2">
                   {isOnline ? (
