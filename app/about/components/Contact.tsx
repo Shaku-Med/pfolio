@@ -15,7 +15,7 @@ export const Contact: React.FC = () => {
       className="bg-gradient-to-r from-card/20 via-accent/20 to-card/20 p-6 sm:p-12 rounded-3xl shadow-2xl backdrop-blur-sm border border-border/50"
     >
       <div className="text-center mb-8 sm:mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-card to-accent bg-clip-text text-transparent">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 ">
           Let's Build Something Amazing
         </h2>
         <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">

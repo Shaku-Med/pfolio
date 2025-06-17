@@ -22,6 +22,136 @@ import Link from 'next/link'
 import DeleteButton from './edit/components/DeleteButton'
 import { MarkdownPreview } from '@/app/admin/experience/[id]/edit/components/MarkdownPreview'
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  try {
+    let {id} = await params
+    if(!id) return {}
+    // 
+    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'location', 'type', 'task_completed', 'long_description'], {}, [id])
+    if(!experience || experience.length === 0) return {}
+    const exp = experience[0]
+ 
+    const cleanDescription = exp.description?.replace(/\n+/g, ' ').trim() || `${exp.position} at ${exp.company} - Professional experience by Mohamed Amara`;
+    const startDate = new Date(exp.start).getFullYear();
+    const endDate = exp.is_present ? 'Present' : new Date(exp.end).getFullYear();
+    const duration = exp.is_present ? `${startDate} - Present` : `${startDate} - ${endDate}`;
+    const experienceType = exp.type?.charAt(0).toUpperCase() + exp.type?.slice(1) || 'Experience';
+    
+    return {
+      title: {
+        absolute: `${exp.position} at ${exp.company} - Mohamed Amara | Medzy Amara`
+      },
+      description: `${cleanDescription} (${duration}) - ${exp.location}. ${experienceType} experience showcasing ${exp.sub_title} development skills.`.slice(0, 160),
+      keywords: [
+        `${exp.position}`,
+        `${exp.company}`,
+        'Mohamed Amara experience',
+        exp.sub_title,
+        exp.type,
+        'professional experience',
+        'software development',
+        'tech career',
+        exp.location,
+        `${exp.company} developer`,
+        `${exp.position} experience`,
+        'career journey',
+        'work experience',
+        'professional growth'
+      ].filter(Boolean),
+      authors: [{ name: 'Mohamed Amara' }],
+      creator: 'Mohamed Amara',
+      publisher: 'Mohamed Amara',
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
+      openGraph: {
+        title: `${exp.position} at ${exp.company} | Mohamed Amara`,
+        description: `${cleanDescription} Professional ${exp.type} experience (${duration}) showcasing expertise in ${exp.sub_title} development.`,
+        url: `/experience/${id}`,
+        siteName: 'Mohamed Amara - Professional Experience',
+        images: [
+          {
+            url: `/Icons/web/OgImages/og-experience.png`,
+            width: 1200,
+            height: 630,
+            alt: `${exp.position} at ${exp.company} - Mohamed Amara Experience`,
+          },
+        ],
+        locale: 'en_US',
+        type: 'profile',
+        profile: {
+          firstName: 'Mohamed',
+          lastName: 'Amara',
+          username: 'medzyamara',
+        }
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${exp.position} at ${exp.company} | Mohamed Amara`,
+        description: `${experienceType} experience in ${exp.sub_title} development (${duration}). ${cleanDescription.slice(0, 100)}...`,
+        images: [`/Icons/web/OgImages/og-experience.png`],
+        creator: '@medzyamara',
+        site: '@medzyamara',
+      },
+      alternates: {
+        canonical: `/experience/${id}`,
+      },
+      category: `${experienceType} Experience`,
+      classification: 'Professional Experience',
+      other: {
+        'profile:first_name': 'Mohamed',
+        'profile:last_name': 'Amara',
+        'profile:username': 'medzyamara',
+        'article:author': 'Mohamed Amara',
+        'article:section': 'Experience',
+        'job:title': exp.position,
+        'job:company': exp.company,
+        'job:location': exp.location,
+        'job:type': exp.type,
+        'job:start_date': exp.start,
+        'job:end_date': exp.is_present ? 'present' : exp.end,
+        'job:is_current': exp.is_present.toString(),
+        'job:duration': duration,
+        'job:specialty': exp.sub_title,
+        'job:tasks_count': exp.task_completed?.length?.toString() || '0',
+      }
+    }
+  }
+  catch {
+    return {
+      title: {
+        absolute: 'Experience - Mohamed Amara | Medzy Amara'
+      },
+      description: 'Explore Mohamed Amara\'s professional experience in software development, AI, and cybersecurity. Discover roles, projects, and growth in the tech industry.',
+      keywords: ['Mohamed Amara experience', 'software developer experience', 'professional experience', 'tech career'],
+      openGraph: {
+        title: 'Experience - Mohamed Amara | Professional Journey',
+        description: 'Learn about Mohamed\'s professional experience and career development in technology.',
+        url: '/experience',
+        siteName: 'Mohamed Amara Experience',
+        type: 'profile',
+      },
+      twitter: {
+        card: 'summary',
+        title: 'Experience - Mohamed Amara | Tech Career',
+        description: 'Professional experience and career journey in software development.',
+        creator: '@medzyamara',
+      },
+      alternates: {
+        canonical: '/experience',
+      }
+    }
+  }
+ }
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   return format(date, 'MMM yyyy')

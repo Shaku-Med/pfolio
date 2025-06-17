@@ -62,6 +62,8 @@ export interface Gallery {
   fileData: any
   created_at: string;
   user_id: string;
+  isVideo?: boolean;
+  updated_at?: string;
 }
 
 export interface Experience {

@@ -20,20 +20,14 @@ import {
   ZoomOut,
   RotateCw,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Copy,
+  Check
 } from 'lucide-react'
 import * as mammoth from 'mammoth'
 import { Alert, AlertDescription } from './components/ui/alert'
 import { ScrollArea } from './components/ui/scroll-area'
 import DOMPurify from 'dompurify'
-
-// React PDF Viewer imports
-import { Viewer, Worker } from '@react-pdf-viewer/core'
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
-
-// Import styles
-import '@react-pdf-viewer/core/lib/styles/index.css'
-import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 
 interface DocumentInfo {
   title: string
@@ -46,14 +40,15 @@ interface DocumentInfo {
 
 const DocumentViewer = () => {
   const [zoomLevel, setZoomLevel] = useState(100)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [documentUrl] = useState(`${window.location.origin}/resume.pdf`)
+  const [documentUrl, setDocumentUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [previewContent, setPreviewContent] = useState<string>('')
   const [previewType, setPreviewType] = useState<'html' | 'image' | 'pdf' | 'text'>('text')
   const [previewUrl, setPreviewUrl] = useState<string>('')
-  const [pdfFileUrl, setPdfFileUrl] = useState<string>('')
+  const [copySuccess, setCopySuccess] = useState(false)
+  const [fileBlob, setFileBlob] = useState<Blob | null>(null)
+  const [isClipboardSupported, setIsClipboardSupported] = useState(false)
   const [documentInfo, setDocumentInfo] = useState<DocumentInfo>({
     title: "Sample Document",
     author: "Unknown",
@@ -63,13 +58,31 @@ const DocumentViewer = () => {
     fileType: "PDF"
   })
 
-  // Create plugin instance
-  const defaultLayoutPluginInstance = defaultLayoutPlugin({
-    sidebarTabs: (defaultTabs) => [
-      defaultTabs[0], // Thumbnail tab
-      defaultTabs[1], // Bookmark tab
-    ],
-  })
+  // Check clipboard API support on component mount
+  useEffect(() => {
+    const checkClipboardSupport = async () => {
+      try {
+        // Check if the clipboard API is available
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          // Try a simple write to verify it works
+          await navigator.clipboard.writeText('test')
+          setIsClipboardSupported(true)
+        } else {
+          setIsClipboardSupported(false)
+        }
+      } catch (err) {
+        setIsClipboardSupported(false)
+      }
+    }
+
+    checkClipboardSupport()
+  }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setDocumentUrl(`${window.location.origin}/resume.pdf`)
+    }
+  }, [])
 
   const handleZoomIn = () => {
     setZoomLevel(prev => Math.min(prev + 25, 200))
@@ -111,6 +124,46 @@ const DocumentViewer = () => {
     }
   }
 
+  const handleDownload = () => {
+    if (!fileBlob) return
+    
+    const url = URL.createObjectURL(fileBlob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'mohamed_amara_resume.pdf'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleCopyToClipboard = async () => {
+    if (!fileBlob) return
+
+    try {
+      // Check if clipboard API is available
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        throw new Error('Clipboard API not available')
+      }
+
+      // Convert blob to base64
+      const reader = new FileReader()
+      reader.readAsDataURL(fileBlob)
+      reader.onloadend = async () => {
+        try {
+          const base64data = reader.result as string
+          await navigator.clipboard.writeText(base64data)
+          setCopySuccess(true)
+          setTimeout(() => setCopySuccess(false), 2000)
+        } catch (err) {
+          setError('Failed to copy to clipboard')
+        }
+      }
+    } catch (err) {
+      setError('Clipboard functionality not available in this browser')
+    }
+  }
+
   const loadDocument = async () => {
     if (!documentUrl.trim()) {
       setError('Please enter a valid URL')
@@ -121,7 +174,7 @@ const DocumentViewer = () => {
     setError('')
     setPreviewContent('')
     setPreviewUrl('')
-    setPdfFileUrl('')
+    setFileBlob(null)
 
     try {
       let url = `/api/resume?url=${encodeURIComponent(documentUrl)}`
@@ -145,6 +198,7 @@ const DocumentViewer = () => {
       })
 
       const blob = await response.blob()
+      setFileBlob(blob)
       const objectUrl = URL.createObjectURL(blob)
       setPreviewUrl(objectUrl)
 
@@ -160,7 +214,6 @@ const DocumentViewer = () => {
       } else if (fileType === 'Image') {
         setPreviewType('image')
       } else if (fileType === 'PDF') {
-        setPdfFileUrl(objectUrl)
         setPreviewType('pdf')
       } else {
         setPreviewContent(`Preview not available for ${fileType} files.`)
@@ -178,7 +231,7 @@ const DocumentViewer = () => {
     if (documentUrl) {
       loadDocument()
     }
-  }, [])
+  }, [documentUrl])
 
   // Cleanup blob URLs on unmount
   useEffect(() => {
@@ -186,15 +239,12 @@ const DocumentViewer = () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
       }
-      if (pdfFileUrl) {
-        URL.revokeObjectURL(pdfFileUrl)
-      }
     }
-  }, [previewUrl, pdfFileUrl])
+  }, [previewUrl])
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <div className="w-full px-4">
+    <div className="flex min-h-full bg-background items-center justify-center">
+      <div className="w-full px-4 container">
         <div className="w-full">
           <div className="w-full">
             <Card className="h-[calc(100vh-4rem)] bg-transparent border-none rounded-none w-full relative border">
@@ -214,51 +264,77 @@ const DocumentViewer = () => {
 
               {!isLoading && !error && (
                 <>
-                  {previewType === 'html' && (
-                    <ScrollArea className="h-full p-4">
-                      <div 
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: previewContent }}
-                      />
-                    </ScrollArea>
-                  )}
-                  
-                  {previewType === 'text' && (
-                    <ScrollArea className="h-full">
-                      <pre className="p-4 whitespace-pre-wrap font-mono text-sm">
-                        {previewContent}
-                      </pre>
-                    </ScrollArea>
-                  )}
-                  
-                  {previewType === 'image' && previewUrl && (
-                    <div className="flex items-center justify-center p-4 h-full">
-                      <img 
-                        src={previewUrl} 
-                        alt="Document preview" 
-                        className="max-w-full max-h-full object-contain"
-                        style={{ transform: `scale(${zoomLevel / 100})` }}
-                      />
-                    </div>
-                  )}
-                  
-                  {previewType === 'pdf' && pdfFileUrl && (
-                    <div className="h-full w-full">
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer
-                          theme={'dark'}
-                          fileUrl={pdfFileUrl}
-                          plugins={[defaultLayoutPluginInstance]}
-                          onDocumentLoad={(e) => {
-                            setDocumentInfo(prev => ({
-                              ...prev,
-                              pages: e.doc.numPages
-                            }))
-                          }}
+                  <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background/80 p-2 rounded-lg shadow-lg">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownload}
+                      className="flex items-center gap-2 transition-colors"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span className="hidden sm:inline">Download</span>
+                    </Button>
+                    {isClipboardSupported && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyToClipboard}
+                        className="flex items-center gap-2 transition-colors"
+                      >
+                        {copySuccess ? (
+                          <>
+                            <Check className="h-4 w-4" />
+                            <span className="hidden sm:inline">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            <span className="hidden sm:inline">Copy</span>
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="pt-16"> {/* Add padding to prevent content from going under the buttons */}
+                    {previewType === 'html' && (
+                      <ScrollArea className="h-[calc(100vh-8rem)] p-4">
+                        <div 
+                          className="prose max-w-none"
+                          dangerouslySetInnerHTML={{ __html: previewContent }}
                         />
-                      </Worker>
-                    </div>
-                  )}
+                      </ScrollArea>
+                    )}
+                    
+                    {previewType === 'text' && (
+                      <ScrollArea className="h-[calc(100vh-8rem)]">
+                        <pre className="p-4 whitespace-pre-wrap font-mono text-sm">
+                          {previewContent}
+                        </pre>
+                      </ScrollArea>
+                    )}
+                    
+                    {previewType === 'image' && previewUrl && (
+                      <div className="flex items-center justify-center p-4 h-[calc(100vh-8rem)]">
+                        <img 
+                          src={previewUrl} 
+                          alt="Document preview" 
+                          className="max-w-full max-h-full object-contain"
+                          style={{ transform: `scale(${zoomLevel / 100})` }}
+                        />
+                      </div>
+                    )}
+                    
+                    {previewType === 'pdf' && previewUrl && (
+                      <div className="h-[calc(100vh-8rem)] w-full">
+                        <iframe
+                          src={previewUrl}
+                          className="w-full h-full border-none"
+                          title="PDF Viewer"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </Card>

@@ -21,6 +21,158 @@ import {
   Lightbulb
 } from "lucide-react"
 import Link from 'next/link'
+import { Metadata } from 'next'
+
+
+function determineSkillCategory(skillName: string): string {
+  const skillLower = skillName.toLowerCase();
+  
+  if (skillLower.includes('python') || skillLower.includes('javascript') || skillLower.includes('typescript') || skillLower.includes('java') || skillLower.includes('c++')) {
+    return 'Programming Language';
+  }
+  if (skillLower.includes('react') || skillLower.includes('next') || skillLower.includes('vue') || skillLower.includes('angular')) {
+    return 'Frontend Framework';
+  }
+  if (skillLower.includes('node') || skillLower.includes('express') || skillLower.includes('django') || skillLower.includes('flask')) {
+    return 'Backend Framework';
+  }
+  if (skillLower.includes('aws') || skillLower.includes('azure') || skillLower.includes('gcp') || skillLower.includes('docker')) {
+    return 'Cloud Technology';
+  }
+  if (skillLower.includes('security') || skillLower.includes('penetration') || skillLower.includes('ethical') || skillLower.includes('cyber')) {
+    return 'Cybersecurity';
+  }
+  if (skillLower.includes('ai') || skillLower.includes('machine') || skillLower.includes('neural') || skillLower.includes('ml')) {
+    return 'AI/Machine Learning';
+  }
+  if (skillLower.includes('database') || skillLower.includes('sql') || skillLower.includes('mongodb') || skillLower.includes('postgres')) {
+    return 'Database Technology';
+  }
+  
+  return 'Technical Skill';
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  try {
+    let {id} = await params
+    if(!id) return {}
+    let skills = await getSkills(1, ['id', 'name', 'description', 'level', 'color', 'created_at'], {}, [id])
+    if(!skills || skills.length === 0) return {}
+    const skill = skills[0]
+ 
+    const cleanDescription = skill.description?.replace(/\n+/g, ' ').trim() || `${skill.name} - A skill mastered by Mohamed Amara with ${skill.level}% proficiency`;
+    const proficiencyLevel = skill.level >= 90 ? 'Expert' : skill.level >= 75 ? 'Advanced' : skill.level >= 50 ? 'Intermediate' : 'Beginner';
+    const skillCategory = determineSkillCategory(skill.name);
+    
+    return {
+      title: {
+        absolute: `${skill.name} - Skills | Mohamed Amara | Medzy Amara`
+      },
+      description: `${cleanDescription} - ${proficiencyLevel} level (${skill.level}%) expertise in ${skill.name} demonstrated through practical projects and professional experience.`.slice(0, 160),
+      keywords: [
+        `${skill.name}`,
+        `Mohamed Amara ${skill.name}`,
+        `${skill.name} skills`,
+        `${skill.name} expertise`,
+        proficiencyLevel,
+        `${skill.level}% proficiency`,
+        skillCategory,
+        'technical skills',
+        'software development',
+        'programming skills',
+        'developer expertise',
+        'professional skills',
+        'tech skills portfolio',
+        'skill mastery'
+      ].filter(Boolean),
+      authors: [{ name: 'Mohamed Amara' }],
+      creator: 'Mohamed Amara',
+      publisher: 'Mohamed Amara',
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
+      openGraph: {
+        title: `${skill.name} - ${proficiencyLevel} Level | Mohamed Amara`,
+        description: `${cleanDescription} Demonstrated ${proficiencyLevel.toLowerCase()} expertise (${skill.level}%) through hands-on projects and professional application.`,
+        url: `/skills/${id}`,
+        siteName: 'Mohamed Amara - Technical Skills',
+        images: [
+          {
+            url: `/Icons/web/OgImages/og-skills.png`,
+            width: 1200,
+            height: 630,
+            alt: `${skill.name} - ${proficiencyLevel} Level Skill by Mohamed Amara`,
+          },
+        ],
+        locale: 'en_US',
+        type: 'profile',
+        firstName: 'Mohamed',
+        lastName: 'Amara',
+        username: 'medzyamara',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${skill.name} | ${proficiencyLevel} Level - Mohamed Amara`,
+        description: `${skill.level}% proficiency in ${skill.name}. ${cleanDescription.slice(0, 100)}...`,
+        images: [`/Icons/web/OgImages/og-skills.png`],
+        creator: '@medzyamara',
+        site: '@medzyamara',
+      },
+      alternates: {
+        canonical: `/skills/${id}`,
+      },
+      category: `${skillCategory} Skill`,
+      classification: 'Technical Skill',
+      other: {
+        'profile:first_name': 'Mohamed',
+        'profile:last_name': 'Amara',
+        'profile:username': 'medzyamara',
+        'article:author': 'Mohamed Amara',
+        'article:section': 'Skills',
+        'skill:name': skill.name,
+        'skill:level': skill.level.toString(),
+        'skill:proficiency': proficiencyLevel,
+        'skill:category': skillCategory,
+        'skill:created': skill.created_at,
+        'skill:color': skill.color,
+        'skill:description': cleanDescription,
+      }
+    }
+  }
+  catch {
+    return {
+      title: {
+        absolute: 'Skill - Mohamed Amara | Medzy Amara'
+      },
+      description: 'Explore Mohamed Amara\'s technical skills and expertise in software development, AI, cybersecurity, and modern technologies.',
+      keywords: ['Mohamed Amara skills', 'technical expertise', 'software development skills', 'programming skills'],
+      openGraph: {
+        title: 'Skill - Mohamed Amara | Technical Expertise',
+        description: 'Learn about Mohamed\'s technical skills and professional capabilities.',
+        url: '/skills',
+        siteName: 'Mohamed Amara Skills',
+        type: 'profile',
+      },
+      twitter: {
+        card: 'summary',
+        title: 'Skill - Mohamed Amara | Tech Expertise',
+        description: 'Technical skills and expertise in modern development.',
+        creator: '@medzyamara',
+      },
+      alternates: {
+        canonical: '/skills',
+      }
+    }
+  }
+ }
 
 const getSkillIcon = (skillName: string) => {
   const name = skillName.toLowerCase()

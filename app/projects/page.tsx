@@ -7,6 +7,129 @@ import AnimatedHeader from './components/AnimatedHeader'
 import SearchForm from './components/SearchForm'
 import Pagination from './components/Pagination'
 import { getProjects } from '../admin/projects/page'
+import { Metadata, ResolvedMetadata } from 'next'
+
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export async function generateMetadata({searchParams}: Props, parent: ResolvedMetadata): Promise<Metadata> {
+  try {
+    const params = await searchParams;
+    const currentPage = Number(params.page) || 1;
+    const search = params.search as string || '';
+ 
+    const baseTitle = 'Projects - Mohamed Amara';
+    const searchSuffix = search ? ` - ${search}` : '';
+    const pageSuffix = currentPage > 1 ? ` - Page ${currentPage}` : '';
+    const fullTitle = `${baseTitle}${searchSuffix}${pageSuffix}`;
+ 
+    const baseDescription = "Explore Mohamed Amara's portfolio of projects spanning AI development, cybersecurity solutions, full-stack web applications, mobile apps, and desktop software. From machine learning models to secure web platforms, discover how I turn ideas into reality with clean code and innovative solutions.";
+    const searchDescription = search ? `Projects filtered by "${search}" - ${baseDescription}` : baseDescription;
+    const pageDescription = currentPage > 1 ? `Page ${currentPage} of Mohamed Amara's projects. ${searchDescription}` : searchDescription;
+ 
+    return {
+      title: {
+        absolute: fullTitle
+      },
+      description: pageDescription,
+      keywords: [
+        'Mohamed Amara projects',
+        'AI projects',
+        'machine learning applications',
+        'cybersecurity solutions',
+        'full stack web apps',
+        'mobile applications',
+        'desktop software',
+        'React projects',
+        'Next.js applications',
+        'Python AI models',
+        'TypeScript projects',
+        'open source projects',
+        'student developer portfolio',
+        'software engineering projects',
+        'web development portfolio',
+        search ? `${search} projects` : null,
+        currentPage > 1 ? `page ${currentPage}` : null
+      ].filter((keyword): keyword is string => keyword !== null),
+      authors: [{ name: 'Mohamed Amara' }],
+      creator: 'Mohamed Amara',
+      publisher: 'Mohamed Amara',
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
+      openGraph: {
+        title: fullTitle,
+        description: pageDescription,
+        url: `https://medzyamara.dev/projects${search ? `?search=${encodeURIComponent(search)}` : ''}${currentPage > 1 ? `${search ? '&' : '?'}page=${currentPage}` : ''}`,
+        siteName: 'Mohamed Amara - Developer Portfolio',
+        images: [
+          {
+            url: `/Icons/web/OgImages/og-projects.png`,
+            width: 1200,
+            height: 630,
+            alt: search ? `Mohamed Amara ${search} Projects` : 'Mohamed Amara Projects Portfolio',
+          },
+        ],
+        locale: 'en_US',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: fullTitle,
+        description: pageDescription,
+        images: ['/Icons/web/OgImages/og-projects.png'],
+        creator: '@medzyamara',
+        site: '@medzyamara',
+      },
+      alternates: {
+        canonical: `https://medzyamara.dev/projects${search ? `?search=${encodeURIComponent(search)}` : ''}${currentPage > 1 ? `${search ? '&' : '?'}page=${currentPage}` : ''}`,
+      },
+      category: 'Projects Portfolio',
+      classification: 'Portfolio',
+      other: {
+        'profile:first_name': 'Mohamed',
+        'profile:last_name': 'Amara',
+        'profile:username': 'medzyamara',
+        ...(search && { 'article:tag': search }),
+        ...(currentPage > 1 && { 'article:section': `Page ${currentPage}` }),
+      }
+    }
+  }
+  catch {
+    return {
+      title: {
+        absolute: `Projects - Mohamed Amara`
+      },
+      description: "Explore Mohamed Amara's diverse portfolio of AI, cybersecurity, web, mobile, and desktop applications. Discover innovative projects built with modern technologies and clean code practices.",
+      keywords: ['Mohamed Amara projects', 'developer portfolio', 'AI projects', 'cybersecurity solutions', 'full stack applications'],
+      openGraph: {
+        title: 'Projects - Mohamed Amara | Developer Portfolio',
+        description: "Check out Mohamed's collection of AI-powered applications, security tools, and full-stack projects that showcase modern development practices.",
+        url: 'https://medzyamara.dev/projects',
+        siteName: 'Mohamed Amara Portfolio',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Projects - Mohamed Amara | Innovation Meets Code',
+        description: 'Discover projects that blend AI, security, and user experience into practical solutions.',
+        creator: '@medzyamara',
+      },
+      alternates: {
+        canonical: 'https://medzyamara.dev/projects',
+      }
+    }
+  }
+ }
 
 const ProjectPage = async ({
   searchParams,

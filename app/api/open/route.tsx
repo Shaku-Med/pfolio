@@ -16,6 +16,7 @@ export async function GET(request: Request) {
         let isAdmin: any = await IsAuth(true)
         
         const { searchParams } = new URL(request.url);
+        console.log(request.url)
         let id = searchParams.get('id')
 
         if(!id){

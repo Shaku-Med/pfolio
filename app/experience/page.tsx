@@ -19,6 +19,90 @@ import {
 } from "lucide-react"
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: {
+    absolute: 'My Experience - Mohamed Amara | Medzy Amara'
+  },
+  description: "Explore Mohamed Amara's professional journey from computer science student to AI developer and cybersecurity enthusiast. Discover my experience with machine learning projects, full-stack development, security implementations, and open-source contributions that showcase growth, innovation, and technical expertise.",
+  keywords: [
+    'Mohamed Amara experience',
+    'software developer experience',
+    'AI developer background',
+    'cybersecurity experience',
+    'computer science student',
+    'CUNY student developer',
+    'machine learning projects',
+    'full stack development experience',
+    'Python AI development',
+    'React development experience',
+    'cybersecurity projects',
+    'open source contributions',
+    'tech internships',
+    'programming experience',
+    'Staten Island developer',
+    'student developer journey',
+    'coding bootcamp',
+    'self-taught developer',
+    'tech skills development',
+    'software engineering experience'
+  ],
+  authors: [{ name: 'Mohamed Amara' }],
+  creator: 'Mohamed Amara',
+  publisher: 'Mohamed Amara',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: 'My Experience - Mohamed Amara | From Student to Developer',
+    description: 'Follow Mohamed\'s journey through computer science, AI development, and cybersecurity. From academic projects to real-world applications, discover the experiences that shaped a passionate developer.',
+    url: '/experience',
+    siteName: 'Mohamed Amara - Professional Experience',
+    images: [
+      {
+        url: `/Icons/web/OgImages/og-experience.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Mohamed Amara Professional Experience - AI Developer & Security Expert',
+      },
+    ],
+    locale: 'en_US',
+    type: 'profile',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'My Experience - Mohamed Amara | Developer Journey',
+    description: 'Discover the experiences, projects, and growth that define Mohamed\'s path as a student developer specializing in AI and cybersecurity.',
+    images: ['/Icons/web/OgImages/og-experience.png'],
+    creator: '@medzyamara',
+    site: '@medzyamara',
+  },
+  alternates: {
+    canonical: '/experience',
+  },
+  category: 'Professional Experience',
+  classification: 'Resume',
+  other: {
+    'profile:first_name': 'Mohamed',
+    'profile:last_name': 'Amara',
+    'profile:username': 'medzyamara',
+    'profile:gender': 'male',
+    'business:contact_data:locality': 'Staten Island',
+    'business:contact_data:region': 'New York',
+    'business:contact_data:country_name': 'United States',
+    'article:author': 'Mohamed Amara',
+    'article:section': 'Experience',
+  }
+ }
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)

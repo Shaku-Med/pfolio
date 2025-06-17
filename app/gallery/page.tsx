@@ -1,6 +1,13 @@
 import { getGallery } from "@/app/about/components/GetInfos"
 import { ErrorCard } from "../posts/[id]/ErrorCard"
 import MasonryGallery from "./components/GalleryClient"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: {
+    absolute: 'Gallery | Mohamed Amara | Medzy Amara'
+  }
+}
 
 const page = async () => {
   try {
