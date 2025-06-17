@@ -1,4 +1,4 @@
-import { getGallery } from '@/app/about/page'
+import { getGallery } from '@/app/about/components/GetInfos'
 import GalleryComponent from './components/Gallery'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'

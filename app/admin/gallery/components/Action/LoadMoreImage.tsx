@@ -1,6 +1,6 @@
 'use server'
 
-import { getGallery } from "@/app/about/page";
+import { getGallery } from '@/app/about/components/GetInfos';
 
 const LoadMoreImage = async (itemsPerPage?: number, from?: number, to?: number) => {
   try {
