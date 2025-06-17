@@ -62,7 +62,7 @@ const SEO = (): Metadata => {
       siteName: 'Mohamed Amara Portfolio',
       title: 'Mohamed Amara - Software Developer & AI Engineer',
       description: 'Computer Science student and Software Developer specializing in AI/ML, web development, and cross-platform applications. Available for exciting projects and opportunities.',
-      emails: ['medzyamara@gmail.com'],
+      emails: ['amaramohamedb@gmail.com'],
       countryName: 'United States',
       ttl: 604800,
       images: [
@@ -75,11 +75,11 @@ const SEO = (): Metadata => {
           secureUrl: `${baseUrl}/og-image.png`,
         },
         {
-          url: '/Icons/web/profile-photo.jpg',
+          url: '/Icons/profile-photo.png',
           width: 512,
           height: 512,
           alt: 'Mohamed Amara Profile Photo',
-          type: 'image/jpeg',
+          type: 'image/png',
         }
       ]
     },
@@ -112,11 +112,11 @@ const SEO = (): Metadata => {
       statusBarStyle: 'black-translucent',
       startupImage: [
         {
-          url: '/Icons/web/apple-touch-startup-image-768x1004.png',
+          url: '/Icons/web/icon-512.png',
           media: '(device-width: 768px) and (device-height: 1024px)',
         },
         {
-          url: '/Icons/web/apple-touch-startup-image-1536x2008.png',
+          url: '/Icons/web/icon-512.png',
           media: '(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)',
         },
       ],
