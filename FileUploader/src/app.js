@@ -32,13 +32,8 @@ const limiter = rateLimit({
 const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
-            'http://localhost:3000', 
-            'http://localhost:3001',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:3001',
-            'https://spotlight.medzyamara.dev',
-            'https://aws.medzyamara.dev',
             'http://192.168.1.92:3000',
+            'https://medzyamara.dev',
         ];
         
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
