@@ -143,7 +143,6 @@ export const getFeaturedProjects = async (limit: number = 4, select: string[] = 
       if (Object.keys(pagination).length > 0) {
         return shuffled.slice(pagination.from, pagination.to + 1);
       } else {
-        // console.log(shuffled)
         return shuffled.slice(0, limit);
       }
     }

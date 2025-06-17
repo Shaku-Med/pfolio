@@ -1,6 +1,6 @@
 import React from 'react'
 import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
-import { getGallery } from '@/app/about/page'
+import { getGallery } from '@/app/about/components/GetInfos'
 import { GalleryForm } from '../../new/components/GalleryForm'
 
 interface EditPageProps {

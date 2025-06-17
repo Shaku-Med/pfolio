@@ -1,5 +1,5 @@
 import React from 'react'
-import { getExperience } from '@/app/about/page'
+import { getExperience } from '@/app/about/components/GetInfos'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
