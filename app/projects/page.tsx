@@ -7,13 +7,13 @@ import AnimatedHeader from './components/AnimatedHeader'
 import SearchForm from './components/SearchForm'
 import Pagination from './components/Pagination'
 import { getProjects } from '../admin/projects/page'
-import { Metadata, ResolvedMetadata } from 'next'
+import { Metadata } from 'next'
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export async function generateMetadata({searchParams}: Props, parent: ResolvedMetadata): Promise<Metadata> {
+export async function generateMetadata({searchParams}: Props): Promise<Metadata> {
   try {
     const params = await searchParams;
     const currentPage = Number(params.page) || 1;
