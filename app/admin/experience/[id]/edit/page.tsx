@@ -1,6 +1,6 @@
 import React from 'react'
 import { ExperienceForm } from '../../new/components/ExperienceForm'
-import { getExperience } from '@/app/about/page';
+import { getExperience } from '../../../../about/page';
 import Link from 'next/link';
 import DeleteButton from './components/DeleteButton';
 
