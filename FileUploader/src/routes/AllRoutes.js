@@ -89,7 +89,7 @@ const AllRoutes = (req, res, next) => {
             }
             else {
                 res.status(401).send({
-                    message: `Welcome to the file upload api | You need an access token to upload files.`,
+                    message: `Hello User`,
                     access: false,
                     error: true,
                 })
