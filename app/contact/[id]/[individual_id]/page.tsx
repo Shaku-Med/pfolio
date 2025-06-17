@@ -13,7 +13,7 @@ import Body from '@/app/contact/[id]/Body/Body'
 import { Admin, User } from '@/app/contact/[id]/context/types'
 
 type Props = {
-  params: { id: string, individual_id: string }
+  params: Promise<{ id: string, individual_id: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

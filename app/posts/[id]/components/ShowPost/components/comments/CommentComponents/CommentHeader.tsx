@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Menu } from 'lucide-react'
-import { formatNumber } from '../../../../../page'
+import { formatNumber } from '../../../../../utils'
 import { InfoDialog } from '../InfoDialog'
 import { CommentHeaderProps } from './types'
 

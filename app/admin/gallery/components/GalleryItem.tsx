@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Gallery } from '../../projects/page';
-import { ErrorCard } from '@/app/posts/[id]/page';
+import {ErrorCard} from '@/app/posts/[id]/ErrorCard';
 import NonHls from '@/app/contact/[id]/Body/components/FileHandler/NoNHls/NonHls';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';

@@ -1,8 +1,8 @@
 import { getPost } from "@/app/about/page"
-import { ErrorCard } from "./[id]/page"
+import { ErrorCard } from "./[id]/ErrorCard"
 
 import db from "@/lib/Database/Supabase/Base";
-import { Post } from "./[id]/page"
+import { Post } from "./[id]/utils"
 import { Admin } from "@/app/contact/[id]/context/types"
 import MyCard from "./components/MyCard";
 

@@ -74,8 +74,9 @@ const getSkillLevel = (level: number) => {
   }
 }
 
-const page = async ({ searchParams }: { searchParams: { page?: string } }) => {
-  const currentPage = Number(searchParams.page) || 1
+const page = async ({ searchParams }: { searchParams: Promise<{ page?: string }> }) => {
+  const { page } = await searchParams
+  const currentPage = Number(page) || 1
   const itemsPerPage = 6
   const from = (currentPage - 1) * itemsPerPage
   const to = from + itemsPerPage - 1

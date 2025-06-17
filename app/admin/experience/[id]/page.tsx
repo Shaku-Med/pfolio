@@ -46,10 +46,10 @@ const calculateDuration = (start: string, end: string | null, isPresent: boolean
   }
 }
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async ({params}: {params: Promise<{id: string}>}) => {
   try {
-    let id = [`${params?.id}`]
-    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'long_description', 'location', 'type', 'task_completed'], {}, id)
+    let {id} = await params
+    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'long_description', 'location', 'type', 'task_completed'], {}, [id])
 
     if (!experience || experience.length === 0) {
       return (

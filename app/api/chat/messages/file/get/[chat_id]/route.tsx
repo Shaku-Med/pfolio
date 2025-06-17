@@ -6,13 +6,14 @@ import { getClientIP } from '@/app/Auth/Functions/GetIp';
 
 export async function GET(
   request: Request,
-  { params }: { params: { chat_id: string } }
+  { params }: { params: Promise<{chat_id: string}> }
 ) {
   try {
     const headersList = await headers();
     let c = await cookies()
     let ip = await getClientIP(headersList)
-    const chatId = params.chat_id;
+    const {chat_id} = await params
+    const chatId = chat_id;
 
     let message_token = c.get('message')?.value
     c.delete('message')

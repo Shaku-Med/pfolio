@@ -244,10 +244,9 @@ const DocumentViewer = () => {
                   
                   {previewType === 'pdf' && pdfFileUrl && (
                     <div className="h-full w-full">
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <Viewer
-                        theme={'dark'}
-                            
+                          theme={'dark'}
                           fileUrl={pdfFileUrl}
                           plugins={[defaultLayoutPluginInstance]}
                           onDocumentLoad={(e) => {

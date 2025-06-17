@@ -9,7 +9,7 @@ import { Play, ImageIcon, X, Sparkles, Grid3X3, Heart, MessageCircle, Share, Boo
 import { Gallery } from '@/app/admin/projects/page'
 import NonHls from '@/app/contact/[id]/Body/components/FileHandler/NoNHls/NonHls'
 import { cn } from '@/lib/utils'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import Link from 'next/link'
 import LoadMoreImage from '@/app/admin/gallery/components/Action/LoadMoreImage'
 

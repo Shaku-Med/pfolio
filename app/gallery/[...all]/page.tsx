@@ -1,5 +1,5 @@
 import { getGallery } from "@/app/about/page"
-import { ErrorCard } from "@/app/posts/[id]/page"
+import { ErrorCard } from "@/app/posts/[id]/ErrorCard"
 import MasonryGallery from "@/app/gallery/components/GalleryClient"
 
 const page = async () => {

@@ -34,7 +34,13 @@ export interface Project {
   priority: string;
   category: string;
   technologies: string[];
-  project_files?: any[]
+  project_files?: Array<{
+    url: string;
+    fileType: string;
+    totalChunks?: number;
+    thumbnail?: string[];
+    customName?: string;
+  }>;
 }
 
 export interface Skill {

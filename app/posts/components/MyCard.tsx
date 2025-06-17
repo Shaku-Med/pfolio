@@ -1,10 +1,10 @@
 'use client'
 import React, { useCallback, useLayoutEffect, useState } from 'react'
-import { Post } from '../[id]/page'
 import ImageCard from '@/components/ui/ImageCard'
 import { Admin } from '@/app/contact/[id]/context/types'
 import { Loader2 } from 'lucide-react'
 import getPostServer from './getPostServer'
+import { Post } from '../[id]/utils'
 
 interface Paginations {
   currentPage: number,

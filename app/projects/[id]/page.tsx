@@ -8,11 +8,11 @@ import { ProjectTimeline } from './components/ProjectTimeline'
 import ProjectGallery from './components/ProjectGallery'
 import { ProjectComments } from './components/ProjectComments'
 import { GenerateToken } from '@/app/posts/[id]/components/GenerateToken'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import db from '@/lib/Database/Supabase/Base'
 
-export default async function page({ params }: { params: { id: string } }) {
-  let id = await params.id
+export default async function page({ params }: { params: Promise<{ id: string }> }) {
+  let {id} = await params
   if(!db){
     return <ErrorCard title="Error" message={`Access Configuration Error.`}/>
   }

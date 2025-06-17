@@ -2,8 +2,9 @@ import React from 'react'
 import { EditSkillForm } from './components/EditSkillForm'
 import { getSkills } from '@/app/about/page'
 
-export default async function EditSkillPage({ params }: { params: { id: string } }) {
-  const skills = await getSkills(1, ['*'], {}, [params.id])
+export default async function EditSkillPage({ params }: { params: Promise<{id: string}> }) {
+  const {id} = await params
+  const skills = await getSkills(1, ['*'], {}, [id])
   const skill = skills?.[0]
 
   if (!skill) {

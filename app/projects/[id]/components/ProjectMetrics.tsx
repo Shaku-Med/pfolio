@@ -8,8 +8,11 @@ import ProjectGallery from './ProjectGallery'
 import { useState } from 'react'
 
 interface ProjectFile {
+  url: string
+  fileType: string
+  totalChunks?: number
+  thumbnail?: string[]
   customName?: string
-  fileType?: string
 }
 
 interface Project {

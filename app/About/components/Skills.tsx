@@ -42,7 +42,7 @@ export const Skills: React.FC<SkillsProps> = ({ skills, isInView }) => {
       scale: 1,
       rotateX: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 10
       }
@@ -56,7 +56,7 @@ export const Skills: React.FC<SkillsProps> = ({ skills, isInView }) => {
       opacity: 1,
       transition: {
         duration: 1.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
         delay: 0.3
       }
     })

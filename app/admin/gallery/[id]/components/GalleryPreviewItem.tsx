@@ -1,6 +1,6 @@
 import { Gallery } from '@/app/admin/projects/page'
 import React, { useState, useEffect } from 'react'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import NonHls from '@/app/contact/[id]/Body/components/FileHandler/NoNHls/NonHls'
 import { cn } from '@/lib/utils'
 import { 

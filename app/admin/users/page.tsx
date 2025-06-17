@@ -49,9 +49,10 @@ async function getUsers(page: number = 1, pageSize: number = 10) {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { page?: string }
+  searchParams: Promise<{page?: string}>
 }) {
-  const currentPage = Number(searchParams?.page) || 1
+  const {page} = await searchParams
+  const currentPage = Number(page) || 1
   const { users, totalPages, totalItems } = await getUsers(currentPage)
 
   return (
