@@ -44,6 +44,8 @@ export default function About({projects, experience, skills}: AboutData) {
     return () => clearTimeout(timer)
   }, [])
 
+  // Testing
+
   return (
     <div className="min-h-screen w-full bg-background text-foreground overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-16 relative z-10">
