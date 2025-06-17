@@ -24,22 +24,6 @@ const nextConfig = {
     webpack: (config, { isServer }) => {
         // Ensure consistent module resolution
         config.resolve.symlinks = false;
-        
-        // Handle canvas module
-        if (!isServer) {
-            config.resolve.fallback = {
-                ...config.resolve.fallback,
-                canvas: false,
-                'canvas-prebuilt': false,
-            };
-        }
-
-        // Ignore canvas module
-        config.module.rules.push({
-            test: /canvas\.node$/,
-            use: 'ignore-loader',
-        });
-
         return config;
     },
 };
