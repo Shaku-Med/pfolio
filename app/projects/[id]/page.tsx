@@ -10,13 +10,13 @@ import { ProjectComments } from './components/ProjectComments'
 import { GenerateToken } from '@/app/posts/[id]/components/GenerateToken'
 import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import db from '@/lib/Database/Supabase/Base'
-import { Metadata, ResolvedMetadata } from 'next'
+import { Metadata } from 'next'
 
 type Props = {
   params: Promise<{ id: string }>
  }
  
- export async function generateMetadata({params}: Props, parent: ResolvedMetadata): Promise<Metadata> {
+ export async function generateMetadata({params}: Props): Promise<Metadata> {
   try {
     const {id} = await params
     if(!id) return {}
