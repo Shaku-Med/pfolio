@@ -1,6 +1,6 @@
 'use server'
 
-import { getPost } from "@/app/about/page";
+import { getPost } from "@/app/about/components/GetInfos";
 import db from "@/lib/Database/Supabase/Base"
 import { Post } from "../[id]/utils";
 

@@ -1,4 +1,4 @@
-import { getPost } from "@/app/about/page"
+import { getPost } from "@/app/about/components/GetInfos"
 import { ErrorCard } from "./[id]/ErrorCard"
 
 import db from "@/lib/Database/Supabase/Base";

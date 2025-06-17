@@ -1,4 +1,4 @@
-import { getGallery } from "../about/page"
+import { getGallery } from "@/app/about/components/GetInfos"
 import { ErrorCard } from "../posts/[id]/ErrorCard"
 import MasonryGallery from "./components/GalleryClient"
 
