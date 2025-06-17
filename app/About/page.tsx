@@ -1,6 +1,6 @@
 import React from 'react'
 import About from '@/app/about/components/About';
-import { getExperience, getFeaturedProjects, getSkills } from './components/GetInfos';
+import { getExperience, getFeaturedProjects, getSkills } from '@/app/about/components/GetInfos';
 
 
 const page = async () => {

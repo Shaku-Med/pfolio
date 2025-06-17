@@ -1,4 +1,4 @@
-import { getPost } from '@/app/about/page'
+import { getPost } from '@/app/about/components/GetInfos'
 import React from 'react'
 import { NewPostForm } from '../../new/components/NewPostForm'
 import { ErrorCard, Post } from '../page'
