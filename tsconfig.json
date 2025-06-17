@@ -29,14 +29,15 @@
     "target": "ES2017"
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "app/Featured/[id]/page.jsx",
     "app/components/Pages/Home/Projects/Item.jsx",
     "app/components/Pages/Nav/Nav_pv.jsx",
-    "app/Featured/[id]/page.jsx",
+    "app/not-found.jsx",
     "app/not-found.tssx",
-    "app/not-found.jsx"
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
