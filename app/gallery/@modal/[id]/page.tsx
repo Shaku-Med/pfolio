@@ -2,7 +2,7 @@ import React from 'react'
 import GalleryModal from './components/Modal'
 import { Metadata } from 'next'
 import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
-import { getGallery } from '@/app/about/page'
+import { getGallery } from '@/app/about/components/GetInfos'
 
 interface EditPageProps {
   params: Promise<{

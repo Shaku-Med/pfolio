@@ -1,4 +1,4 @@
-import { getSkills } from '@/app/about/page'
+import { getSkills } from '@/app/about/components/GetInfos'
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
