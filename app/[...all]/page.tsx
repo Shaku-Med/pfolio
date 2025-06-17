@@ -1,7 +1,6 @@
 import ModernPortfolio from '@/components/home/Main'
 import React from 'react'
-import { getExperience, getFeaturedProjects, getPost, getSkills } from '../about/page'
-import { Experience, Project, Skill } from '@/app/admin/projects/page'
+import { getExperience, getFeaturedProjects, getPost, getSkills } from '@/app/about/components/GetInfos'
 
 
 const page = async () => {
