@@ -22,6 +22,103 @@ import {
 } from "lucide-react"
 import Link from 'next/link'
 import { Progress } from "@/components/ui/progress"
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: {
+    absolute: 'My Skills - Mohamed Amara | Medzy Amara'
+  },
+  description: "Discover Mohamed Amara's comprehensive skill set in AI development, cybersecurity, and full-stack engineering. From Python machine learning and React development to penetration testing and cloud architecture, explore the technical expertise that drives innovative solutions and secure applications.",
+  keywords: [
+    'Mohamed Amara skills',
+    'AI development skills',
+    'machine learning expertise',
+    'cybersecurity skills',
+    'full stack developer skills',
+    'Python programming',
+    'React development',
+    'JavaScript expertise',
+    'TypeScript skills',
+    'penetration testing',
+    'ethical hacking',
+    'cloud computing skills',
+    'AWS expertise',
+    'database management',
+    'API development',
+    'software engineering skills',
+    'computer science skills',
+    'technical skills',
+    'programming languages',
+    'development frameworks',
+    'security testing',
+    'web development skills',
+    'mobile app development',
+    'DevOps skills',
+    'system administration',
+    'network security'
+  ],
+  authors: [{ name: 'Mohamed Amara' }],
+  creator: 'Mohamed Amara',
+  publisher: 'Mohamed Amara',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: 'My Skills - Mohamed Amara | Technical Expertise & Capabilities',
+    description: 'Comprehensive overview of Mohamed\'s technical skills spanning AI development, cybersecurity, full-stack engineering, and emerging technologies. From programming languages to security frameworks.',
+    url: '/skills',
+    siteName: 'Mohamed Amara - Technical Skills',
+    images: [
+      {
+        url: `/Icons/web/OgImages/og-skills.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Mohamed Amara Technical Skills - AI, Security & Full-Stack Development',
+      },
+    ],
+    locale: 'en_US',
+    type: 'profile',
+    firstName: 'Mohamed',
+    lastName: 'Amara',
+    username: 'medzyamara',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'My Skills - Mohamed Amara | AI • Security • Full-Stack',
+    description: 'Explore Mohamed\'s technical arsenal: AI/ML development, cybersecurity expertise, full-stack engineering, and modern development practices that power innovative solutions.',
+    images: ['/Icons/web/OgImages/og-skills.png'],
+    creator: '@medzyamara',
+    site: '@medzyamara',
+  },
+  alternates: {
+    canonical: '/skills',
+  },
+  category: 'Technical Skills',
+  classification: 'Skills Portfolio',
+  other: {
+    'profile:first_name': 'Mohamed',
+    'profile:last_name': 'Amara',
+    'profile:username': 'medzyamara',
+    'article:author': 'Mohamed Amara',
+    'article:section': 'Skills',
+    'skills:primary_languages': 'Python, JavaScript, TypeScript',
+    'skills:frameworks': 'React, Next.js, Node.js, Express',
+    'skills:specialties': 'AI Development, Cybersecurity, Full-Stack',
+    'skills:cloud_platforms': 'AWS, Google Cloud',
+    'skills:databases': 'PostgreSQL, MongoDB, Firebase',
+    'skills:security_tools': 'Penetration Testing, Ethical Hacking',
+    'skills:ai_ml': 'Machine Learning, Neural Networks, NLP',
+    'skills:level': 'Advanced',
+  }
+ }
 
 const getSkillIcon = (skillName: string) => {
   const name = skillName.toLowerCase()

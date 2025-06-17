@@ -21,20 +21,24 @@ const GalleryModal = ({ gallery }: { gallery: Gallery[] }) => {
   const { isMobileInstalledPortrait } = useDeviceStatus()
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
-  }, [gallery.length])
+    const newIndex = currentIndex === 0 ? gallery.length - 1 : currentIndex - 1
+    setCurrentIndex(newIndex)
+    if(gallery[newIndex]?.id) {
+      window.history.pushState({}, '', `/gallery/${gallery[newIndex].id}`)
+    }
+  }, [currentIndex, gallery])
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
-  }, [gallery.length])
+    const newIndex = currentIndex === gallery.length - 1 ? 0 : currentIndex + 1
+    setCurrentIndex(newIndex)
+    if(gallery[newIndex]?.id) {
+      window.history.pushState({}, '', `/gallery/${gallery[newIndex].id}`)
+    }
+  }, [currentIndex, gallery])
 
   return (
     <Dialog onOpenChange={() => {
-        if (window.history.length > 2) {
-            nav.back()
-        } else {
-            nav.push('/gallery')
-        }
+        nav.push(`/gallery`)
     }} defaultOpen>
       <DialogContent className={`min-w-full ${isMobileInstalledPortrait && `max-h-[90vh]`} h-full rounded-none z-[1000000001] p-0 flex flex-col items-center justify-between w-full bg-black/95 backdrop-blur-xl`}>
           <div className={`w-full h-full flex items-center justify-center relative bg-black/50`}>
@@ -69,7 +73,12 @@ const GalleryModal = ({ gallery }: { gallery: Gallery[] }) => {
                 className={`h-2.5 rounded-full transition-all duration-300 hover:scale-110 ${
                   currentIndex === index ? 'bg-white w-8' : 'bg-white/50 w-2.5'
                 }`}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => {
+                  setCurrentIndex(index)
+                  if(gallery[index]?.id) {
+                    window.history.pushState({}, '', `/gallery/${gallery[index].id}`)
+                  }
+                }}
               />
             ))}
           </div>

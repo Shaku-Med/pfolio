@@ -123,7 +123,7 @@ const Footer: React.FC = () => {
               <span>Navigation</span>
             </h3>
             <ul className="space-y-3">
-              {['Home', 'About', 'Projects', 'Contact', 'Posts', 'Gallery', 'Music'].map((item, index) => (
+              {['Home', 'About', 'Projects', 'Contact', 'Posts', 'Gallery', 'Download', 'Music', 'Resume', 'Experience', 'Skills'].map((item, index) => (
                 <motion.li 
                   key={index}
                   whileHover={{ x: 4 }}
@@ -181,7 +181,7 @@ const Footer: React.FC = () => {
                 { icon: Github, href: 'https://github.com/Shaku-Med', label: 'GitHub', color: 'hover:text-white' },
                 { icon: Twitter, href: 'https://twitter.com/medzyamara', label: 'Twitter', color: 'hover:text-blue-400' },
                 { icon: Linkedin, href: 'https://www.linkedin.com/in/mohamed-amara-b84447247/', label: 'LinkedIn', color: 'hover:text-blue-600' },
-                { icon: Mail, href: 'mailto:jujubelt124@gmail.com', label: 'Email', color: 'hover:text-red-500' },
+                { icon: Mail, href: 'mailto:amaramohamedb@gmail.com', label: 'Email', color: 'hover:text-red-500' },
               ].map((social) => (
                 <motion.div
                   key={social.label}
