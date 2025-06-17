@@ -15,8 +15,11 @@ export async function GET(request: Request) {
         let ip = await getClientIP(h)
         let isAdmin: any = await IsAuth(true)
         
-        const { searchParams } = new URL(request.url);
-        console.log(request.url)
+        let url = decodeURIComponent(request.url).toString()
+        url = url.split(`amp;`).join('')
+        // console.log(url)
+
+        const { searchParams } = new URL(url);
         let id = searchParams.get('id')
 
         if(!id){
