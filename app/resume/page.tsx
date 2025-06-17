@@ -1,10 +1,11 @@
 import React from 'react'
-import ClientResume from './Client/ClientResume'
+// import ClientResume from './Client/ClientResume'
 
 const page = () => {
   return (
     <>
-      <ClientResume/>
+    Access
+      {/* <ClientResume/> */}
     </>
   )
 }
