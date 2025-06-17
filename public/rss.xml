@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Mohamed Amara | Medzy Amara - AI Developer and Security Expert</title>
+    <description>Follow Mohamed Amara's journey in AI development, cybersecurity, and full-stack engineering. Stay updated with latest insights, projects, and technical discoveries from a passionate computer science student and developer.</description>
+    <link>https://medzyamara.dev</link>
+    <atom:link href="https://medzyamara.dev/rss.xml" rel="self" type="application/rss+xml" />
+    <language>en-US</language>
+    <lastBuildDate>Tue, 17 Jun 2025 12:00:00 GMT</lastBuildDate>
+    <pubDate>Tue, 17 Jun 2025 12:00:00 GMT</pubDate>
+    <ttl>60</ttl>
+    <image>
+      <url>https://medzyamara.dev/Icons/web/logo.png</url>
+      <title>Mohamed Amara | Medzy Amara</title>
+      <link>https://medzyamara.dev</link>
+      <width>144</width>
+      <height>144</height>
+      <description>Mohamed Amara - AI Developer and Security Expert</description>
+    </image>
+    <managingEditor>contact@medzyamara.dev (Mohamed Amara)</managingEditor>
+    <webMaster>contact@medzyamara.dev (Mohamed Amara)</webMaster>
+    <copyright>Copyright 2025 Mohamed Amara. All rights reserved.</copyright>
+    <category>Technology</category>
+    <category>Programming</category>
+    <category>AI Development</category>
+    <category>Cybersecurity</category>
+    <category>Software Engineering</category>
+
+    <!-- Sample Blog Posts - Replace with dynamic content -->
+    <item>
+      <title>Building AI-Powered Security Tools: A Student Developer's Journey</title>
+      <description>Exploring the intersection of artificial intelligence and cybersecurity through hands-on projects and real-world applications. Learn how machine learning can enhance threat detection and automated security responses.</description>
+      <link>https://medzyamara.dev/posts/ai-powered-security-tools</link>
+      <guid isPermaLink="true">https://medzyamara.dev/posts/ai-powered-security-tools</guid>
+      <pubDate>Mon, 16 Jun 2025 09:00:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>AI Development</category>
+      <category>Cybersecurity</category>
+      <category>Machine Learning</category>
+      <content:encoded><![CDATA[
+        <p>In today's rapidly evolving digital landscape, the convergence of artificial intelligence and cybersecurity presents unprecedented opportunities for innovation...</p>
+        <p>Through my experience as a computer science student specializing in AI and security, I've discovered fascinating ways to leverage machine learning for threat detection...</p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Full-Stack Development with Next.js and Supabase: Best Practices</title>
+      <description>A comprehensive guide to building scalable web applications using Next.js, TypeScript, and Supabase. From authentication to real-time features, discover the patterns that drive modern web development.</description>
+      <link>https://medzyamara.dev/posts/nextjs-supabase-best-practices</link>
+      <guid isPermaLink="true">https://medzyamara.dev/posts/nextjs-supabase-best-practices</guid>
+      <pubDate>Fri, 14 Jun 2025 14:30:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Full-Stack Development</category>
+      <category>Next.js</category>
+      <category>TypeScript</category>
+      <category>Supabase</category>
+      <content:encoded><![CDATA[
+        <p>Building modern web applications requires careful consideration of architecture, performance, and user experience...</p>
+        <p>In this comprehensive guide, I'll share the patterns and practices I've developed while working on production applications...</p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Ethical Hacking for Developers: Understanding Security from the Inside Out</title>
+      <description>Why every developer should understand penetration testing and ethical hacking principles. Explore common vulnerabilities, testing methodologies, and how security thinking can improve your code quality.</description>
+      <link>https://medzyamara.dev/posts/ethical-hacking-for-developers</link>
+      <guid isPermaLink="true">https://medzyamara.dev/posts/ethical-hacking-for-developers</guid>
+      <pubDate>Wed, 12 Jun 2025 11:15:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Cybersecurity</category>
+      <category>Ethical Hacking</category>
+      <category>Penetration Testing</category>
+      <category>Security</category>
+      <content:encoded><![CDATA[
+        <p>Understanding security from an attacker's perspective is crucial for building robust applications...</p>
+        <p>Through my journey in cybersecurity and ethical hacking, I've learned that the best defense comes from understanding offense...</p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Machine Learning in Practice: From Theory to Production</title>
+      <description>Bridging the gap between academic machine learning concepts and real-world applications. Discover the challenges, solutions, and lessons learned from deploying ML models in production environments.</description>
+      <link>https://medzyamara.dev/posts/ml-theory-to-production</link>
+      <guid isPermaLink="true">https://medzyamara.dev/posts/ml-theory-to-production</guid>
+      <pubDate>Mon, 10 Jun 2025 16:45:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Machine Learning</category>
+      <category>AI Development</category>
+      <category>Python</category>
+      <category>Data Science</category>
+      <content:encoded><![CDATA[
+        <p>The journey from understanding machine learning algorithms to deploying them in production is filled with challenges...</p>
+        <p>As a student developer working on AI projects, I've encountered numerous obstacles that textbooks don't always cover...</p>
+      ]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Open Source Contributions: Building a Developer Portfolio</title>
+      <description>How contributing to open source projects can accelerate your learning, build your network, and showcase your skills. A student developer's guide to making meaningful contributions to the tech community.</description>
+      <link>https://medzyamara.dev/posts/open-source-portfolio-building</link>
+      <guid isPermaLink="true">https://medzyamara.dev/posts/open-source-portfolio-building</guid>
+      <pubDate>Sat, 08 Jun 2025 13:20:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Open Source</category>
+      <category>Career Development</category>
+      <category>Portfolio</category>
+      <category>Community</category>
+      <content:encoded><![CDATA[
+        <p>Open source contributions have been instrumental in my growth as a developer and my understanding of collaborative software development...</p>
+        <p>In this post, I'll share strategies for finding projects to contribute to, making your first pull request, and building lasting relationships in the tech community...</p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- Experience Updates -->
+    <item>
+      <title>New Experience: Software Development Internship Journey</title>
+      <description>Reflecting on recent professional experiences and the lessons learned in software development, team collaboration, and technical growth in a professional environment.</description>
+      <link>https://medzyamara.dev/experience/latest-internship-insights</link>
+      <guid isPermaLink="true">https://medzyamara.dev/experience/latest-internship-insights</guid>
+      <pubDate>Thu, 06 Jun 2025 10:00:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Career</category>
+      <category>Internship</category>
+      <category>Professional Growth</category>
+      <content:encoded><![CDATA[
+        <p>Professional experiences shape us as developers in ways that academic learning alone cannot...</p>
+        <p>Through my recent internship experiences, I've gained invaluable insights into industry practices, team dynamics, and the reality of software development at scale...</p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- Skills & Technology Updates -->
+    <item>
+      <title>Expanding Technical Skills: Latest Additions to My Arsenal</title>
+      <description>Continuous learning updates on new technologies, frameworks, and methodologies. Discover the latest additions to my technical skill set and how they're applied in real projects.</description>
+      <link>https://medzyamara.dev/skills/recent-technical-growth</link>
+      <guid isPermaLink="true">https://medzyamara.dev/skills/recent-technical-growth</guid>
+      <pubDate>Tue, 04 Jun 2025 15:30:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Skills Development</category>
+      <category>Learning</category>
+      <category>Technology</category>
+      <content:encoded><![CDATA[
+        <p>The technology landscape evolves rapidly, and staying current requires continuous learning and adaptation...</p>
+        <p>Here's an overview of the new technologies and skills I've been developing, along with practical applications and project implementations...</p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- Gallery/Portfolio Updates -->
+    <item>
+      <title>Project Showcase: Recent Work and Creative Endeavors</title>
+      <description>Visual showcase of recent projects, experiments, and creative work. From technical implementations to design explorations, discover the latest additions to my portfolio.</description>
+      <link>https://medzyamara.dev/gallery/recent-projects-showcase</link>
+      <guid isPermaLink="true">https://medzyamara.dev/gallery/recent-projects-showcase</guid>
+      <pubDate>Sun, 02 Jun 2025 12:15:00 GMT</pubDate>
+      <author>contact@medzyamara.dev (Mohamed Amara)</author>
+      <category>Portfolio</category>
+      <category>Projects</category>
+      <category>Showcase</category>
+      <content:encoded><![CDATA[
+        <p>Visual documentation of recent projects provides insight into the development process, design decisions, and technical implementations...</p>
+        <p>This showcase highlights recent work spanning AI development, web applications, security tools, and experimental projects...</p>
+      ]]></content:encoded>
+    </item>
+
+  </channel>
+</rss>
