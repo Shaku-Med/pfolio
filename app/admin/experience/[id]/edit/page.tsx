@@ -4,10 +4,10 @@ import { getExperience } from '@/app/about/page';
 import Link from 'next/link';
 import DeleteButton from './components/DeleteButton';
 
-const page = async ({params}: {params: {id: string}}) => {
+const page = async ({params}: {params: Promise<{id: string}>}) => {
   try {
-    let id = [`${await params?.id}`]
-    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'location', 'type', 'task_completed'], {}, id);
+    let {id} = await params
+    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'location', 'type', 'task_completed'], {}, [id]);
 
     if(!experience || experience.length === 0) {
       return (

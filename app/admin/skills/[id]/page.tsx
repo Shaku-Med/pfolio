@@ -15,10 +15,10 @@ import {
 import Link from 'next/link'
 import DeleteButton from '../[id]/edit/components/DeleteButton'
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async ({ params }: { params: Promise<{id: string}> }) => {
   try {
-    let id = [`${params?.id}`]
-    let skills = await getSkills(1, ['id', 'name', 'description', 'level', 'color', 'created_at'], {}, id)
+    let {id} = await params
+    let skills = await getSkills(1, ['id', 'name', 'description', 'level', 'color', 'created_at'], {}, [id])
 
     if (!skills || skills.length === 0) {
       return (

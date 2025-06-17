@@ -1,17 +1,15 @@
 import { getGallery } from '@/app/about/page'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import React from 'react'
 import GalleryPreview from './components/GalleryPreview'
 
 interface EditPageProps {
-    params: {
-        id: string
-    }
+    params: Promise<{id: string}>
 }
 
 const page = async ({ params }: EditPageProps) => {
   try {
-    let id = await params.id
+    let {id} = await params
     let galleryImage = await getGallery(1, ['*'], {}, [id])
     if(!galleryImage || galleryImage.length < 1) return <ErrorCard title="Failed to Load" message="This gallery does not exist." />
 

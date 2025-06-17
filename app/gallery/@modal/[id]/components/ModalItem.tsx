@@ -1,6 +1,6 @@
 import ModalPreviewItem from '@/app/gallery/@modal/[id]/components/ModalPreviewItem'
 import { Gallery } from '@/app/admin/projects/page'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import { Button } from '@/components/ui/button'
 import { DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import React, { useState } from 'react'

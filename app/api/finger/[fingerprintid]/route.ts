@@ -6,7 +6,7 @@ import VerifyToken from '@/app/Auth/Functions/VerifyToken';
 
 export async function GET(
   request: Request,
-  { params }: { params: { fingerprintid: string } }
+  { params }: { params: Promise<{fingerprintid: string}> }
 ) {
   let h = await headers()
   let c = await cookies()

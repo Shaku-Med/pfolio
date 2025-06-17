@@ -46,10 +46,10 @@ const calculateDuration = (start: string, end: string | null, isPresent: boolean
   }
 }
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   try {
-    let id = [`${params?.id}`]
-    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'location', 'type', 'task_completed', 'long_description'], {}, id)
+    let {id} = await params
+    let experience = await getExperience(1, ['id', 'title', 'sub_title', 'company', 'position', 'start', 'end', 'is_present', 'description', 'location', 'type', 'task_completed', 'long_description'], {}, [id])
 
     if (!experience || experience.length === 0) {
       return (
@@ -92,7 +92,7 @@ const page = async ({ params }: { params: { id: string } }) => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div className="space-y-2">
               <Button asChild variant="ghost" size="sm" className="mb-2">
-                <Link href="/admin/experience">
+                <Link href="/experience">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Experiences
                 </Link>
@@ -103,15 +103,6 @@ const page = async ({ params }: { params: { id: string } }) => {
               <p className="text-muted-foreground">
                 View and manage your professional experience
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/admin/experience/${exp.id}/edit`}>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </Link>
-              </Button>
-              <DeleteButton id={exp.id} />
             </div>
           </div>
 

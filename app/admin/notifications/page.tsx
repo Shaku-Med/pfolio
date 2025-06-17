@@ -9,6 +9,7 @@ import Link from 'next/link'
 import db from '@/lib/Database/Supabase/Base'
 import IsAuth from '@/app/admin/Auth/IsAuth'
 import NotificationsList from './NotificationsList'
+import { formatRelativeTime } from '@/lib/utils/time'
 
 interface Notification {
   user_id?: string
@@ -21,44 +22,6 @@ interface Notification {
 }
 
 const ITEMS_PER_PAGE = 10
-
-export const formatRelativeTime = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-  if (diffInSeconds < 60) {
-    return 'just now'
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60)
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} minute${diffInMinutes === 1 ? '' : 's'} ago`
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  if (diffInHours < 24) {
-    return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24)
-  if (diffInDays < 7) {
-    return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`
-  }
-
-  const diffInWeeks = Math.floor(diffInDays / 7)
-  if (diffInWeeks < 4) {
-    return `${diffInWeeks} week${diffInWeeks === 1 ? '' : 's'} ago`
-  }
-
-  const diffInMonths = Math.floor(diffInDays / 30)
-  if (diffInMonths < 12) {
-    return `${diffInMonths} month${diffInMonths === 1 ? '' : 's'} ago`
-  }
-
-  const diffInYears = Math.floor(diffInDays / 365)
-  return `${diffInYears} year${diffInYears === 1 ? '' : 's'} ago`
-}
 
 async function getNotifications(page: number = 1) {
   try {
@@ -101,10 +64,10 @@ async function getNotifications(page: number = 1) {
 export default async function NotificationsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{page?: string}>
 }) {
-  const page = searchParams?.page
-  const currentPage = typeof page === 'string' ? Number(page) : 1
+  const {page} = await searchParams
+  const currentPage = Number(page) || 1
   const { data: notifications, total } = await getNotifications(currentPage)
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
 

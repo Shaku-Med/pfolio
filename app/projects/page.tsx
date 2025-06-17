@@ -11,7 +11,7 @@ import { getProjects } from '../admin/projects/page'
 const ProjectPage = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) => {
   try {
     const params = await searchParams;

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Post } from '../../../page'
+import { Post } from '../../../utils'
 import PostFiles from './components/PostFiles'
 
 const Content = ({post}: {post?: Post}) => {

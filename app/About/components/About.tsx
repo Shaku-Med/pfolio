@@ -10,6 +10,7 @@ import { Contact } from './Contact'
 import { Project, Experience as ExperienceType } from '@/app/admin/projects/page'
 
 interface Skill {
+  id: string
   name: string
   level: number
   color: string

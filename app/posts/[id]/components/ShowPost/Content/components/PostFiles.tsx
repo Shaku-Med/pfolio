@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { Post } from '../../../../page'
+import { Post } from '../../../../utils'
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Video, Music, Files } from 'lucide-react'
 import NonHls from '@/app/contact/[id]/Body/components/FileHandler/NoNHls/NonHls'
 import HlsPlayer from '@/app/contact/[id]/Body/components/FileHandler/HlsPlayer'

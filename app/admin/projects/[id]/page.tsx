@@ -21,8 +21,9 @@ export async function getProject(id: string) {
   }
 }
 
-export default async function page({ params }: { params: { id: string } }) {
-    const project = await getProject(params.id)
+export default async function page({ params }: { params: Promise<{id: string}> }) {
+    const {id} = await params
+    const project = await getProject(id)
 
     return (
         <>

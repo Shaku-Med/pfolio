@@ -56,8 +56,9 @@ const getExperienceIcon = (title: string, company: string) => {
   return <User className="w-5 h-5 text-primary" />
 }
 
-const page = async ({ searchParams }: { searchParams: { page?: string } }) => {
-  const currentPage = Number(searchParams.page) || 1
+const page = async ({ searchParams }: { searchParams: Promise<{ page?: string }> }) => {
+  const { page } = await searchParams
+  const currentPage = Number(page) || 1
   const itemsPerPage = 6
   const from = (currentPage - 1) * itemsPerPage
   const to = from + itemsPerPage - 1

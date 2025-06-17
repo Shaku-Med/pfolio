@@ -16,7 +16,7 @@ import IsAuth from '@/app/admin/Auth/IsAuth'
 import AdminAccess from './Admin/Admin'
 
 type Props = {
-  params: { id: string }
+  params: Promise<{id: string}>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

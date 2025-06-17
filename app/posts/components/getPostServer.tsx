@@ -2,7 +2,7 @@
 
 import { getPost } from "@/app/about/page";
 import db from "@/lib/Database/Supabase/Base"
-import { Post } from "../[id]/page";
+import { Post } from "../[id]/utils";
 
 interface Paginations {
     currentPage: number,

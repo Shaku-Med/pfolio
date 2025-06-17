@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { ErrorCard } from '@/app/posts/[id]/page'
+import { ErrorCard } from '@/app/posts/[id]/ErrorCard'
 import { Gallery } from '@/app/admin/projects/page'
 import GalleryPreviewItem from './GalleryPreviewItem'
 import { Swiper, SwiperSlide } from 'swiper/react'

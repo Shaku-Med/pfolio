@@ -1,6 +1,6 @@
 'use client'
 
-import { Post } from '../../page'
+import { Post } from '../../utils'
 import { PostComments } from './components/comments/Comments'
 import SideBySideLayout from './components/SideBySideLayout'
 import { CommentsProvider } from '@/store/comments-context'

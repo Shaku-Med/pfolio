@@ -22,10 +22,10 @@ import {
   Users,
   Activity
 } from 'lucide-react'
-import { Post } from '../../../../page'
+import { Post } from '@/app/posts/[id]/utils'
 import MDEditor from '@uiw/react-md-editor'
 import DOMPurify from 'dompurify'
-import { formatNumber } from '../../../../page'
+import { formatNumber } from '@/app/posts/[id]/utils'
 
 interface InfoDialogProps {
   post: Post

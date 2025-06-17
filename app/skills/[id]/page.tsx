@@ -45,10 +45,10 @@ const getSkillLevel = (level: number) => {
   return { label: 'Beginner', icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-500/10' }
 }
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   try {
-    let id = [`${params?.id}`]
-    let skills = await getSkills(1, ['id', 'name', 'description', 'level', 'color', 'created_at'], {}, id)
+    let {id} = await params
+    let skills = await getSkills(1, ['id', 'name', 'description', 'level', 'color', 'created_at'], {}, [id])
 
     if (!skills || skills.length === 0) {
       return (

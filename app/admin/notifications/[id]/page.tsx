@@ -50,8 +50,9 @@ async function getNotificationById(id: string) {
   }
 }
 
-export default async function NotificationPage({ params }: { params: { id: string } }) {
-  const notification = await getNotificationById(params.id)
+export default async function NotificationPage({ params }: { params: Promise<{id: string}> }) {
+  const {id} = await params
+  const notification = await getNotificationById(id)
 
   if (!notification) {
     notFound()
