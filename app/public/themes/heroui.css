@@ -1,0 +1,63 @@
+/**
+ * HeroUI theme layer – maps shadcn/ui palette to HeroUI tokens.
+ * Import this after your theme file (e.g. stone.css) so --background, --foreground,
+ * --primary, --muted, etc. are already set. Works with .light, .dark, and .system.
+ */
+:root {
+  /* Spacing & layout */
+  --spacing: 0.25rem;
+  --border-width: 1px;
+  --field-border-width: 0px;
+  --disabled-opacity: 0.5;
+  --ring-offset-width: 2px;
+  --cursor-interactive: pointer;
+  --cursor-disabled: not-allowed;
+  --field-radius: calc(var(--radius) * 1.5);
+
+  /* Surfaces (maps to shadcn background/card/popover) */
+  --surface: var(--background);
+  --surface-foreground: var(--foreground);
+  --surface-secondary: var(--card);
+  --surface-secondary-foreground: var(--card-foreground);
+  --surface-tertiary: var(--background);
+  --surface-tertiary-foreground: var(--foreground);
+
+  /* Overlays (popovers, modals, menus) */
+  --overlay: var(--popover);
+  --overlay-foreground: var(--popover-foreground);
+
+  --scrollbar: var(--background);
+  --default: var(--secondary);
+  --default-foreground: var(--secondary-foreground);
+
+  /* Form fields */
+  --field-background: var(--background);
+  --field-foreground: var(--foreground);
+  --field-placeholder: var(--muted-foreground);
+  --field-border: transparent;
+
+  /* Status (define --success, --warning, --danger in theme or app if you want custom colors) */
+  --success-foreground: var(--primary-foreground);
+  --warning-foreground: var(--primary-foreground);
+  --danger-foreground: var(--primary-foreground);
+
+  /* Segments & misc */
+  --segment: var(--background);
+  --segment-foreground: var(--foreground);
+  --focus: var(--ring);
+  --link: var(--foreground);
+  --separator: var(--border);
+
+  /* Shadows – subtle, work in light and dark */
+  --surface-shadow:
+    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    0 0 1px 0 rgba(0, 0, 0, 0.06);
+  --overlay-shadow:
+    0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 -6px 12px 0 rgba(0, 0, 0, 0.03),
+    0 14px 28px 0 rgba(0, 0, 0, 0.08);
+  --field-shadow:
+    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    0 0 1px 0 rgba(0, 0, 0, 0.06);
+
+  --skeleton-animation: shimmer;
+}
