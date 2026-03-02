@@ -21,14 +21,14 @@ jobs:
         with:
           node-version: '20'
 
-      # 3️⃣ Install & Build (from pfolio/app)
+      # 3️⃣ Install & Build
       - name: Install dependencies
         run: npm ci
-        working-directory: pfolio/app
+        working-directory: app
 
       - name: Build
         run: npm run build
-        working-directory: pfolio/app
+        working-directory: app
 
       # 4️⃣ Deploy build to EC2
       - name: Deploy to EC2
@@ -37,9 +37,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'pfolio/app/build/*'
+          source: 'app/build/*'
           target: /var/www/medzy.brozy.org/
-          strip_components: 3
+          strip_components: 2
           overwrite: true
 
       # 5️⃣ Confirm deployment
