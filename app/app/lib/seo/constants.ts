@@ -5,7 +5,7 @@ export const BASE_URL =
   EnvValidator("SITE_URL") ??
   (IsDevelopment()
     ? `http://localhost:${IsDevelopment() ? 3001 : 3000}`
-    : "https://medzyamara.dev");
+    : "https://medzy.brozy.org");
 
 export const SITE_NAME = "Mohamed Amara";
 export const DEFAULT_TITLE = "Mohamed Amara";

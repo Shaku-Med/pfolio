@@ -12,5 +12,7 @@ export default defineConfig(({ mode }) => {
       port: !isDev ? 3001 : 3000,
       host: true,
     },
+    allowedHosts: ["medzy.brozy.org"],
+    cors: true,
   };
 });
