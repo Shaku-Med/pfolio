@@ -1,10 +1,10 @@
 import { EnvValidator } from "../utils/env";
-
+import IsDevelopment from "../utils/IsDevelopment";
 /** Absolute site origin for canonical URLs and OG images. Set SITE_URL in env for production. */
 export const BASE_URL =
   EnvValidator("SITE_URL") ??
-  (typeof process !== "undefined" && process.env?.NODE_ENV === "development"
-    ? "http://localhost:3000"
+  (IsDevelopment()
+    ? `http://localhost:${IsDevelopment() ? 3001 : 3000}`
     : "https://medzyamara.dev");
 
 export const SITE_NAME = "Mohamed Amara";

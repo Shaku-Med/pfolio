@@ -5,12 +5,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(({ mode }) => {
   loadEnv(mode, process.cwd(), "");
-  console.log(`Loaded the enveroment variables... \n`);
-  
+  let isDev = mode === "development";
   return {
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
     server: {
-      port: 3000,
+      port: !isDev ? 3001 : 3000,
       host: true,
     },
   };
