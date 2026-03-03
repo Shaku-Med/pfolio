@@ -15,34 +15,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      # 2️⃣ Create .env file from GitHub secret
+      - name: Create .env file
+        run: |
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            cat << 'EOF' > app/.env
+          ${{ secrets.ENV_FILE }}
+          EOF
+            echo "✅ .env file created"
+          else
+            echo "❌ ERROR: ENV_FILE secret is empty!"
+            exit 1
+          fi
 
-      # 3️⃣ Install & Build
-      - name: Install dependencies
-        run: npm ci
-        working-directory: app
-
-      - name: Build
-        run: npm run build
-        working-directory: app
-
-      # 4️⃣ Deploy build to EC2
+      # 3️⃣ Deploy full app directory to EC2
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'app/build/*'
+          source: 'app/*'
           target: /var/www/medzy.brozy.org/
-          strip_components: 2
+          strip_components: 1
           overwrite: true
 
-      # 5️⃣ Confirm deployment
+      # 4️⃣ Confirm deployment
       - name: Verify deployment
         uses: appleboy/ssh-action@v1
         with:
