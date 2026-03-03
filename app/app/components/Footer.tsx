@@ -19,7 +19,7 @@ const Footer = () => {
               Mohamed Amara
             </p>
             <p className="max-w-md text-[11px] leading-relaxed text-muted-foreground">
-              Shipping thoughtful, maintainable software with React, TypeScript, and a focus on systems that stay reliable in production.
+              I ship real stuff to the world.
             </p>
           </div>
 
@@ -29,6 +29,9 @@ const Footer = () => {
                 Navigate
               </p>
               <nav className="flex flex-col gap-1">
+                <Link to="/resume" className="hover:text-foreground">
+                  Resume
+                </Link>
                 <Link to="/projects" className="hover:text-foreground">
                   Projects
                 </Link>
@@ -59,14 +62,14 @@ const Footer = () => {
               </p>
               <div className="flex flex-col gap-1">
                 <a
-                  href="mailto:contact@amara.so"
+                  href="mailto:jujubelt124@gmail.com"
                   className="inline-flex items-center gap-1 hover:text-foreground"
                 >
                   <Mail className="h-3 w-3" />
                   <span>Email</span>
                 </a>
                 <a
-                  href="https://github.com/amara"
+                  href="https://github.com/Shaku-Med"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 hover:text-foreground"
@@ -75,7 +78,7 @@ const Footer = () => {
                   <span>GitHub</span>
                 </a>
                 <a
-                  href="https://www.linkedin.com"
+                  href="https://www.linkedin.com/in/mohamed-amara-b84447247/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 hover:text-foreground"
@@ -90,9 +93,9 @@ const Footer = () => {
 
         <div className="flex flex-col gap-3 border-t border-border/50 pt-4 text-[11px] text-muted-foreground/80 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <p>© {year} Amara. All rights reserved.</p>
+            <p>© {year} Mohamed Amara. All rights reserved.</p>
             <p className="text-[10px] text-muted-foreground/70">
-              Built with Remix, React, TypeScript, and a lot of small, careful iterations.
+            You can check out the source code of this website and make your own changes.
             </p>
           </div>
           <button

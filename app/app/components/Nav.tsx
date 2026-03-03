@@ -44,6 +44,7 @@ import {
   SheetClose,
 } from "./ui/sheet";
 import { THEME_MODES, THEME_MODE_LABELS } from "../lib/theme/constants";
+import { useStandalone } from "~/lib/hooks/useStandalone";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -79,6 +80,8 @@ const Nav: React.FC = () => {
     | { theme: string; style: string }
     | undefined;
   const theme = rootData?.theme ?? "system";
+  const isStandalone = useStandalone();
+
 
   const handleThemeChange = async (mode: string) => {
     try {
@@ -158,7 +161,11 @@ const Nav: React.FC = () => {
     <>
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         {/* ── Header bar ── */}
-        <header className="fixed inset-x-0 top-0 z-40 border-b border-border/60 bg-background backdrop-blur-lg">
+        <header
+          className={`fixed inset-x-0 top-0 z-40 border-b border-border/60 bg-background backdrop-blur-lg ${
+            isStandalone ? "pt-[env(safe-area-inset-top)]" : ""
+          }`}
+        >
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5 sm:px-5 lg:px-6">
             {/* Left: hamburger + logo */}
             <div className="flex items-center gap-3">
