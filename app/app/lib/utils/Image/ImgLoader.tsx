@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useInView } from "../../../hooks/useInView";
 import { cn } from "~/lib/utils";
-import { Skeleton } from "@heroui/react";
+import { Skeleton } from "~/components/ui/skeleton";
 import { AnimatePresence, motion } from "motion/react";
 import ImgPreview from "./ImagePreview/ImgPreview";
 

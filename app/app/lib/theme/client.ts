@@ -14,7 +14,8 @@ export function getThemeFromCookieClient(): ThemeMode | null {
 
 /** Set theme cookie and update document.documentElement class. */
 export function setTheme(mode: ThemeMode): void {
-  document.cookie = `${THEME_COOKIE_NAME}=${mode}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${THEME_COOKIE_NAME}=${mode}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
   document.documentElement.classList.remove("system", "light", "dark");
   document.documentElement.classList.add(mode);
 }

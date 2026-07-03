@@ -11,7 +11,6 @@ import {
 
 import type { Route } from "./+types/root";
 import "./lib/styles/app.css";
-import "./lib/styles/themes/heroui.css";
 import {
   getThemeFromCookie,
   getStyleFromCookie,
@@ -34,6 +33,13 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export const headers: Route.HeadersFunction = () => ({
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+});
 
 export const meta: Route.MetaFunction = ({ error }) => {
   if (error) {

@@ -55,7 +55,7 @@ export default function StackIndex() {
 
   if (items.length === 0) {
     return (
-      <main className="mx-auto max-w-6xl px-4 px-5 py-2 sm:py-5 md:py-6">
+      <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
         <h1 className="mb-6 text-xl font-semibold tracking-tight">
           Stack & tooling
         </h1>
@@ -76,7 +76,7 @@ export default function StackIndex() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 px-5 py-2 sm:py-5 md:py-6">
+    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
       <div className="space-y-4">
         <h1 className="text-xl font-semibold tracking-tight">
           Stack & tooling

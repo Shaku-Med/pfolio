@@ -1,4 +1,3 @@
-import { Card, Button } from "@heroui/react";
 import { Link } from "react-router";
 import type { GalleryItem } from "../../lib/gallery";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
@@ -14,9 +13,7 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
       ? item.src
       : `/api/load/image${item.src}`;
   const card = (
-    <Card
-      className="relative p-0 flex min-h-[220px] flex-col overflow-hidden rounded-3xl border border-border/70 bg-background/80"
-    >
+    <div className="relative flex min-h-[220px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80">
       <ImgLoader
         src={src}
         alt={item.title}
@@ -32,23 +29,23 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
             : "from-background/85 via-background/30 to-background/10"
         }`}
       />
-      <Card.Header className="relative z-10 px-4 pt-4">
-        <Card.Title
+      <div className="relative z-10 px-4 pt-4">
+        <p
           className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${
             item.tone === "dark" ? "text-white/80" : "text-black/70"
           }`}
         >
           {item.title}
-        </Card.Title>
-        <Card.Description
+        </p>
+        <p
           className={`text-xs font-medium ${
             item.tone === "dark" ? "text-white/65" : "text-black/60"
           }`}
         >
           {item.subtitle}
-        </Card.Description>
-      </Card.Header>
-    </Card>
+        </p>
+      </div>
+    </div>
   );
 
   if (to) {

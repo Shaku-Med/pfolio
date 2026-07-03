@@ -383,7 +383,7 @@ const Nav: React.FC = () => {
                 Hire me
               </Link>
               <a
-                href="https://github.com/Shaku-Med/provit"
+                href="https://github.com/Shaku-Med/pfolio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm transition hover:bg-muted"

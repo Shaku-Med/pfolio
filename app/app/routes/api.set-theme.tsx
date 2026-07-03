@@ -38,12 +38,13 @@ export async function action({ request }: { request: Request }) {
     // use "/"
   }
 
+  const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
   const cookies: string[] = [];
   if (theme) {
-    cookies.push(`${THEME_COOKIE_NAME}=${theme}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`);
+    cookies.push(`${THEME_COOKIE_NAME}=${theme}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`);
   }
   if (style) {
-    cookies.push(`${STYLE_COOKIE_NAME}=${style}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`);
+    cookies.push(`${STYLE_COOKIE_NAME}=${style}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`);
   }
 
   const headers = new Headers();

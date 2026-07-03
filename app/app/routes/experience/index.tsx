@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router";
-import ExperienceItem from "../../components/accessories/ExperienceItem";
+import Timeline, {
+  experienceToTimeline,
+  projectsToTimeline,
+  sortTimeline,
+} from "../../components/accessories/Timeline/Timeline";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import {
   Empty,
@@ -11,7 +15,7 @@ import {
 } from "../../components/ui/empty";
 import { useInView } from "../../hooks/useInView";
 import { Briefcase } from "lucide-react";
-import { getExperience } from "../../lib/database/queries";
+import { getExperience, getProjects } from "../../lib/database/queries";
 import type { ExperienceEntry } from "../../lib/experience";
 import { buildPageMeta } from "../../lib/seo";
 
@@ -20,18 +24,21 @@ const PAGE_SIZE = 12;
 export function meta() {
   return buildPageMeta({
     title: "Experience – Mohamed Amara",
-    description: "Where I've worked and what I've shipped.",
+    description: "Where I've worked and what I've shipped, on one timeline.",
     canonicalPath: "/experience",
   });
 }
 
 export async function loader() {
-  const data = await getExperience(PAGE_SIZE, 0);
-  return { items: data };
+  const [items, projects] = await Promise.all([
+    getExperience(PAGE_SIZE, 0),
+    getProjects(50, 0),
+  ]);
+  return { items, projects: projects.filter((p) => p.date) };
 }
 
 export default function ExperienceIndex() {
-  const { items: initialItems } = useLoaderData<typeof loader>();
+  const { items: initialItems, projects } = useLoaderData<typeof loader>();
   const [items, setItems] = useState<ExperienceEntry[]>(initialItems);
   const [hasMore, setHasMore] = useState(initialItems.length === PAGE_SIZE);
   const appendedRef = useRef(false);
@@ -55,9 +62,14 @@ export default function ExperienceIndex() {
     );
   }, [inView, hasMore, items.length, fetcher.state]);
 
-  if (items.length === 0) {
+  const timelineItems = sortTimeline([
+    ...experienceToTimeline(items),
+    ...projectsToTimeline(projects),
+  ]);
+
+  if (timelineItems.length === 0) {
     return (
-      <main className="mx-auto max-w-6xl px-4 px-5 py-2 sm:py-5 md:py-6">
+      <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
         <h1 className="mb-6 text-xl font-semibold tracking-tight">
           Experience
         </h1>
@@ -77,18 +89,15 @@ export default function ExperienceIndex() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 px-5 py-2 sm:py-5 md:py-6">
+    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
       <div className="space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">Experience</h1>
-        <div className="space-y-6 border-l border-border/40 pl-4 sm:pl-6">
-          {items.map((entry) => (
-            <ExperienceItem
-              key={entry.id}
-              entry={entry}
-              to={`/experience/${entry.id}`}
-            />
-          ))}
-        </div>
+        <header className="space-y-1">
+          <h1 className="text-xl font-semibold tracking-tight">Experience</h1>
+          <p className="text-sm text-muted-foreground">
+            Roles and shipped projects, newest first.
+          </p>
+        </header>
+        <Timeline items={timelineItems} />
       </div>
       <div ref={sentinelRef} className="min-h-[1px] w-full">
         {fetcher.state === "loading" && <LoadMoreSkeleton />}

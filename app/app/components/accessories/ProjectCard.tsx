@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import type { Project, ProjectLink } from "../../lib/projects";
-import { Card } from "@heroui/react";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { TechTag } from "../../lib/tech/TechTag";
 
@@ -41,8 +40,8 @@ export default function ProjectCard({
 
   const content = (
     <>
-     <Card className="flex h-full w-full flex-col p-0">
-        <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-t-3xl bg-muted">
+     <div className="flex h-full w-full flex-col">
+        <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-muted">
           <ImgLoader
             src={`/api/load/image${project.image}`}
             alt={project.imageAlt}
@@ -62,7 +61,7 @@ export default function ProjectCard({
               {project.description}
             </p>
           </div>
-          <Card.Footer className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
+          <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
             {tags.map((tag, i) => {
               const tagUrl = `/tags/${encodeURIComponent(tag)}`;
               if (to) {
@@ -106,7 +105,7 @@ export default function ProjectCard({
                 </span>
               )
             }
-          </Card.Footer>
+          </div>
           {
             (!project.githubUrl && !project.liveUrl && !project.links?.length) ? null : (
               <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3 w-full">
@@ -157,7 +156,7 @@ export default function ProjectCard({
             )
           }
         </div>
-     </Card>
+     </div>
     </>
   );
 

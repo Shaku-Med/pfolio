@@ -1,11 +1,9 @@
 import { getProjects } from "~/lib/database/queries";
+import { pageParams } from "~/lib/security/http.server";
 
 const PAGE_SIZE = 12;
 
 export async function loader({ request }: { request: Request }) {
-  const url = new URL(request.url);
-  const limit = Math.min(Number(url.searchParams.get("limit")) || PAGE_SIZE, 50);
-  const offset = Number(url.searchParams.get("offset")) || 0;
-  const data = await getProjects(limit, offset);
-  return data;
+  const { limit, offset } = pageParams(new URL(request.url), PAGE_SIZE);
+  return await getProjects(limit, offset);
 }

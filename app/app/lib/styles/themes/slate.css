@@ -35,11 +35,6 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 
-  /* HeroUI aliases (import themes/heroui.css after this file) */
-  --white: var(--background);
-  --black: var(--foreground);
-  --snow: var(--muted);
-  --eclipse: var(--accent);
 }
 
 /* Dark theme variables */
@@ -77,11 +72,6 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.05 255);
 
-  /* HeroUI aliases */
-  --white: var(--background);
-  --black: var(--foreground);
-  --snow: var(--muted);
-  --eclipse: var(--accent);
 }
 
 /* System theme (system) - respects user's system preference */
@@ -124,10 +114,6 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.05 255);
-  --white: var(--background);
-  --black: var(--foreground);
-  --snow: var(--muted);
-  --eclipse: var(--accent);
     color-scheme: dark !important;
   }
 }
@@ -168,10 +154,6 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.55 0.05 255);
-  --white: var(--background);
-  --black: var(--foreground);
-  --snow: var(--muted);
-  --eclipse: var(--accent);
     color-scheme: light !important;
   }
 }

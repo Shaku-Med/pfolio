@@ -1,11 +1,10 @@
 import { Link, useLoaderData } from "react-router";
 import { getStackById, getStackUsage } from "../../../lib/database/queries";
+import type { StackUsageItem } from "../../../lib/database/queries";
 import type { StackCategory } from "../../../lib/stack";
 import { parseToolsString } from "../../../lib/stack";
 import { TechTag } from "~/lib/tech/TechTag";
 import { buildPageMeta } from "~/lib/seo";
-
-type StackUsageItem = Awaited<ReturnType<typeof getStackUsage>>[number];
 
 export async function loader({
   params,

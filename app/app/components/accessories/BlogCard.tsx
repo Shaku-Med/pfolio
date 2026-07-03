@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { type BlogPost, formatBlogDate } from "../../lib/blog";
-import { Separator } from "@heroui/react";
+import { Separator } from "~/components/ui/separator";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 
 type BlogCardProps = {

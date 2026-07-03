@@ -16,6 +16,7 @@ type DbProject = {
   github_url: string | null;
   live_url: string | null;
   links: unknown | null;
+  date?: string | null;
   details_md?: string | null;
 };
 
@@ -124,6 +125,7 @@ function mapProject(row: DbProject): Project {
     githubUrl: row.github_url ?? undefined,
     liveUrl: row.live_url ?? undefined,
     links: (row.links as Project["links"]) ?? undefined,
+    date: row.date ?? undefined,
     ...(row.details_md != null && row.details_md !== "" && { detailsMd: row.details_md }),
   };
 }

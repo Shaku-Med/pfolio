@@ -11,25 +11,69 @@ export function meta() {
   });
 }
 
+const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/;
+const GENERIC_ERROR =
+  "Couldn't send your message right now. Please try again later or email me directly.";
+
+function field(formData: FormData, key: string): string {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export async function action({ request }: { request: Request }) {
   if (request.method !== "POST") return null;
+
+  const { rateLimit, clientIp, isSameOrigin } = await import(
+    "../../lib/security/http.server"
+  );
+
+  if (!isSameOrigin(request)) {
+    return { success: false, error: GENERIC_ERROR };
+  }
+
+  const ip = clientIp(request);
+  if (
+    !rateLimit(`contact:${ip}`, 3, 10 * 60 * 1000) ||
+    !rateLimit("contact:global", 30, 60 * 60 * 1000)
+  ) {
+    return {
+      success: false,
+      error: "Too many messages in a short time. Please try again later.",
+    };
+  }
+
   const formData = await request.formData();
-  const name = (formData.get("name") as string)?.trim();
-  const email = (formData.get("email") as string)?.trim();
-  const message = (formData.get("message") as string)?.trim();
+
+  // Bots fill the hidden field; pretend it worked so they move on.
+  if (field(formData, "_gotcha")) {
+    return { success: true };
+  }
+
+  const name = field(formData, "name").replace(/[\r\n\t]/g, " ");
+  const email = field(formData, "email");
+  const message = field(formData, "message");
 
   if (!name || !email || !message) {
     return { success: false, error: "Please fill in all fields." };
   }
-
+  if (name.length > 100) {
+    return { success: false, error: "Name is too long." };
+  }
+  if (email.length > 254 || !EMAIL_RE.test(email)) {
+    return { success: false, error: "That email address doesn't look valid." };
+  }
   if (message.length < 10) {
     return { success: false, error: "Message should be at least 10 characters." };
+  }
+  if (message.length > 4000) {
+    return { success: false, error: "Message is too long (4000 characters max)." };
   }
 
   const { sendContactEmail } = await import("../../lib/send-contact-email.server");
   const result = await sendContactEmail({ name, email, message });
   if (result.ok) return { success: true };
-  return { success: false, error: result.error };
+  console.error("Contact email failed:", result.error);
+  return { success: false, error: GENERIC_ERROR };
 }
 
 export default function ContactIndex() {
@@ -57,14 +101,14 @@ export default function ContactIndex() {
           </h2>
 
           {actionData?.success && (
-            <div className="flex items-center gap-3 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-400">
-              <CheckCircle className="h-5 w-5 shrink-0" />
+            <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">
+              <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
               <span>Message sent. I’ll get back to you soon.</span>
             </div>
           )}
 
           {actionData && !actionData.success && actionData.error && (
-            <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+            <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <AlertCircle className="h-5 w-5 shrink-0" />
               <span>{actionData.error}</span>
             </div>
