@@ -51,8 +51,9 @@ function formatPeriod(period: DbExperience["period"]): string {
   if (!period) return "";
   const from = normalizePeriodPart(period.from);
   const to = normalizePeriodPart(period.to);
-  if (from && to) return `${from} – ${to}`;
-  if (from) return `${from} – Present`;
+  const ongoing = to != null && /^(present|now|current|ongoing)$/i.test(to);
+  if (from && (ongoing || !to)) return `Since ${from}`;
+  if (from && to) return from === to ? from : `${from} to ${to}`;
   if (to) return to;
   return "";
 }

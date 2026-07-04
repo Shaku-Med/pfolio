@@ -13,7 +13,7 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
       ? item.src
       : `/api/load/image${item.src}`;
   const card = (
-    <div className="relative flex min-h-[220px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80">
+    <div className="relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80">
       <ImgLoader
         src={src}
         alt={item.title}
@@ -50,7 +50,7 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
 
   if (to) {
     return (
-      <Link to={to} className="block">
+      <Link to={to} className="block h-full">
         {card}
       </Link>
     );

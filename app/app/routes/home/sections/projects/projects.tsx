@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import ProjectCard from "../../../../components/accessories/ProjectCard";
+import { Reveal, SectionHeader } from "../../../../components/accessories/Rail/Rail";
 import { useContextHook } from "../../../../components/accessories/context/Context";
 
 const ProjectsSection = () => {
@@ -8,20 +8,12 @@ const ProjectsSection = () => {
 
   return (
     <section id="projects" className="space-y-4">
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-lg font-semibold tracking-tight">Selected work</h2>
-        <Link
-          to="/projects"
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          View more
-        </Link>
-      </div>
+      <SectionHeader title="Selected work" to="/projects" />
       <div className="grid gap-4 md:grid-cols-3 items-stretch">
-        {projects.map((project) => (
-          <div key={project.id} className="min-w-0 flex">
+        {projects.map((project, i) => (
+          <Reveal key={project.id} delay={Math.min(i * 0.07, 0.28)} className="min-w-0 flex">
             <ProjectCard to={`/projects/${project.id}`} project={project} descriptionClamp />
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -29,4 +21,3 @@ const ProjectsSection = () => {
 };
 
 export default ProjectsSection;
-

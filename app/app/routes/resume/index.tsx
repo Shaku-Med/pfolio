@@ -3,11 +3,12 @@ import { useLoaderData } from "react-router";
 import { getResume } from "../../lib/database/queries";
 import { MarkdownPreview } from "../../components/accessories/MarkdownPreview";
 import { ResumePdfViewer } from "./Accessory/ResumePdfViewer";
+import { RailGlyph, Reveal } from "../../components/accessories/Rail/Rail";
 import { buildPageMeta } from "../../lib/seo";
 
 export function meta() {
   return buildPageMeta({
-    title: "Resume – Mohamed Amara",
+    title: "Resume | Mohamed Amara",
     description: "View the latest version of my resume as rich text or as a PDF.",
     canonicalPath: "/resume",
   });
@@ -26,14 +27,14 @@ const ResumePage = () => {
 
   return (
     <section className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Resume
-        </h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
-          View the latest version of my resume as rich text or as a PDF.
-        </p>
-      </header>
+      <Reveal>
+        <header className="space-y-2">
+          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <RailGlyph className="h-3 w-8" />
+            Resume
+          </h1>
+        </header>
+      </Reveal>
 
       <div className="inline-flex rounded-full border border-border bg-muted/60 p-1 text-xs sm:text-sm">
         <button
@@ -65,14 +66,14 @@ const ResumePage = () => {
           <MarkdownPreview content={resumeMd} title="Resume" />
         ) : (
           <p className="text-sm text-muted-foreground">
-            Resume content is not available yet. Please check back later.
+            The resume isn't up yet. Check back soon.
           </p>
         )
       ) : resumePdfUrl ? (
         <ResumePdfViewer pdfUrl={resumePdfUrl} />
       ) : (
         <p className="text-sm text-muted-foreground">
-          We can't seem to find the resume PDF. Please check back later.
+          Can't find the PDF right now. Check back soon.
         </p>
       )}
     </section>

@@ -5,6 +5,7 @@ import type { ExperienceEntry } from "../../../lib/experience";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { TechTag } from "~/lib/tech/TechTag";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { RailList, Reveal } from "~/components/accessories/Rail/Rail";
 import { useState } from "react";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 
@@ -22,7 +23,7 @@ export async function loader({
 export function meta({ data }: { data: { entry: ExperienceEntry } | null }) {
   if (!data?.entry) {
     return buildPageMeta({
-      title: "Not found – Mohamed Amara",
+      title: "Not found | Mohamed Amara",
       description: "Experience not found.",
       noindex: true,
     });
@@ -34,7 +35,7 @@ export function meta({ data }: { data: { entry: ExperienceEntry } | null }) {
       : `${BASE_URL}/api/load/image${entry.logo}`
     : undefined;
   return buildPageMeta({
-    title: `${entry.title ?? entry.role ?? entry.company} – Mohamed Amara`,
+    title: `${entry.title ?? entry.role ?? entry.company} | Mohamed Amara`,
     description: entry.description ?? undefined,
     canonicalPath: `/experience/${entry.id}`,
     ogImage,
@@ -101,14 +102,18 @@ const ExperienceIdIndex = () => {
         <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-10 lg:grid-cols-[1fr_17rem]">
           {/* ── Left column: main content ── */}
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
-              {entry.title}
-            </h1>
+            <Reveal>
+              <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
+                {entry.title}
+              </h1>
+            </Reveal>
 
             {entry.description && (
-              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                {entry.description}
-              </p>
+              <Reveal delay={0.08}>
+                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                  {entry.description}
+                </p>
+              </Reveal>
             )}
 
             {entry.detailsMd && (
@@ -140,17 +145,7 @@ const ExperienceIdIndex = () => {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-foreground">
                   Key highlights
                 </h2>
-                <ul className="mt-3 space-y-2.5">
-                  {entry.highlights.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex gap-3 text-[0.938rem] leading-[1.85] text-muted-foreground"
-                    >
-                      <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-primary/60" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <RailList items={entry.highlights} />
               </section>
             )}
 
@@ -160,17 +155,7 @@ const ExperienceIdIndex = () => {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-foreground">
                   Challenges
                 </h2>
-                <ul className="mt-3 space-y-2.5">
-                  {entry.challenges.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex gap-3 text-[0.938rem] leading-[1.85] text-muted-foreground"
-                    >
-                      <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-primary/60" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <RailList items={entry.challenges} />
               </section>
             )}
 
@@ -180,17 +165,7 @@ const ExperienceIdIndex = () => {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-foreground">
                   Learnings
                 </h2>
-                <ul className="mt-3 space-y-2.5">
-                  {entry.learnings.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex gap-3 text-[0.938rem] leading-[1.85] text-muted-foreground"
-                    >
-                      <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-primary/60" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <RailList items={entry.learnings} />
               </section>
             )}
           </div>

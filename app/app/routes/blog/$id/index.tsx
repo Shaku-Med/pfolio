@@ -6,6 +6,7 @@ import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { TechTag } from "~/lib/tech/TechTag";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { Reveal } from "~/components/accessories/Rail/Rail";
 import { useState } from "react";
 
 export async function loader({
@@ -22,7 +23,7 @@ export async function loader({
 export function meta({ data }: { data: { post: BlogPost } | null }) {
   if (!data?.post) {
     return buildPageMeta({
-      title: "Not found – Mohamed Amara",
+      title: "Not found | Mohamed Amara",
       description: "Post not found.",
       noindex: true,
     });
@@ -34,7 +35,7 @@ export function meta({ data }: { data: { post: BlogPost } | null }) {
       : `${BASE_URL}/api/load/image${post.coverImage}`
     : undefined;
   return buildPageMeta({
-    title: `${post.title} – Blog – Mohamed Amara`,
+    title: `${post.title} | Blog | Mohamed Amara`,
     description: post.excerpt ?? undefined,
     canonicalPath: `/blog/${post.id}`,
     ogImage,
@@ -101,15 +102,19 @@ export default function BlogPostPage() {
           {/* ── Left column: main content ── */}
           <div className="min-w-0">
             {/* Title */}
-            <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
-              {post.title}
-            </h1>
+            <Reveal>
+              <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
+                {post.title}
+              </h1>
+            </Reveal>
 
             {/* Excerpt as lede */}
             {post.excerpt && (
-              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                {post.excerpt}
-              </p>
+              <Reveal delay={0.08}>
+                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                  {post.excerpt}
+                </p>
+              </Reveal>
             )}
 
             <hr className="my-8 border-border/50" />

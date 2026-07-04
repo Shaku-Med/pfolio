@@ -1,12 +1,17 @@
-import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useLoaderData } from "react-router";
 import MarkdownBody from "../../../components/accessories/MarkdownBody";
-import { getGallery, getGalleryById } from "../../../lib/database/queries";
+import { getGalleryById } from "../../../lib/database/queries";
 import type { GalleryItem } from "../../../lib/gallery";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { Reveal } from "~/components/accessories/Rail/Rail";
+
+function resolveImageSrc(path: string | null | undefined): string {
+  if (!path) return "";
+  return path.startsWith("http") ? path : `/api/load/image${path}`;
+}
 
 export async function loader({
   params,
@@ -22,7 +27,7 @@ export async function loader({
 export function meta({ data }: { data: { item: GalleryItem } | null }) {
   if (!data?.item) {
     return buildPageMeta({
-      title: "Not found – Mohamed Amara",
+      title: "Not found | Mohamed Amara",
       description: "Gallery item not found.",
       noindex: true,
     });
@@ -34,7 +39,7 @@ export function meta({ data }: { data: { item: GalleryItem } | null }) {
       : `${BASE_URL}/api/load/image${item.src}`
     : undefined;
   return buildPageMeta({
-    title: `${item.title} – Gallery – Mohamed Amara`,
+    title: `${item.title} | Gallery | Mohamed Amara`,
     description: item.subtitle ?? undefined,
     canonicalPath: `/gallery/${item.id}`,
     ogImage,
@@ -44,8 +49,8 @@ export function meta({ data }: { data: { item: GalleryItem } | null }) {
 
 export default function GalleryIdIndex() {
   const data = useLoaderData<typeof loader>();
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [imgColors, setImgColors] = useState<string[]>([]);
+
   if (!data?.item) {
     return (
       <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
@@ -55,117 +60,141 @@ export default function GalleryIdIndex() {
   }
 
   const item = data.item as GalleryItem;
-  const src =
-    item.src && item.src.startsWith("http")
-      ? item.src
-      : `/api/load/image${item.src}`;
+  const heroSrc = resolveImageSrc(item.src);
   const extras = item.projectSrcs ?? [];
 
-  const scroll = (dir: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const amount = scrollRef.current.clientWidth * 0.6;
-    scrollRef.current.scrollBy({
-      left: dir === "left" ? -amount : amount,
-      behavior: "smooth",
-    });
-  };
+  const allImages = useMemo(() => {
+    const extraSrcs = extras.map(resolveImageSrc).filter(Boolean);
+    return heroSrc ? [heroSrc, ...extraSrcs] : extraSrcs;
+  }, [heroSrc, extras]);
+
+  /** Thumbnails below the hero — hero is already shown above. */
+  const thumbnails = useMemo(
+    () => (allImages.length > 1 ? allImages.slice(1) : []),
+    [allImages],
+  );
+
+  const GRID_CAP = 4;
+  const gridTiles = useMemo(
+    () =>
+      thumbnails.length > GRID_CAP
+        ? thumbnails.slice(0, GRID_CAP)
+        : thumbnails,
+    [thumbnails],
+  );
+  const overflowCount =
+    thumbnails.length > GRID_CAP ? thumbnails.length - GRID_CAP : 0;
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
       <article>
-        {/* ── Hero ── */}
+        {/* Hero */}
         <div className="relative -mx-5 overflow-hidden sm:mx-0 sm:rounded-3xl">
           <div className="aspect-[21/9] w-full bg-background">
             <CanvasGradient colors={imgColors} />
             <ImgLoader
               shouldShowPreview={true}
-              src={src}
+              multipleImages={allImages}
+              multipleCurrentImageIndex={0}
+              src={heroSrc}
               alt={item.title}
-              loading="lazy"
+              loading="eager"
+              fetchPriority="high"
               className="h-full w-full"
               imageClassName="object-contain"
               getImgColors={true}
-              onGetImgColorsCallback={(colors) => {
-                setImgColors(colors);
-              }}
+              onGetImgColorsCallback={setImgColors}
             />
           </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8">
+          <div className="absolute bottom-5 left-5 right-5 sm:bottom-8 sm:left-8 sm:right-8">
             <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md">
               Gallery
             </span>
+            {allImages.length > 1 && (
+              <p className="mt-3 max-w-xl text-sm text-white/75">
+                {allImages.length} images — tap to preview
+              </p>
+            )}
           </div>
         </div>
 
-        {/* ── Side-by-side ── */}
         <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-10 lg:grid-cols-[1fr_17rem]">
-          {/* Left column */}
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
-              {item.title}
-            </h1>
+            <Reveal>
+              <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
+                {item.title}
+              </h1>
+            </Reveal>
 
             {item.subtitle && (
-              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                {item.subtitle}
-              </p>
+              <Reveal delay={0.08}>
+                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                  {item.subtitle}
+                </p>
+              </Reveal>
             )}
 
-            {/* ── Carousel ── */}
-            {extras.length > 0 && (
+            {thumbnails.length > 0 && (
               <>
                 <hr className="my-8 border-border/50" />
 
-                <div className="relative">
-                  <button
-                    onClick={() => scroll("left")}
-                    className="absolute -left-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-opacity hover:bg-background"
-                    aria-label="Scroll left"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => scroll("right")}
-                    className="absolute -right-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-opacity hover:bg-background"
-                    aria-label="Scroll right"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
+                <Reveal delay={0.1}>
+                  <div>
+                    <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
+                        Gallery
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        {allImages.length} images — tap to preview
+                        {overflowCount > 0
+                          ? ` · ${gridTiles.length} shown`
+                          : null}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      {gridTiles.map((imageSrc, i) => {
+                        const previewIndex = i + 1;
+                        const isOverflowTile =
+                          overflowCount > 0 && i === gridTiles.length - 1;
 
-                  <div
-                    ref={scrollRef}
-                    className="scrollbar-none flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
-                  >
-                    {extras.map((p, i) => {
-                      const extraSrc =
-                        p && p.startsWith("http")
-                          ? p
-                          : `/api/load/image${p}`;
-                      return (
-                        <div
-                          key={`${p}-${i}`}
-                          className="w-40 shrink-0 snap-start overflow-hidden rounded-xl bg-muted sm:w-48"
-                        >
-                          <ImgLoader
-                            shouldShowPreview={true}
-                            multipleImages={extras.map(p => p && p.startsWith("http") ? p : `/api/load/image${p}`)}
-                            multipleCurrentImageIndex={i}
-                            src={extraSrc}
-                            alt={`${item.title} ${i + 1}`}
-                            loading="lazy"
-                            className="aspect-[4/3] h-full w-full"
-                            imageClassName="object-cover"
-                          />
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div
+                            key={`${imageSrc}-${previewIndex}`}
+                            className="relative overflow-hidden rounded-xl border border-border/50 bg-muted/30"
+                          >
+                            <ImgLoader
+                              shouldShowPreview={true}
+                              multipleImages={allImages}
+                              multipleCurrentImageIndex={previewIndex}
+                              src={imageSrc}
+                              alt={`${item.title} ${previewIndex + 1}`}
+                              loading="lazy"
+                              className="aspect-square w-full"
+                              imageClassName="object-cover"
+                            />
+                            {isOverflowTile ? (
+                              <div
+                                className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-black/55 backdrop-blur-[2px]"
+                                aria-hidden
+                              >
+                                <span className="text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
+                                  +{overflowCount}
+                                </span>
+                                <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">
+                                  more
+                                </span>
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                </Reveal>
               </>
             )}
 
-            {/* ── Markdown body ── */}
             {item.detailsMd && (
               <>
                 <hr className="my-8 border-border/50" />
@@ -177,9 +206,8 @@ export default function GalleryIdIndex() {
             )}
           </div>
 
-          {/* Right sidebar */}
           <aside className="lg:pt-1">
-            <div className="lg:sticky lg:top-28 space-y-8">
+            <div className="space-y-8 lg:sticky lg:top-28">
               <div>
                 <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
                   Project
@@ -187,13 +215,13 @@ export default function GalleryIdIndex() {
                 <p className="text-sm text-foreground">{item.title}</p>
               </div>
 
-              {extras.length > 0 && (
+              {allImages.length > 0 && (
                 <div>
                   <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
                     Images
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {extras.length + 1} total
+                    {allImages.length} total
                   </p>
                 </div>
               )}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router";
 import BlogCard from "../../components/accessories/BlogCard";
+import { PageHeader, Reveal } from "../../components/accessories/Rail/Rail";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import { useInView } from "../../hooks/useInView";
 import { getBlogPosts } from "../../lib/database/queries";
@@ -11,7 +12,7 @@ const PAGE_SIZE = 12;
 
 export function meta() {
   return buildPageMeta({
-    title: "Blog – Mohamed Amara",
+    title: "Blog | Mohamed Amara",
     description: "Notes on design, engineering, and shipping.",
     canonicalPath: "/blog",
   });
@@ -47,14 +48,7 @@ export default function BlogIndex() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <header className="mb-12">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Blogs
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Notes on building, shipping, and what I've learned along the way.
-        </p>
-      </header>
+      <PageHeader title="Blog" />
 
       {items.length === 0 ? (
         <p className="py-20 text-center text-muted-foreground">
@@ -66,14 +60,18 @@ export default function BlogIndex() {
             className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
             aria-label="Blog posts"
           >
-            {items.map((post) => (
-              <div key={post.id} className="min-w-0">
+            {items.map((post, i) => (
+              <Reveal
+                key={post.id}
+                delay={Math.min((i % 3) * 0.07, 0.28)}
+                className="min-w-0"
+              >
                 <BlogCard
                   post={post}
                   variant="full"
                   to={`/blog/${post.id}`}
                 />
-              </div>
+              </Reveal>
             ))}
           </section>
 

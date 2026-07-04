@@ -45,7 +45,7 @@ function formatProjectPeriod(iso: string): string {
 
 export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[] {
   return entries.map((entry) => {
-    const ongoing = /now|present/i.test(entry.period);
+    const ongoing = /now|present|since/i.test(entry.period);
     const year = startYear(entry.period);
     return {
       kind: "experience" as const,

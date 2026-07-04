@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from "react-router";
 import type { SearchResult } from "../../../lib/database/queries";
 import { searchByTag } from "../../../lib/database/queries";
+import { RailGlyph, Reveal } from "../../../components/accessories/Rail/Rail";
 import { buildPageMeta } from "../../../lib/seo";
 
 const PAGE_SIZE = 20;
@@ -8,7 +9,7 @@ const PAGE_SIZE = 20;
 export function meta({ data }: { data: { tag: string } | undefined }) {
   const tag = data?.tag ?? "";
   return buildPageMeta({
-    title: tag ? `#${tag} – Tags – Mohamed Amara` : "Tags – Mohamed Amara",
+    title: tag ? `#${tag} | Tags | Mohamed Amara` : "Tags | Mohamed Amara",
     description: "Items across projects, experience, stack, blog, and gallery that mention this tag.",
     canonicalPath: tag ? `/tags/${encodeURIComponent(tag)}` : "/tags",
   });
@@ -37,15 +38,17 @@ export default function TagPage() {
   const { tag, results, page, hasMore } = useLoaderData<typeof loader>();
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-14 sm:px-5 sm:py-16 md:px-6 md:py-24 space-y-8">
-      <header className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Tag: <span className="text-primary">#{tag}</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Items across projects, experience, stack, blog, and gallery that mention this tag.
-        </p>
-      </header>
+    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6 space-y-8">
+      <Reveal>
+        <header className="space-y-3">
+          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <RailGlyph className="h-3 w-8" />
+            <span>
+              Tag: <span className="text-primary">#{tag}</span>
+            </span>
+          </h1>
+        </header>
+      </Reveal>
 
       {results.length === 0 && (
         <p className="text-sm text-muted-foreground">

@@ -7,6 +7,7 @@ import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { TechTag } from "~/lib/tech/TechTag";
 import { useState } from "react";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { Reveal } from "~/components/accessories/Rail/Rail";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 
 const linkIcons: Record<NonNullable<ProjectLink["icon"]>, typeof FileText> = {
@@ -30,7 +31,7 @@ export async function loader({
 export function meta({ data }: { data: { project: Project } | null }) {
   if (!data?.project) {
     return buildPageMeta({
-      title: "Not found – Mohamed Amara",
+      title: "Not found | Mohamed Amara",
       description: "Project not found.",
       noindex: true,
     });
@@ -42,7 +43,7 @@ export function meta({ data }: { data: { project: Project } | null }) {
       : `${BASE_URL}/api/load/image${project.image}`
     : undefined;
   return buildPageMeta({
-    title: `${project.title} – Mohamed Amara`,
+    title: `${project.title} | Mohamed Amara`,
     description: project.description,
     canonicalPath: `/projects/${project.id}`,
     ogImage,
@@ -52,6 +53,8 @@ export function meta({ data }: { data: { project: Project } | null }) {
 
 export default function ProjectIdIndex() {
   const data = useLoaderData<typeof loader>();
+  const [imgColors, setImgColors] = useState<string[]>([]);
+
   if (!data?.project) {
     return (
       <main className="mx-auto max-w-6xl px-5 py-24">
@@ -64,8 +67,6 @@ export default function ProjectIdIndex() {
   const tags = project.tags.filter(
     (tag) => tag != null && String(tag).trim() !== ""
   );
-
-  const [imgColors, setImgColors] = useState<string[]>([]);
 
   const hasLinks =
     project.githubUrl || project.liveUrl || (project.links?.length ?? 0) > 0;
@@ -107,14 +108,18 @@ export default function ProjectIdIndex() {
         <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-10 lg:grid-cols-[1fr_17rem]">
           {/* ── Left column: main content ── */}
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
-              {project.title}
-            </h1>
+            <Reveal>
+              <h1 className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-[2.65rem]">
+                {project.title}
+              </h1>
+            </Reveal>
 
             {project.description && (
-              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                {project.description}
-              </p>
+              <Reveal delay={0.08}>
+                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                  {project.description}
+                </p>
+              </Reveal>
             )}
 
             <hr className="my-8 border-border/50" />

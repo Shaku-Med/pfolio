@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,16 +18,45 @@ import {
   Maximize2,
   Download,
 } from "lucide-react";
-import { Dialog, DialogContent } from "~/components/ui/dialog";
-import ImgLoader from "../ImgLoader";
-import { motion } from "motion/react";
+import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
+import { motion, useReducedMotion } from "motion/react";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { useStandalone } from "~/hooks/useStandalone";
+import { useAdaptiveTone, type Tone } from "~/lib/useAdaptiveTone";
+import { getDominantColors } from "~/lib/utils/Image/colors";
+import {
+  getContainedViewportRect,
+  loadImageDimensions,
+  MORPH_DURATION,
+  MORPH_EASE,
+  type MorphOrigin,
+} from "~/lib/utils/Image/ImagePreview/morph";
+import { cn } from "~/lib/utils";
+
+const AdaptiveCtx = createContext<{
+  imageRef: RefObject<HTMLImageElement | null>;
+  trigger: string;
+} | null>(null);
+
+const NULL_IMG_REF: RefObject<HTMLImageElement | null> = { current: null };
+
+function useControlTone(targetRef: RefObject<HTMLElement | null>): Tone {
+  const ctx = useContext(AdaptiveCtx);
+  return useAdaptiveTone({
+    imageRef: ctx?.imageRef ?? NULL_IMG_REF,
+    targetRef,
+    trigger: ctx?.trigger,
+    defaultTone: "light",
+  });
+}
 
 interface ImgPreviewProps {
   images: string[];
   index: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  colors?: string[];
+  morphOrigin?: MorphOrigin | null;
 }
 
 export default function ImgPreview({
@@ -26,8 +64,11 @@ export default function ImgPreview({
   index: initialIndex,
   isOpen,
   setIsOpen,
+  colors: initialColors = [],
+  morphOrigin = null,
 }: ImgPreviewProps) {
-  if (images.length < 1) return null;
+  const isStandalone = useStandalone();
+  const reduceMotion = useReducedMotion();
 
   const [current, setCurrent] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
@@ -35,21 +76,29 @@ export default function ImgPreview({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [imgColors, setImgColors] = useState<string[]>([]);
+  const [imgColors, setImgColors] = useState<string[]>(initialColors);
+  const [morphPhase, setMorphPhase] = useState<"enter" | "idle" | "exit">(
+    morphOrigin && !reduceMotion ? "enter" : "idle",
+  );
+  const [morphTarget, setMorphTarget] = useState<Omit<
+    MorphOrigin,
+    "borderRadius"
+  > | null>(null);
+  const storedOrigin = useRef<MorphOrigin | null>(morphOrigin);
+  const closingRef = useRef(false);
 
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const dragStart = useRef({ x: 0, y: 0 });
   const panStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const zoomRef = useRef(zoom);
   const panRef = useRef(pan);
 
-  // Pinch
   const lastPinchDist = useRef(0);
   const lastPinchMid = useRef({ x: 0, y: 0 });
   const pinching = useRef(false);
-
-  // Swipe
+  const gestureWasMultiTouch = useRef(false);
   const swipeStart = useRef<{ x: number; y: number; t: number } | null>(null);
 
   zoomRef.current = zoom;
@@ -60,12 +109,22 @@ export default function ImgPreview({
   }, [initialIndex]);
 
   useEffect(() => {
+    setCurrent((c) =>
+      images.length < 1 ? 0 : Math.min(c, images.length - 1)
+    );
+  }, [images.length]);
+
+  useEffect(() => {
     setZoom(1);
     setRotation(0);
     setPan({ x: 0, y: 0 });
   }, [current]);
 
-  // ── Helpers ──
+  useEffect(() => {
+    if (isOpen && initialColors.length > 0) {
+      setImgColors(initialColors);
+    }
+  }, [isOpen, initialColors]);
 
   const clampZoom = (z: number) => Math.min(Math.max(z, 1), 5);
 
@@ -113,8 +172,6 @@ export default function ImgPreview({
     [clampPan]
   );
 
-  // ── Auto-hide controls ──
-
   const resetHideTimer = useCallback(() => {
     setShowControls(true);
     clearTimeout(hideTimer.current || 0);
@@ -125,8 +182,6 @@ export default function ImgPreview({
     if (isOpen) resetHideTimer();
     return () => clearTimeout(hideTimer.current || 0);
   }, [isOpen, resetHideTimer]);
-
-  // ── Navigation ──
 
   const go = useCallback(
     (dir: -1 | 1) => {
@@ -158,7 +213,63 @@ export default function ImgPreview({
     a.click();
   };
 
-  // ── Block browser Ctrl/Cmd+key zoom globally while dialog is open ──
+  const canMorph = !!morphOrigin && !reduceMotion;
+
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    if (!canMorph || !storedOrigin.current || !morphTarget) {
+      setIsOpen(false);
+      return;
+    }
+    closingRef.current = true;
+    setMorphPhase("exit");
+  }, [canMorph, morphTarget, setIsOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    storedOrigin.current = morphOrigin;
+    closingRef.current = false;
+
+    if (!canMorph) {
+      setMorphPhase("idle");
+      setMorphTarget(null);
+      return;
+    }
+
+    setMorphPhase("enter");
+    setMorphTarget(null);
+
+    const src = images[initialIndex];
+    if (!src) {
+      setMorphPhase("idle");
+      return;
+    }
+
+    let cancelled = false;
+    loadImageDimensions(src)
+      .then(({ width, height }) => {
+        if (cancelled) return;
+        setMorphTarget(getContainedViewportRect(width, height));
+      })
+      .catch(() => {
+        if (!cancelled) setMorphPhase("idle");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, initialIndex, morphOrigin, canMorph, images]);
+
+  const onMorphAnimationComplete = useCallback(() => {
+    setMorphPhase((phase) => {
+      if (phase === "enter") return "idle";
+      if (phase === "exit") {
+        closingRef.current = false;
+        queueMicrotask(() => setIsOpen(false));
+      }
+      return phase;
+    });
+  }, [setIsOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -174,8 +285,6 @@ export default function ImgPreview({
     return () => document.removeEventListener("keydown", blockBrowserKeyZoom);
   }, [isOpen]);
 
-  // ── Keyboard ──
-
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
@@ -188,7 +297,7 @@ export default function ImgPreview({
           go(1);
           break;
         case "Escape":
-          setIsOpen(false);
+          requestClose();
           break;
         case "+":
         case "=":
@@ -207,15 +316,20 @@ export default function ImgPreview({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isOpen, go, setIsOpen, resetHideTimer]);
-
-  // ── Ctrl/Cmd + wheel → block browser zoom + zoom toward cursor ──
+  }, [isOpen, go, requestClose, resetHideTimer]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const handler = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
+    const onWheel = (e: WheelEvent) => {
+      const el = containerRef.current;
+      const over =
+        !!el &&
+        (e.target === el ||
+          (e.target instanceof Node && el.contains(e.target)));
+      const withModifier = e.ctrlKey || e.metaKey;
+      if (!withModifier && !over) return;
+
       e.preventDefault();
       e.stopPropagation();
       resetHideTimer();
@@ -223,15 +337,12 @@ export default function ImgPreview({
       zoomToward(e.clientX, e.clientY, zoomRef.current + delta);
     };
 
-    document.addEventListener("wheel", handler, { passive: false });
-    return () => document.removeEventListener("wheel", handler);
+    document.addEventListener("wheel", onWheel, { passive: false });
+    return () => document.removeEventListener("wheel", onWheel);
   }, [isOpen, zoomToward, resetHideTimer]);
-
-  // ── Pointer: only for mouse drag pan when zoomed ──
 
   const handlePointerDown = (e: React.PointerEvent) => {
     resetHideTimer();
-    // Only capture mouse, not touch — touch needs to flow to touch handlers for swipe
     if (e.pointerType !== "mouse") return;
     if (pinching.current) return;
     if (zoomRef.current <= 1) return;
@@ -256,8 +367,6 @@ export default function ImgPreview({
     setDragging(false);
   };
 
-  // ── Touch: pinch zoom, swipe nav, single-finger pan when zoomed ──
-
   const getPinchInfo = (touches: React.TouchList) => {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
@@ -273,18 +382,19 @@ export default function ImgPreview({
 
     if (e.touches.length === 2) {
       pinching.current = true;
+      gestureWasMultiTouch.current = true;
       swipeStart.current = null;
       const info = getPinchInfo(e.touches);
       lastPinchDist.current = info.dist;
       lastPinchMid.current = { x: info.midX, y: info.midY };
     } else if (e.touches.length === 1) {
+      gestureWasMultiTouch.current = false;
       swipeStart.current = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY,
         t: Date.now(),
       };
 
-      // If zoomed, start pan tracking
       if (zoomRef.current > 1) {
         setDragging(true);
         dragStart.current = {
@@ -308,14 +418,12 @@ export default function ImgPreview({
       swipeStart.current = null;
     } else if (e.touches.length === 1 && !pinching.current) {
       if (zoomRef.current > 1 && dragging) {
-        // Pan when zoomed
         const nextPan = {
           x: panStart.current.x + (e.touches[0].clientX - dragStart.current.x),
           y: panStart.current.y + (e.touches[0].clientY - dragStart.current.y),
         };
         setPan(clampPan(nextPan, zoomRef.current));
       }
-      // Let swipe detection happen on touchEnd — don't cancel swipeStart here
     }
   };
 
@@ -326,7 +434,6 @@ export default function ImgPreview({
 
     setDragging(false);
 
-    // Swipe detection (only at 1x zoom)
     if (
       swipeStart.current &&
       e.changedTouches.length === 1 &&
@@ -349,11 +456,8 @@ export default function ImgPreview({
     swipeStart.current = null;
   };
 
-  // ── Tap handling (mouse only — touch uses swipe) ──
-
   const lastTap = useRef(0);
   const handleClick = (e: React.MouseEvent) => {
-    // Ignore if this came from a touch (swipe handles that)
     if ((e as unknown as PointerEvent).pointerType === "touch") return;
 
     const now = Date.now();
@@ -375,11 +479,9 @@ export default function ImgPreview({
     }
   };
 
-  // Double-tap for touch
   const lastTouch = useRef(0);
   const handleTouchEndTap = (e: React.TouchEvent) => {
-    // Only count single-finger taps that didn't swipe
-    if (e.changedTouches.length !== 1 || pinching.current) return;
+    if (e.changedTouches.length !== 1 || pinching.current || gestureWasMultiTouch.current) return;
 
     const now = Date.now();
     const touch = e.changedTouches[0];
@@ -396,229 +498,321 @@ export default function ImgPreview({
     }
   };
 
-  // Merge touchEnd handlers
   const onTouchEnd = (e: React.TouchEvent) => {
     handleTouchEnd(e);
     handleTouchEndTap(e);
   };
 
-  const imageSrc = images[current];
-  const controlsClass = `transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`;
+  const handleImageLoad = () => {
+    if (imgRef.current) {
+      setImgColors(getDominantColors(imgRef.current));
+    }
+  };
 
-  const imageId = `img-loader-${imageSrc}`;
+  const controlsClass = `transition-opacity duration-300 ${
+    showControls && morphPhase === "idle"
+      ? "opacity-100"
+      : "opacity-0 pointer-events-none"
+  }`;
+
+  const stageVisible = morphPhase === "idle";
+  const morphActive =
+    canMorph &&
+    morphOrigin &&
+    morphTarget &&
+    (morphPhase === "enter" || morphPhase === "exit");
+  const morphImageSrc = images[initialIndex] ?? images[current];
+
+  const adaptTrigger = useMemo(
+    () => `${current}|${zoom}|${rotation}|${pan.x}|${pan.y}`,
+    [current, zoom, rotation, pan.x, pan.y],
+  );
+  const adaptCtxValue = useMemo(
+    () => ({ imageRef: imgRef, trigger: adaptTrigger }),
+    [adaptTrigger],
+  );
+
+  if (images.length < 1) return null;
+
+  const imageSrc = images[current];
+  if (!imageSrc) return null;
+
+  const hasMultiple = images.length > 1;
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) requestClose();
+      }}
+    >
       <DialogContent
-        className="fixed inset-0 flex min-h-full min-w-full max-w-none translate-x-0 translate-y-0 border-0 bg-black p-0 shadow-none data-[state=open]:slide-in-from-bottom-0 [&>button]:hidden"
+        showCloseButton={false}
+        overlayClassName="bg-transparent"
+        className="fixed inset-0 flex h-[100dvh] min-h-[100dvh] w-full min-w-full max-w-none translate-x-0 translate-y-0 flex-col border-0 bg-transparent p-0 shadow-none data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 data-[state=open]:slide-in-from-bottom-0 data-[state=closed]:slide-out-to-bottom-0 [&>button]:hidden"
         style={{ borderRadius: 0, top: 0, left: 0, transform: "none" }}
         onPointerMove={resetHideTimer}
       >
-        {/* ── Image ── */}
-        <motion.div
-          ref={containerRef}
-          className="absolute inset-0 flex items-center justify-center overflow-hidden"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={onTouchEnd}
-          onClick={handleClick}
-          style={{
-            cursor:
-              zoom > 1 ? (dragging ? "grabbing" : "grab") : "default",
-            touchAction: "none",
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div
+        <AdaptiveCtx.Provider value={adaptCtxValue}>
+          <DialogTitle className="sr-only">
+            Image preview{hasMultiple ? `, ${current + 1} of ${images.length}` : ""}
+          </DialogTitle>
+
+          {/* Backdrop — fades with morph */}
+          <motion.div
+            aria-hidden
+            className="pointer-events-none fixed inset-0 z-[1] bg-black"
+            initial={false}
+            animate={{ opacity: morphPhase === "exit" ? 0 : morphTarget ? 0.92 : 0 }}
+            transition={{ duration: MORPH_DURATION, ease: MORPH_EASE }}
+          />
+
+          {/* Source → fullscreen morph flight */}
+          {morphActive && morphOrigin && morphTarget && morphImageSrc && (
+            <motion.div
+              aria-hidden
+              className="fixed z-[2] overflow-hidden will-change-[top,left,width,height]"
+              initial={
+                morphPhase === "enter"
+                  ? {
+                      top: morphOrigin.top,
+                      left: morphOrigin.left,
+                      width: morphOrigin.width,
+                      height: morphOrigin.height,
+                      borderRadius: morphOrigin.borderRadius,
+                    }
+                  : {
+                      top: morphTarget.top,
+                      left: morphTarget.left,
+                      width: morphTarget.width,
+                      height: morphTarget.height,
+                      borderRadius: 0,
+                    }
+              }
+              animate={
+                morphPhase === "enter"
+                  ? {
+                      top: morphTarget.top,
+                      left: morphTarget.left,
+                      width: morphTarget.width,
+                      height: morphTarget.height,
+                      borderRadius: 0,
+                    }
+                  : {
+                      top: storedOrigin.current?.top ?? morphOrigin.top,
+                      left: storedOrigin.current?.left ?? morphOrigin.left,
+                      width: storedOrigin.current?.width ?? morphOrigin.width,
+                      height: storedOrigin.current?.height ?? morphOrigin.height,
+                      borderRadius: storedOrigin.current?.borderRadius ?? morphOrigin.borderRadius,
+                    }
+              }
+              transition={{ duration: MORPH_DURATION, ease: MORPH_EASE }}
+              onAnimationComplete={onMorphAnimationComplete}
+            >
+              <img
+                src={morphImageSrc}
+                alt=""
+                className="h-full w-full object-contain"
+                draggable={false}
+              />
+            </motion.div>
+          )}
+
+          {/* Full-screen stage — canvas is fixed bg; only the image transforms */}
+          <motion.div
+            ref={containerRef}
+            className="absolute inset-0 z-[3] flex items-center justify-center overflow-hidden bg-transparent"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={onTouchEnd}
+            onClick={handleClick}
             style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotation}deg)`,
-              transition:
-                dragging || pinching.current
-                  ? "none"
-                  : "transform 150ms ease-out",
-              willChange: "transform",
+              cursor:
+                zoom > 1 ? (dragging ? "grabbing" : "grab") : "default",
+              touchAction: "none",
+              pointerEvents: stageVisible ? "auto" : "none",
             }}
+            initial={false}
+            animate={{ opacity: stageVisible ? 1 : 0 }}
+            transition={{ duration: stageVisible ? 0 : 0.12, ease: MORPH_EASE }}
           >
             <CanvasGradient colors={imgColors} />
-            <ImgLoader
-              src={imageSrc}
-              alt={`Image ${current + 1}`}
-              className="h-screen w-screen select-none"
-              imageClassName="h-full w-full object-contain"
-              loading="eager"
-              fetchPriority="high"
-              getImgColors={true}
-              onGetImgColorsCallback={(colors) => {
-                setImgColors(colors);
+            <div
+              className="relative z-10 flex h-full w-full items-center justify-center"
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotation}deg)`,
+                transition:
+                  dragging || pinching.current
+                    ? "none"
+                    : "transform 150ms ease-out",
+                willChange: "transform",
               }}
-            />
-          </div>
-        </motion.div>
+            >
+              <img
+                ref={imgRef}
+                src={imageSrc}
+                alt=""
+                crossOrigin="anonymous"
+                className="h-full w-full max-h-[100dvh] max-w-[100dvw] select-none object-contain"
+                loading="eager"
+                fetchPriority="high"
+                draggable={false}
+                onLoad={handleImageLoad}
+              />
+            </div>
+          </motion.div>
 
-        {/* ── Floating top bar ── */}
-        <div
-          className={`absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/60 to-transparent px-4 pb-8 pt-4 ${controlsClass}`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-white/80">
-              {current + 1} / {images.length}
-            </span>
+          {/* Top bar */}
+          <div
+            className={`pointer-events-none absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-black/70 to-transparent px-4 pb-6 ${
+              isStandalone
+                ? "pt-[max(0.75rem,env(safe-area-inset-top))]"
+                : "pt-3 sm:pt-4"
+            }`}
+          >
+            <div className={`pointer-events-auto flex items-center justify-between gap-3 ${controlsClass}`}>
+              {hasMultiple ? (
+                <ToneText className="text-sm font-medium tabular-nums">
+                  {current + 1} / {images.length}
+                </ToneText>
+              ) : (
+                <span className="text-sm font-medium text-white/80">Preview</span>
+              )}
 
-            <div className="hidden items-center gap-1 sm:flex">
-              <ToolButton
-                onClick={zoomOut}
-                label="Zoom out"
-                disabled={zoom <= 1}
+              <div className="hidden items-center gap-1 sm:flex">
+                <ToolButton onClick={zoomOut} label="Zoom out" disabled={zoom <= 1}>
+                  <Minus className="h-4 w-4" />
+                </ToolButton>
+                <ToneText className="min-w-[3rem] text-center text-xs" light="text-white/60" dark="text-black/60">
+                  {Math.round(zoom * 100)}%
+                </ToneText>
+                <ToolButton onClick={zoomIn} label="Zoom in" disabled={zoom >= 5}>
+                  <Plus className="h-4 w-4" />
+                </ToolButton>
+                <Divider />
+                <ToolButton onClick={rotate} label="Rotate">
+                  <RotateCw className="h-4 w-4" />
+                </ToolButton>
+                <ToolButton onClick={resetView} label="Reset view">
+                  <Maximize2 className="h-4 w-4" />
+                </ToolButton>
+                <ToolButton onClick={handleDownload} label="Download">
+                  <Download className="h-4 w-4" />
+                </ToolButton>
+                <Divider />
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requestClose();
+                }}
+                aria-label="Close"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/12 text-white shadow-sm ring-1 ring-white/10 transition-colors hover:bg-white/22 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
               >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile toolbar */}
+          <div
+            className={`absolute inset-x-0 bottom-0 z-30 border-t border-white/10 bg-gradient-to-t from-black/70 to-transparent backdrop-blur-md sm:hidden ${controlsClass}`}
+            style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+          >
+            <div className="flex items-center justify-center gap-2 px-3 pb-2 pt-4">
+              <ToolButton onClick={zoomOut} label="Zoom out" disabled={zoom <= 1}>
                 <Minus className="h-4 w-4" />
               </ToolButton>
-              <span className="min-w-[3rem] text-center text-xs text-white/60">
-                {Math.round(zoom * 100)}%
-              </span>
-              <ToolButton
-                onClick={zoomIn}
-                label="Zoom in"
-                disabled={zoom >= 5}
-              >
+              <ToolButton onClick={zoomIn} label="Zoom in" disabled={zoom >= 5}>
                 <Plus className="h-4 w-4" />
               </ToolButton>
-              <Divider />
               <ToolButton onClick={rotate} label="Rotate">
                 <RotateCw className="h-4 w-4" />
               </ToolButton>
-              <ToolButton onClick={resetView} label="Reset view">
+              <ToolButton onClick={resetView} label="Reset">
                 <Maximize2 className="h-4 w-4" />
               </ToolButton>
               <ToolButton onClick={handleDownload} label="Download">
                 <Download className="h-4 w-4" />
               </ToolButton>
-              <Divider />
             </div>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-              }}
-              aria-label="Close"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* ── Mobile bottom bar ── */}
-        <div
-          className={`absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/60 to-transparent sm:hidden ${controlsClass}`}
-        >
-          <div className="flex items-center justify-center gap-3 px-4 pb-3 pt-8">
-            <ToolButton onClick={zoomOut} label="Zoom out" disabled={zoom <= 1}>
-              <Minus className="h-4 w-4" />
-            </ToolButton>
-            <ToolButton onClick={zoomIn} label="Zoom in" disabled={zoom >= 5}>
-              <Plus className="h-4 w-4" />
-            </ToolButton>
-            <ToolButton onClick={rotate} label="Rotate">
-              <RotateCw className="h-4 w-4" />
-            </ToolButton>
-            <ToolButton onClick={resetView} label="Reset">
-              <Maximize2 className="h-4 w-4" />
-            </ToolButton>
-            <ToolButton onClick={handleDownload} label="Download">
-              <Download className="h-4 w-4" />
-            </ToolButton>
+            {hasMultiple && (
+              <ThumbnailStrip
+                images={images}
+                current={current}
+                onSelect={setCurrent}
+                size="sm"
+              />
+            )}
           </div>
 
-          {images.length > 1 && (
-            <div className="flex justify-center gap-2 overflow-x-auto px-4 pb-4 scrollbar-none">
-              {images.map((img, i) => (
-                <button
-                  key={`${img}-${i}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrent(i);
-                  }}
-                  className={`h-10 w-10 shrink-0 overflow-hidden rounded-md transition-all ${
-                    i === current
-                      ? "ring-2 ring-white ring-offset-1 ring-offset-black"
-                      : "opacity-40"
-                  }`}
-                >
-                  <img
-                    src={img}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </button>
-              ))}
+          {/* Desktop toolbar + thumbnails */}
+          <div
+            className={`absolute inset-x-0 bottom-0 z-30 hidden border-t border-white/10 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-md sm:block ${controlsClass}`}
+            style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+          >
+            {hasMultiple && (
+              <ThumbnailStrip
+                images={images}
+                current={current}
+                onSelect={setCurrent}
+                size="md"
+              />
+            )}
+          </div>
+
+          {hasMultiple && (
+            <div className={controlsClass}>
+              <NavArrow direction="prev" onClick={() => go(-1)} />
+              <NavArrow direction="next" onClick={() => go(1)} />
             </div>
           )}
-        </div>
-
-        {/* ── Desktop thumbnails ── */}
-        {images.length > 1 && (
-          <div
-            className={`absolute inset-x-0 bottom-0 z-30 hidden bg-gradient-to-t from-black/60 to-transparent sm:block ${controlsClass}`}
-          >
-            <div className="flex justify-center gap-2 overflow-x-auto px-5 pb-5 pt-8 scrollbar-none">
-              {images.map((img, i) => (
-                <button
-                  key={`${img}-${i}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrent(i);
-                  }}
-                  className={`h-12 w-12 shrink-0 overflow-hidden rounded-lg transition-all ${
-                    i === current
-                      ? "ring-2 ring-white ring-offset-2 ring-offset-black"
-                      : "opacity-40 hover:opacity-70"
-                  }`}
-                >
-                  <img
-                    src={img}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Prev / Next ── */}
-        {images.length > 1 && (
-          <div className={controlsClass}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                go(-1);
-              }}
-              className="absolute left-3 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-colors hover:bg-black/50 sm:left-5 sm:h-11 sm:w-11"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                go(1);
-              }}
-              className="absolute right-3 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-colors hover:bg-black/50 sm:right-5 sm:h-11 sm:w-11"
-              aria-label="Next image"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-        )}
+        </AdaptiveCtx.Provider>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ThumbnailStrip({
+  images,
+  current,
+  onSelect,
+  size,
+}: {
+  images: string[];
+  current: number;
+  onSelect: (index: number) => void;
+  size: "sm" | "md";
+}) {
+  const thumb = size === "sm" ? "h-10 w-10 rounded-md" : "h-14 w-14 rounded-lg";
+  return (
+    <div className="flex justify-center gap-2 overflow-x-auto px-4 pb-3 pt-2 scrollbar-none">
+      {images.map((img, i) => (
+        <button
+          key={`${img}-${i}`}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(i);
+          }}
+          className={cn(
+            "shrink-0 overflow-hidden transition-all",
+            thumb,
+            i === current
+              ? "ring-2 ring-white ring-offset-2 ring-offset-black opacity-100"
+              : "opacity-45 hover:opacity-75",
+          )}
+        >
+          <img src={img} alt="" className="h-full w-full object-cover" loading="lazy" />
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -633,15 +827,24 @@ function ToolButton({
   disabled?: boolean;
   children: React.ReactNode;
 }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const tone = useControlTone(ref);
   return (
     <button
+      ref={ref}
+      type="button"
       onClick={(e) => {
         e.stopPropagation();
         onClick(e);
       }}
       disabled={disabled}
       aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+      className={cn(
+        "flex h-9 w-9 items-center justify-center rounded-full ring-1 transition-colors disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2",
+        tone === "light"
+          ? "bg-white/10 text-white/85 ring-white/10 hover:bg-white/22 hover:text-white focus-visible:ring-white/35"
+          : "bg-black/15 text-black/85 ring-black/10 hover:bg-black/25 hover:text-black focus-visible:ring-black/35",
+      )}
     >
       {children}
     </button>
@@ -650,4 +853,56 @@ function ToolButton({
 
 function Divider() {
   return <div className="mx-1 h-4 w-px bg-white/20" />;
+}
+
+function ToneText({
+  children,
+  className,
+  light = "text-white/90",
+  dark = "text-black/90",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  light?: string;
+  dark?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const tone = useControlTone(ref);
+  return (
+    <span ref={ref} className={cn(tone === "light" ? light : dark, className)}>
+      {children}
+    </span>
+  );
+}
+
+function NavArrow({
+  direction,
+  onClick,
+}: {
+  direction: "prev" | "next";
+  onClick: (e: React.MouseEvent) => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const tone = useControlTone(ref);
+  const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(e);
+      }}
+      aria-label={direction === "prev" ? "Previous image" : "Next image"}
+      className={cn(
+        "absolute top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full shadow-md ring-1 backdrop-blur-sm transition-colors focus-visible:outline-none focus-visible:ring-2 sm:h-12 sm:w-12",
+        direction === "prev" ? "left-3 sm:left-5" : "right-3 sm:right-5",
+        tone === "light"
+          ? "bg-black/40 text-white ring-white/10 hover:bg-black/55 focus-visible:ring-white/35"
+          : "bg-white/60 text-black ring-black/10 hover:bg-white/75 focus-visible:ring-black/35",
+      )}
+    >
+      <Icon className="h-5 w-5" />
+    </button>
+  );
 }

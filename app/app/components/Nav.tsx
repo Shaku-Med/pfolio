@@ -247,7 +247,7 @@ const Nav: React.FC = () => {
               >
                 <Github className="h-3 w-3" />
                 <span className="tabular-nums">
-                  {githubStars !== null ? githubStars : "—"}
+                  {githubStars !== null ? githubStars : "…"}
                 </span>
               </a>
 
@@ -391,7 +391,7 @@ const Nav: React.FC = () => {
               >
                 <Github className="h-3 w-3" />
                 <span className="tabular-nums">
-                  {githubStars !== null ? githubStars : "—"}
+                  {githubStars !== null ? githubStars : "…"}
                 </span>
               </a>
             </div>

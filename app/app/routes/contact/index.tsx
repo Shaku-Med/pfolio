@@ -1,11 +1,12 @@
 import { Loader2, Mail, MessageSquare, Phone, CheckCircle, AlertCircle } from "lucide-react";
 import { Form, useActionData, useNavigation } from "react-router";
 import { contact } from "../../lib/contact";
+import { RailGlyph, Reveal } from "../../components/accessories/Rail/Rail";
 import { buildPageMeta } from "../../lib/seo";
 
 export function meta() {
   return buildPageMeta({
-    title: "Contact – Mohamed Amara",
+    title: "Contact | Mohamed Amara",
     description: "Get in touch.",
     canonicalPath: "/contact",
   });
@@ -83,15 +84,14 @@ export default function ContactIndex() {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-14 sm:px-5 sm:py-16 md:px-6 md:py-24 xl:max-w-3xl 2xl:max-w-4xl">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Get in touch
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Have a project in mind or want to say hi? Send a message and I’ll get
-          back to you.
-        </p>
-      </header>
+      <Reveal>
+        <header className="space-y-2">
+          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <RailGlyph className="h-3 w-8" />
+            Get in touch
+          </h1>
+        </header>
+      </Reveal>
 
       <div className="mt-10 space-y-10">
         <section className="space-y-4">

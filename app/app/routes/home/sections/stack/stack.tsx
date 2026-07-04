@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import StackCard from "../../../../components/accessories/StackCard";
+import { Reveal, SectionHeader } from "../../../../components/accessories/Rail/Rail";
 import { useContextHook } from "../../../../components/accessories/context/Context";
 
 const StackSection = () => {
@@ -8,20 +8,12 @@ const StackSection = () => {
 
   return (
     <section id="stack" className="space-y-4">
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-lg font-semibold tracking-tight">Stack & tooling</h2>
-        <Link
-          to="/stack"
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          View more
-        </Link>
-      </div>
+      <SectionHeader title="Stack & tooling" to="/stack" />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {stack.map((item) => (
-          <div key={item.id} className="min-w-0">
+        {stack.map((item, i) => (
+          <Reveal key={item.id} delay={Math.min(i * 0.07, 0.28)} className="min-w-0">
             <StackCard to={`/stack/${item.id}`} item={item} />
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -29,4 +21,3 @@ const StackSection = () => {
 };
 
 export default StackSection;
-

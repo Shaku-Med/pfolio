@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router";
 import ProjectCard from "../../components/accessories/ProjectCard";
+import { PageHeader, Reveal } from "../../components/accessories/Rail/Rail";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import { useInView } from "../../hooks/useInView";
 import { getProjects } from "../../lib/database/queries";
@@ -11,7 +12,7 @@ const PAGE_SIZE = 12;
 
 export function meta() {
   return buildPageMeta({
-    title: "Projects – Mohamed Amara",
+    title: "Projects | Mohamed Amara",
     description: "Things I've designed, built, and shipped.",
     canonicalPath: "/projects",
   });
@@ -49,14 +50,7 @@ export default function ProjectsIndex() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <header className="mb-12">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Projects
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Things I've designed, built, and shipped.
-        </p>
-      </header>
+      <PageHeader title="Projects" />
 
       {items.length === 0 ? (
         <p className="py-20 text-center text-muted-foreground">
@@ -65,14 +59,18 @@ export default function ProjectsIndex() {
       ) : (
         <>
           <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 items-stretch">
-            {items.map((project) => (
-              <div key={project.id} className="min-w-0 flex">
+            {items.map((project, i) => (
+              <Reveal
+                key={project.id}
+                delay={Math.min((i % 3) * 0.07, 0.28)}
+                className="min-w-0 flex"
+              >
                 <ProjectCard
                   project={project}
                   to={`/projects/${project.id}`}
                   descriptionClamp
                 />
-              </div>
+              </Reveal>
             ))}
           </section>
 

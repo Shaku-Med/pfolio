@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router";
 import GalleryCard from "../../components/accessories/GalleryCard";
+import { PageHeader, Reveal } from "../../components/accessories/Rail/Rail";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import {
   Empty,
@@ -19,7 +20,7 @@ const PAGE_SIZE = 12;
 
 export function meta() {
   return buildPageMeta({
-    title: "Gallery – Mohamed Amara",
+    title: "Gallery | Mohamed Amara",
     description: "Screenshots and visuals from projects.",
     canonicalPath: "/gallery",
   });
@@ -66,7 +67,7 @@ export default function GalleryIndex() {
             </EmptyMedia>
             <EmptyTitle>No gallery items yet</EmptyTitle>
             <EmptyDescription>
-              Nothing to show here. Snapshots will appear when added.
+              Nothing here yet. Check back soon.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -75,22 +76,19 @@ export default function GalleryIndex() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-2 sm:py-5 md:py-6">
-      <header className="mb-12">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Gallery
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Snapshots from work and life.
-        </p>
-      </header>
-        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
-            <div key={item.id} className="min-w-0">
-              <GalleryCard item={item} to={`/gallery/${item.id}`} />
-            </div>
-          ))}
-        </section>
+    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
+      <PageHeader title="Gallery" />
+      <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item, i) => (
+          <Reveal
+            key={item.id}
+            delay={Math.min((i % 3) * 0.07, 0.28)}
+            className="min-w-0"
+          >
+            <GalleryCard item={item} to={`/gallery/${item.id}`} />
+          </Reveal>
+        ))}
+      </section>
       <div ref={sentinelRef} className="min-h-[1px] w-full">
         {fetcher.state === "loading" && <LoadMoreSkeleton />}
       </div>

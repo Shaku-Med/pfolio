@@ -4,6 +4,7 @@ import type { StackUsageItem } from "../../../lib/database/queries";
 import type { StackCategory } from "../../../lib/stack";
 import { parseToolsString } from "../../../lib/stack";
 import { TechTag } from "~/lib/tech/TechTag";
+import { Reveal } from "~/components/accessories/Rail/Rail";
 import { buildPageMeta } from "~/lib/seo";
 
 export async function loader({
@@ -21,14 +22,14 @@ export async function loader({
 export function meta({ data }: { data: { stack: StackCategory } | null }) {
   if (!data?.stack) {
     return buildPageMeta({
-      title: "Not found – Mohamed Amara",
+      title: "Not found | Mohamed Amara",
       description: "Stack item not found.",
       noindex: true,
     });
   }
   const stack = data.stack;
   return buildPageMeta({
-    title: `${stack.category} – Stack – Mohamed Amara`,
+    title: `${stack.category} | Stack | Mohamed Amara`,
     description: stack.description ?? undefined,
     canonicalPath: `/stack/${stack.id}`,
   });
@@ -50,7 +51,7 @@ export default function StackIdIndex() {
   const tools = parseToolsString(stack.tools);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-2 sm:py-5 md:py-6">
+    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
       <section className="space-y-3 border-b border-border/60 pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary/80">
           Stack
@@ -78,7 +79,7 @@ export default function StackIdIndex() {
           </p>
         ) : (
           <div className="space-y-3">
-            {usage.map((item) => {
+            {usage.map((item, i) => {
               const href =
                 item.kind === "project"
                   ? `/projects/${item.id}`
@@ -87,8 +88,8 @@ export default function StackIdIndex() {
                     : `/blog/${item.id}`;
 
               return (
+                <Reveal key={`${item.kind}-${item.id}`} delay={Math.min(i * 0.05, 0.25)}>
                 <Link
-                  key={`${item.kind}-${item.id}`}
                   to={href}
                   className="block rounded-2xl border border-border/70 bg-muted/30 px-4 py-3 transition hover:border-primary/50 hover:bg-primary/5"
                 >
@@ -113,6 +114,7 @@ export default function StackIdIndex() {
                     )}
                   </div>
                 </Link>
+                </Reveal>
               );
             })}
           </div>

@@ -5,6 +5,7 @@ import Timeline, {
   projectsToTimeline,
   sortTimeline,
 } from "../../components/accessories/Timeline/Timeline";
+import { PageHeader } from "../../components/accessories/Rail/Rail";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import {
   Empty,
@@ -23,7 +24,7 @@ const PAGE_SIZE = 12;
 
 export function meta() {
   return buildPageMeta({
-    title: "Experience – Mohamed Amara",
+    title: "Experience | Mohamed Amara",
     description: "Where I've worked and what I've shipped, on one timeline.",
     canonicalPath: "/experience",
   });
@@ -80,7 +81,7 @@ export default function ExperienceIndex() {
             </EmptyMedia>
             <EmptyTitle>No experience yet</EmptyTitle>
             <EmptyDescription>
-              Nothing to show here. Experience entries will appear when added.
+              Nothing here yet. Check back soon.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -91,12 +92,7 @@ export default function ExperienceIndex() {
   return (
     <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
       <div className="space-y-4">
-        <header className="space-y-1">
-          <h1 className="text-xl font-semibold tracking-tight">Experience</h1>
-          <p className="text-sm text-muted-foreground">
-            Roles and shipped projects, newest first.
-          </p>
-        </header>
+        <PageHeader title="Experience" />
         <Timeline items={timelineItems} />
       </div>
       <div ref={sentinelRef} className="min-h-[1px] w-full">

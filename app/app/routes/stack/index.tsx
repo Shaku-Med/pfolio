@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router";
 import StackCard from "../../components/accessories/StackCard";
+import { PageHeader, Reveal } from "../../components/accessories/Rail/Rail";
 import { LoadMoreSkeleton } from "../../components/accessories/LoadMoreSkeleton";
 import {
   Empty,
@@ -19,7 +20,7 @@ const PAGE_SIZE = 12;
 
 export function meta() {
   return buildPageMeta({
-    title: "Stack – Mohamed Amara",
+    title: "Stack | Mohamed Amara",
     description: "Tools and tech I use day to day.",
     canonicalPath: "/stack",
   });
@@ -66,8 +67,7 @@ export default function StackIndex() {
             </EmptyMedia>
             <EmptyTitle>No stack yet</EmptyTitle>
             <EmptyDescription>
-              Nothing to show here. Technologies and tools will appear when
-              added.
+              Nothing here yet. Check back soon.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -77,20 +77,17 @@ export default function StackIndex() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <div className="space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">
-          Stack & tooling
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Technologies and tools I use.
-        </p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
-            <div key={item.id} className="min-w-0">
-              <StackCard item={item} />
-            </div>
-          ))}
-        </div>
+      <PageHeader title="Stack & tooling" />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item, i) => (
+          <Reveal
+            key={item.id}
+            delay={Math.min((i % 3) * 0.07, 0.28)}
+            className="min-w-0"
+          >
+            <StackCard item={item} to={`/stack/${item.id}`} />
+          </Reveal>
+        ))}
       </div>
       <div ref={sentinelRef} className="min-h-[1px] w-full">
         {fetcher.state === "loading" && <LoadMoreSkeleton />}

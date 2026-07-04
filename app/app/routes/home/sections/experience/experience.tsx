@@ -1,9 +1,9 @@
-import { Link } from "react-router";
 import Timeline, {
   experienceToTimeline,
   projectsToTimeline,
   sortTimeline,
 } from "../../../../components/accessories/Timeline/Timeline";
+import { SectionHeader } from "../../../../components/accessories/Rail/Rail";
 import { useContextHook } from "../../../../components/accessories/context/Context";
 
 const ExperienceSection = () => {
@@ -16,15 +16,7 @@ const ExperienceSection = () => {
 
   return (
     <section id="experience" className="space-y-4">
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-lg font-semibold tracking-tight">Timeline</h2>
-        <Link
-          to="/experience"
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          View more
-        </Link>
-      </div>
+      <SectionHeader title="Timeline" to="/experience" />
       <Timeline items={items} />
     </section>
   );
