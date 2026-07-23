@@ -2,24 +2,28 @@
 #
 # Portfolio public site only (no admin). Built from the monorepo root context
 # because npm workspaces + package-lock live there.
-# Secrets are NEVER copied in — compose mounts app/.env at runtime.
+# Secrets are NEVER copied in — compose injects app/.env at runtime.
+#
+# Node 22, not 20: supabase-js always constructs a RealtimeClient, which needs a
+# global WebSocket. That only exists natively from Node 22 — on 20 createClient()
+# throws "native WebSocket not found" and every loader 500s. Do not downgrade.
 
 ############################  deps (incl. dev, for build)  #################
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /src
 COPY package.json package-lock.json ./
 COPY app/package.json ./app/
 RUN npm ci -w app
 
 ############################  production deps only  ########################
-FROM node:20-alpine AS prod-deps
+FROM node:22-alpine AS prod-deps
 WORKDIR /src
 COPY package.json package-lock.json ./
 COPY app/package.json ./app/
 RUN npm ci -w app --omit=dev
 
 ############################  build  #######################################
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /src
 COPY package.json package-lock.json ./
 COPY app ./app
@@ -28,7 +32,7 @@ WORKDIR /src/app
 RUN npm run copy-themes && npm run build
 
 ############################  runtime  #####################################
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 ENV NODE_ENV=production \
     PORT=3000 \
     HOST=0.0.0.0 \
