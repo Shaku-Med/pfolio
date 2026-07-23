@@ -1072,3 +1072,50 @@ def resume_set_from_markdown_file():
         print("Resume saved to Supabase.")
     else:
         print("File not found or save failed.")
+
+
+# LaTeX source for the resume "Source" tab on the site.
+TEX_SUFFIXES = {".tex", ".latex", ".ltx"}
+# The web viewer refuses to render past 400k chars, so anything bigger is a
+# mistake (or a wrong file) — reject it here rather than store what won't show.
+MAX_TEX_CHARS = 400_000
+
+
+def resume_upsert_tex(body_tex: str) -> bool:
+    """Store the LaTeX source on the single resume row."""
+    body = body_tex.strip()
+    if not body or len(body) > MAX_TEX_CHARS:
+        return False
+    r = client.table("resume").select("id").limit(1).execute()
+    if not getattr(r, "data", None) or not r.data:
+        client.table("resume").insert({"id": "default", "body_tex": body}).execute()
+    else:
+        rid = r.data[0]["id"]
+        client.table("resume").update({"body_tex": body}).eq("id", rid).execute()
+    return True
+
+
+def resume_upload_tex_from_file(path: str) -> bool:
+    """Validate then upload a .tex/.latex/.ltx file. Fails closed."""
+    try:
+        p = Path(path).expanduser()
+        if not p.is_file():
+            return False
+        if p.suffix.lower() not in TEX_SUFFIXES:
+            return False
+        if p.stat().st_size > MAX_TEX_CHARS * 4:  # utf-8 worst case per char
+            return False
+        body = p.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return resume_upsert_tex(body)
+
+
+def resume_set_from_tex_file():
+    path_str = input("Resume LaTeX source (.tex) path: ").strip()
+    if not path_str:
+        return
+    if resume_upload_tex_from_file(path_str):
+        print("LaTeX source saved to Supabase.")
+    else:
+        print("Not saved. Needs an existing .tex, .latex or .ltx file under 400k characters.")

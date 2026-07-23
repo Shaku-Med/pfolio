@@ -40,6 +40,7 @@ from crud import (
     get_gallery_list,
     move_item,
     resume_set_from_markdown_file,
+    resume_set_from_tex_file,
 )
 from resume import create_resume
 from server import DASHBOARD_PORT, choose_dashboard_mode, run_dashboard
@@ -257,13 +258,16 @@ def resume_menu() -> None:
         print("\n--- Resume ---")
         print("1. Generate markdown from source file (PDF/DOCX/TXT)")
         print("2. Upload edited markdown file to Supabase")
-        print("3. Back")
+        print("3. Upload LaTeX source (.tex) to Supabase")
+        print("4. Back")
         choice = input("\nChoice: ").strip()
         if choice == "1":
             create_resume()
         elif choice == "2":
             resume_set_from_markdown_file()
         elif choice == "3":
+            resume_set_from_tex_file()
+        elif choice == "4":
             return
         else:
             print("Invalid choice.")
@@ -367,7 +371,14 @@ if __name__ == "__main__":
             print("Cancelled.\n")
             continue
         if surface == "gui":
-            from admin_gui import run_admin_gui
+            # Imported lazily so the terminal CLI keeps working on a machine
+            # that never installed the GUI extras.
+            try:
+                from admin_gui import run_admin_gui
+            except ImportError as e:
+                print(f"\nGUI unavailable ({e}).")
+                print("Install the desktop extras with: pip install -r requirements.txt\n")
+                continue
 
             run_admin_gui()
             continue
