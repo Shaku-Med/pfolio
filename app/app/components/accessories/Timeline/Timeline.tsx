@@ -5,7 +5,7 @@ import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { cn } from "~/lib/utils";
 import type { ExperienceEntry } from "~/lib/experience";
 import type { Project } from "~/lib/projects";
-import { TextBlock } from "./TextBlock";
+import { TextBlock } from "../TextBlock";
 
 export type TimelineItem = {
   kind: "experience" | "project";
