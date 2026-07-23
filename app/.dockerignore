@@ -1,4 +1,20 @@
-.react-router
-build
+# Regenerated inside the image
 node_modules
+build
+.react-router
+dist
+
+# Secrets — never bake these into the image. Mounted read-only at runtime.
+.env
+.env.*
+!.env.example
+
+# Local / VCS / editor junk
+.git
+.gitignore
+*.log
+.DS_Store
+.vscode
+.cursor
+.claude
 README.md

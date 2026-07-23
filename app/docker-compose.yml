@@ -1,0 +1,43 @@
+# Portfolio public site (medzy.brozy.org). Shares this EC2 with Memories.
+#
+# Deploy:   docker compose --env-file .env.deploy up -d
+# Logs:     docker compose logs -f app
+#
+# Host port 3001 (loopback only) — Memories owns 127.0.0.1:3000. nginx proxies
+# medzy.brozy.org → http://127.0.0.1:3001.
+#
+# Explicit project name: this compose lives in a dir called `app`, and so does
+# Memories' (…/memories.brozy.org/app). Compose defaults the project name to
+# that basename, so BOTH would be `app` — and `up --remove-orphans` from one
+# would delete the other's container (same project label, service not defined
+# here). Pinning ours to `pfolio` keeps the two deploys fully isolated.
+name: pfolio
+
+services:
+  app:
+    # CI sets APP_IMAGE to the exact GHCR tag that was just pushed.
+    # Local fallback builds from the monorepo Dockerfile.
+    image: ${APP_IMAGE:-ghcr.io/shaku-med/pfolio/app:latest}
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    container_name: pfolio-app
+    init: true
+    ports:
+      - "127.0.0.1:3001:3000"
+    # The app reads secrets via process.env (server-side, fails closed on
+    # missing) — env_file injects the host .env into the container's environment.
+    # react-router-serve never loads a .env file, so no mount/dotenv is needed.
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

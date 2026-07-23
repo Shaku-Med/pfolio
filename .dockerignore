@@ -1,0 +1,21 @@
+# Monorepo Docker build context (used by app/Dockerfile)
+node_modules
+app/node_modules
+app/build
+app/.react-router
+**/dist
+
+.env
+.env.*
+!**/.env.example
+
+.git
+.github
+.vscode
+.cursor
+.claude
+app_admincli
+autosetup
+*.md
+*.log
+.DS_Store

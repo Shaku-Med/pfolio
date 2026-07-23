@@ -9,5 +9,8 @@
     "build": "npm run build -w app",
     "start": "npm run start -w app",
     "typecheck": "npm run typecheck -w app"
+  },
+  "overrides": {
+    "@hono/node-server": "2.0.11"
   }
 }
