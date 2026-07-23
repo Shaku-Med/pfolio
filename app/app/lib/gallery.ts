@@ -8,4 +8,6 @@ export type GalleryItem = {
   projectSrcs?: string[];
    /** Optional markdown details; only loaded on the detail page. */
   detailsMd?: string;
+  /** Manual display order (lower = earlier). */
+  position?: number;
 };

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { Form, useLoaderData } from "react-router";
+import { useEffect, useState, type ReactNode } from "react";
+import { useLoaderData, useRevalidator } from "react-router";
 import {
   THEME_MODES,
   THEME_MODE_LABELS,
@@ -8,6 +8,11 @@ import {
   type ThemeMode,
   type ThemeStyle,
 } from "../../lib/theme/constants";
+import {
+  persistThemePreference,
+  setStyle,
+  setTheme,
+} from "../../lib/theme/client";
 import { THEME_STYLE_PREVIEW } from "../../lib/theme/themePreviewColors";
 import { PageHeader } from "../../components/accessories/Rail/Rail";
 import { buildPageMeta } from "../../lib/seo";
@@ -71,65 +76,77 @@ export const loader = async ({ request }: { request: Request }) => {
   return { theme, style };
 };
 
+function StyleSwatches({ styleKey }: { styleKey: ThemeStyle }) {
+  const colors = THEME_STYLE_PREVIEW[styleKey];
+  return (
+    <span className="inline-flex items-center gap-0.5" aria-hidden>
+      {([colors.primary, colors.chart, colors.background] as const).map((c) => (
+        <span
+          key={c}
+          className="h-3 w-3 rounded-full border border-black/10 dark:border-white/15"
+          style={{ backgroundColor: c }}
+        />
+      ))}
+    </span>
+  );
+}
+
 function SettingsSection({
   title,
-  defaultOpen = true,
   children,
+  defaultOpen = true,
 }: {
   title: string;
-  defaultOpen?: boolean;
   children: ReactNode;
+  defaultOpen?: boolean;
 }) {
   return (
     <details
       open={defaultOpen}
       className="group rounded-xl border border-border/70 bg-background/80"
     >
-      <summary className="cursor-pointer list-none px-4 py-3.5 sm:px-5 [&::-webkit-details-marker]:hidden">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold tracking-tight text-foreground">
-            {title}
-          </h2>
-          <span
-            aria-hidden
-            className="text-muted-foreground transition-transform group-open:rotate-180"
-          >
-            ▾
+      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold marker:content-none [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center justify-between gap-2">
+          {title}
+          <span className="text-xs font-normal text-muted-foreground group-open:hidden">
+            Show
           </span>
-        </div>
+          <span className="hidden text-xs font-normal text-muted-foreground group-open:inline">
+            Hide
+          </span>
+        </span>
       </summary>
-      <div className="border-t border-border/50 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-        {children}
-      </div>
+      <div className="border-t border-border/60 px-4 py-3">{children}</div>
     </details>
   );
 }
 
-function StyleSwatches({ styleKey }: { styleKey: ThemeStyle }) {
-  const colors = THEME_STYLE_PREVIEW[styleKey];
-  return (
-    <span className="flex shrink-0 gap-0.5 overflow-hidden rounded-md border border-border/60">
-      <span
-        className="h-4 w-4"
-        style={{ backgroundColor: colors.background }}
-        aria-hidden
-      />
-      <span
-        className="h-4 w-4"
-        style={{ backgroundColor: colors.primary }}
-        aria-hidden
-      />
-      <span
-        className="h-4 w-4"
-        style={{ backgroundColor: colors.chart }}
-        aria-hidden
-      />
-    </span>
-  );
-}
-
 export default function SettingsIndex() {
-  const { theme, style } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
+  const revalidator = useRevalidator();
+  const [theme, setThemeState] = useState(loaderData.theme);
+  const [style, setStyleState] = useState(loaderData.style);
+
+  useEffect(() => {
+    setThemeState(loaderData.theme);
+    setStyleState(loaderData.style);
+  }, [loaderData.theme, loaderData.style]);
+
+  const handleTheme = (mode: ThemeMode) => {
+    setTheme(mode);
+    setThemeState(mode);
+    void persistThemePreference({ theme: mode }).then((ok) => {
+      if (ok) revalidator.revalidate();
+    });
+  };
+
+  const handleStyle = (next: ThemeStyle) => {
+    setStyle(next);
+    setStyleState(next);
+    void persistThemePreference({ style: next }).then((ok) => {
+      if (ok) revalidator.revalidate();
+    });
+  };
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-14 sm:px-5 sm:py-16 md:px-6 md:py-20 xl:max-w-3xl">
@@ -145,20 +162,19 @@ export default function SettingsIndex() {
           </p>
           <div className="flex flex-wrap gap-2">
             {THEME_MODES.map((mode) => (
-              <Form key={mode} method="post" action="/set-theme" className="inline">
-                <input type="hidden" name="theme" value={mode} />
-                <button
-                  type="submit"
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 text-sm font-medium transition",
-                    theme === mode
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  {THEME_MODE_LABELS[mode]}
-                </button>
-              </Form>
+              <button
+                key={mode}
+                type="button"
+                onClick={() => handleTheme(mode)}
+                className={cn(
+                  "rounded-lg border px-3 py-1.5 text-sm font-medium transition",
+                  theme === mode
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                {THEME_MODE_LABELS[mode]}
+              </button>
             ))}
           </div>
         </SettingsSection>
@@ -172,21 +188,20 @@ export default function SettingsIndex() {
           </p>
           <div className="flex flex-wrap gap-2">
             {THEME_STYLES.map((s) => (
-              <Form key={s} method="post" action="/set-theme" className="inline">
-                <input type="hidden" name="style" value={s} />
-                <button
-                  type="submit"
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition",
-                    style === s
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  <StyleSwatches styleKey={s} />
-                  {THEME_STYLE_LABELS[s]}
-                </button>
-              </Form>
+              <button
+                key={s}
+                type="button"
+                onClick={() => handleStyle(s)}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition",
+                  style === s
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                <StyleSwatches styleKey={s} />
+                {THEME_STYLE_LABELS[s]}
+              </button>
             ))}
           </div>
         </SettingsSection>

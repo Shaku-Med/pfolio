@@ -6,12 +6,14 @@ type ResumePdfViewerProps = {
   pdfUrl: string;
 };
 
-const isMobile =
-  typeof navigator !== "undefined" &&
-  /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
 export const ResumePdfViewer: React.FC<ResumePdfViewerProps> = ({ pdfUrl }) => {
   const [isFullscreen, setIsFullscreen] = React.useState(false);
+  // Resolved after mount — reading the UA during render would desync SSR.
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+  }, []);
 
   const handleOpenNewTab = () => {
     window.open(pdfUrl, "_blank", "noopener,noreferrer");
@@ -56,20 +58,33 @@ export const ResumePdfViewer: React.FC<ResumePdfViewerProps> = ({ pdfUrl }) => {
           )}
         </div>
 
-        {isMobile ? (
-          <p className="rounded-xl border border-border/60 bg-muted/30 px-5 py-8 text-center text-sm text-muted-foreground">
-            PDF preview isn't supported on most mobile browsers. Use the
-            buttons above to open or download.
-          </p>
-        ) : (
-          <div className="aspect-[8.5/11] w-full overflow-hidden rounded-2xl border border-border/60 bg-muted">
-            <iframe
-              src={pdfUrl}
-              title="Resume"
-              className="h-full w-full"
-            />
-          </div>
-        )}
+        {/*
+          `<object>` renders its children when the browser can't display the
+          PDF itself, so a viewer-less mobile browser gets the fallback card
+          instead of an empty frame.
+        */}
+        <div className="aspect-[8.5/11] w-full overflow-hidden rounded-2xl border border-border/60 bg-muted">
+          <object
+            data={pdfUrl}
+            type="application/pdf"
+            aria-label="Resume PDF"
+            className="h-full w-full"
+          >
+            <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                This browser can't show the PDF inline.
+              </p>
+              <button
+                type="button"
+                onClick={handleOpenNewTab}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Open the PDF
+              </button>
+            </div>
+          </object>
+        </div>
       </div>
 
       {/* Fullscreen dialog */}

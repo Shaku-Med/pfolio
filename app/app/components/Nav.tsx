@@ -4,6 +4,7 @@ import {
   NavLink,
   useFetcher,
   useNavigate,
+  useRevalidator,
   useRouteLoaderData,
 } from "react-router";
 import type { SearchResult } from "../lib/database/queries";
@@ -43,7 +44,8 @@ import {
   SheetFooter,
   SheetClose,
 } from "./ui/sheet";
-import { THEME_MODES, THEME_MODE_LABELS } from "../lib/theme/constants";
+import { THEME_MODES, THEME_MODE_LABELS, type ThemeMode } from "../lib/theme/constants";
+import { persistThemePreference, setTheme } from "../lib/theme/client";
 import { useStandalone } from "~/lib/hooks/useStandalone";
 
 const navItems = [
@@ -75,27 +77,27 @@ const Nav: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [githubStars, setGithubStars] = React.useState<number | null>(null);
   const navigate = useNavigate();
+  const revalidator = useRevalidator();
   const searchFetcher = useFetcher<SearchResult[]>();
   const rootData = useRouteLoaderData("root") as
     | { theme: string; style: string }
     | undefined;
-  const theme = rootData?.theme ?? "system";
+  const [optimisticTheme, setOptimisticTheme] = React.useState<ThemeMode | null>(
+    null,
+  );
+  const theme = optimisticTheme ?? rootData?.theme ?? "system";
   const isStandalone = useStandalone();
 
+  React.useEffect(() => {
+    setOptimisticTheme(null);
+  }, [rootData?.theme]);
 
-  const handleThemeChange = async (mode: string) => {
-    try {
-      await fetch("/set-theme", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: new URLSearchParams({ theme: mode }).toString(),
-      });
-      window.location.reload();
-    } catch {
-      // noop
-    }
+  const handleThemeChange = (mode: ThemeMode) => {
+    setTheme(mode);
+    setOptimisticTheme(mode);
+    void persistThemePreference({ theme: mode }).then((ok) => {
+      if (ok) revalidator.revalidate();
+    });
   };
 
   const closeOverlays = () => {

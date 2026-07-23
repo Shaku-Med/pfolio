@@ -1,11 +1,8 @@
 import os
-from pathlib import Path
 
-from dotenv import load_dotenv
+from env_load import load_admin_env
 
-base = Path(__file__).resolve().parent
-load_dotenv(base / ".env")
-load_dotenv(base.parent / ".env")
+load_admin_env()
 
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")

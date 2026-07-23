@@ -51,7 +51,7 @@ export default function SearchPage() {
               type="search"
               name="q"
               defaultValue={q}
-              placeholder="Search…"
+              placeholder='Try: react OR next · "design system" · kind:project · tag:typescript · -blog'
               className="h-10 flex-1 rounded-full border border-border/70 bg-background px-4 text-sm outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
             />
             <button

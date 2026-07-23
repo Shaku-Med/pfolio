@@ -18,6 +18,7 @@ type DbProject = {
   links: unknown | null;
   date?: string | null;
   details_md?: string | null;
+  position?: number | null;
 };
 
 type DbExperience = {
@@ -35,6 +36,7 @@ type DbExperience = {
   challenges: string[] | null;
   learnings: string[] | null;
   details_md?: string | null;
+  position?: number | null;
 };
 
 function normalizePeriodPart(value?: string | null): string | null {
@@ -63,6 +65,7 @@ type DbStack = {
   category: string;
   tools: string;
   description: string;
+  position?: number | null;
 };
 
 type DbGallery = {
@@ -73,6 +76,7 @@ type DbGallery = {
   tone: "dark" | "light";
   project_srcs?: string[] | null;
   details_md?: string | null;
+  position?: number | null;
 };
 
 export type StackUsageItem = {
@@ -106,6 +110,7 @@ type DbBlog = {
   tags: string[] | null;
   cover_image: string | null;
   body?: string;
+  position?: number | null;
 };
 
 type DbResume = {
@@ -128,6 +133,7 @@ function mapProject(row: DbProject): Project {
     links: (row.links as Project["links"]) ?? undefined,
     date: row.date ?? undefined,
     ...(row.details_md != null && row.details_md !== "" && { detailsMd: row.details_md }),
+    ...(typeof row.position === "number" && { position: row.position }),
   };
 }
 
@@ -149,6 +155,7 @@ function mapExperience(row: DbExperience): ExperienceEntry {
     ...(row.details_md != null && row.details_md !== "" && {
       detailsMd: row.details_md,
     }),
+    ...(typeof row.position === "number" && { position: row.position }),
   };
 }
 
@@ -158,6 +165,7 @@ function mapStack(row: DbStack): StackCategory {
     category: row.category,
     tools: row.tools,
     description: row.description,
+    ...(typeof row.position === "number" && { position: row.position }),
   };
 }
 
@@ -174,6 +182,7 @@ function mapGallery(row: DbGallery): GalleryItem {
     ...(row.details_md != null && row.details_md !== "" && {
       detailsMd: row.details_md,
     }),
+    ...(typeof row.position === "number" && { position: row.position }),
   };
 }
 
@@ -189,6 +198,7 @@ function mapBlog(row: DbBlog): BlogPost {
     tags: row.tags ?? undefined,
     coverImage: row.cover_image || undefined,
     body: row.body ?? "",
+    ...(typeof row.position === "number" && { position: row.position }),
   };
 }
 
@@ -359,7 +369,7 @@ export async function searchByTag(
 
 /** Columns for blog list only; body is excluded and loaded only on /blog/:id. */
 const BLOG_LIST_COLUMNS =
-  "id, slug, title, category, excerpt, date, read_time, tags, cover_image";
+  "id, slug, title, category, excerpt, date, read_time, tags, cover_image, position";
 
 export async function getBlogPosts(
   limit = 20,
@@ -368,7 +378,8 @@ export async function getBlogPosts(
   const { data, error } = await db
     .from("blog_posts")
     .select(BLOG_LIST_COLUMNS)
-    .order("date", { ascending: false })
+    .order("position", { ascending: true })
+    .order("id", { ascending: true })
     .range(offset, offset + limit - 1);
   if (error || !data) return [];
   return (data as DbBlog[]).map(mapBlog);

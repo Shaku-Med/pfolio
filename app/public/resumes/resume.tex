@@ -1,0 +1,162 @@
+%-------------------------------------------------------------------------------
+% Mohamed Amara — resume
+% Compile with: pdflatex mohamed-amara-resume.tex
+% Works on Overleaf as-is (no custom .cls files needed)
+%-------------------------------------------------------------------------------
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{lmodern} % uncomment on Overleaf for slightly cleaner font rendering
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{latexsym}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=0.5in]{geometry}
+\input{glyphtounicode}
+
+% ---------- page setup ----------
+\pagestyle{empty}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+\urlstyle{same}
+
+% ---------- section formatting ----------
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% make the pdf ATS-friendly (selectable, machine-readable text)
+\pdfgentounicode=1
+
+% ---------- custom commands ----------
+\newcommand{\resumeItem}[1]{
+  \item\small{#1 \vspace{-2pt}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.28in, itemsep=0pt, parsep=1pt, topsep=2pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------------------------------------------
+\begin{document}
+
+% ---------- heading ----------
+\begin{center}
+    {\Huge \scshape Mohamed Amara} \\ \vspace{4pt}
+    \small
+    \href{https://medzy.brozy.org}{medzy.brozy.org} $|$
+    \href{https://github.com/Shaku-Med}{github.com/Shaku-Med} $|$
+    \href{mailto:amaramohamedb@gmail.com}{amaramohamedb@gmail.com} $|$
+    \href{https://linkedin.com/in/mohamed-amara-b84447247}{linkedin.com/in/mohamed-amara}
+\end{center}
+
+% ---------- education ----------
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {CUNY College of Staten Island}{Expected May 2027}
+    {B.S. in Computer Science}{Staten Island, NY}
+  \resumeItemListStart
+    \resumeItem{\textbf{Relevant Coursework:} Data Structures \& Algorithms, Network Security, Operating Systems, Digital Logic, Discrete Mathematics}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+% ---------- experience ----------
+\section{Experience}
+\resumeSubHeadingListStart
+
+  \resumeSubheading
+    {Software Engineer Intern}{Jun 2025 -- Aug 2025}
+    {Electronic Arts}{Remote}
+    \resumeItemListStart
+      \resumeItem{Built Go services for the voice platform behind Apex Legends tournament broadcasts, handling real-time audio routing and player connections across distributed game servers during live events.}
+      \resumeItem{Tracked down race conditions and dropped connections in the WebRTC audio pipeline, cutting voice chat failures during high-traffic tournament windows.}
+      \resumeItem{Wrote integration and load tests covering voice channel lifecycle events (join, leave, mute, reconnect), catching edge cases before they hit production.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Software Engineering Intern}{Mar 2025 -- May 2025}
+    {Auristor}{Washington, DC}
+    \resumeItemListStart
+      \resumeItem{Built a Go monitoring system from scratch that collected 150+ infrastructure metrics (CPU, memory, disk I/O, network throughput) into Grafana dashboards, cutting average issue detection time by roughly 40\%.}
+      \resumeItem{Turned Figma mockups into production React components with Tailwind CSS, working through several review cycles with the design team on spacing, typography, and responsive behavior.}
+      \resumeItem{Set up Docker containers and Jenkins CI/CD for the monitoring stack, giving the team weekly releases with zero-downtime deployments.}
+      \resumeItem{Trained 8 teammates on reading the dashboards and responding to alerts, and wrote runbooks for common failure scenarios.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Cybersecurity Intern}{Feb 2023 -- May 2023}
+    {CodePath}{New York, NY}
+    \resumeItemListStart
+      \resumeItem{Hardened learning platform servers with input sanitization and parameterized queries, blocking SQL injection and XSS attempts across all user-facing endpoints.}
+      \resumeItem{Ran penetration tests on 10+ web applications with Burp Suite, OWASP ZAP, and Nmap, finding everything from insecure authentication to misconfigured CORS policies.}
+      \resumeItem{Wrote up findings with severity ratings and reproduction steps, then worked with developers to verify the patches.}
+    \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% ---------- projects ----------
+\section{Projects}
+\resumeSubHeadingListStart
+
+  \resumeProjectHeading
+    {\textbf{Memories} $|$ \emph{Go, TypeScript, PostgreSQL, FFmpeg, AWS} $|$ \href{https://memories.brozy.org}{memories.brozy.org} $|$ \href{https://github.com/Shaku-Med/free_file}{Shaku-Med/free\_file}}{Ongoing}
+    \resumeItemListStart
+      \resumeItem{Building a video platform solo: a React Router 7 and TypeScript web app for watch pages, reels, and a creator studio, backed by four services that handle uploading, transcoding, moderation, and search.}
+      \resumeItem{Wrote the Go upload service that turns raw uploads into HLS renditions and thumbnails with FFmpeg, plus a playback service that signs segment tokens so video files cannot be hotlinked.}
+      \resumeItem{Built the feed, reels, and recommendations as PostgreSQL stored functions, with a Python embedding service that vectorizes titles and descriptions so search can surface similar videos.}
+      \resumeItem{Added NSFW scoring on upload, dual storage across Cloudflare R2 and GitHub with a weekly quota ledger, and deployment on EC2 behind nginx with Redis job queues and GitHub Actions CI/CD.}
+    \resumeItemListEnd
+
+  \resumeProjectHeading
+    {\textbf{ASCILINE} $|$ \emph{Python, FastAPI, WebSockets, NumPy, OpenCV} $|$ \href{https://github.com/YusufB5/ASCILINE}{YusufB5/ASCILINE}}{Ongoing}
+    \resumeItemListStart
+      \resumeItem{Contributor to an open source real-time ASCII video streaming engine (2.5k stars, 280+ forks) that renders video server side and streams binary text frames over WebSocket to an HTML5 canvas player at 30 FPS.}
+      % TODO: swap this bullet for the specific thing you shipped. Name the
+      % feature, what it does, and the result. "I built X in a 2.5k star repo"
+      % lands far harder than "I contribute to it."
+      \resumeItem{Working on the streaming and rendering path, where frames are compressed per frame with delta and run-length encodings and decoded client side without any browser video codec involved.}
+    \resumeItemListEnd
+
+  \resumeProjectHeading
+    {\textbf{HLS Grabber} $|$ \emph{JavaScript, Chrome Extensions, Python, FFmpeg} $|$ \href{https://github.com/Shaku-Med/hls-downloader}{Shaku-Med/hls-downloader}}{2026}
+    \resumeItemListStart
+      \resumeItem{Built a Chrome extension that inspects network traffic per tab, filters the noise down to real media manifests, and saves a stream in one click instead of stitching segments together by hand.}
+      \resumeItem{Wrote the Python native messaging host that runs FFmpeg to write files to disk, an installer that registers it on Windows and Linux, and a job queue so downloads keep running after the popup closes.}
+    \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% ---------- skills ----------
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+  \small{\item{
+    \textbf{Languages:} Python, Go, JavaScript, TypeScript, Java, Kotlin, C++, SQL, PHP \\ \vspace{2pt}
+    \textbf{Frontend:} React, Next.js, React Router 7, Tailwind CSS, Jetpack Compose, HTML5, CSS3 \\ \vspace{2pt}
+    \textbf{Backend \& Infra:} FastAPI, Flask, Node.js, Express.js, Docker, Jenkins, nginx, Redis, AWS (EC2, S3), Cloudflare R2 \\ \vspace{2pt}
+    \textbf{Tools \& Frameworks:} Git, GitHub Actions, Grafana, WebRTC, FFmpeg, OpenCV, TensorFlow, Supabase, PostgreSQL, Burp Suite
+  }}
+\end{itemize}
+
+\end{document}

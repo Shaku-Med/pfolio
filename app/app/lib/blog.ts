@@ -9,6 +9,8 @@ export type BlogPost = {
   tags?: string[];
   coverImage?: string;
   body: string;
+  /** Manual display order (lower = earlier). */
+  position?: number;
 };
 
 export function formatBlogDate(iso: string): string {

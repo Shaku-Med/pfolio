@@ -67,7 +67,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="stylesheet" href={`/themes/${style}.css`} />
+        <link rel="stylesheet" href={`/themes/${style}.css`} data-theme-palette />
         <Meta />
         <Links />
       </head>

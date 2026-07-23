@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { data, redirect } from "react-router";
 import {
   THEME_COOKIE_NAME,
   THEME_MODES,
@@ -26,29 +26,47 @@ export async function action({ request }: { request: Request }) {
   const theme = isValidThemeMode(themeRaw) ? themeRaw : null;
   const style = isValidThemeStyle(styleRaw) ? styleRaw : null;
 
+  const wantsJson =
+    request.headers.get("Accept")?.includes("application/json") === true;
+
   let redirectTo = "/";
-  try {
-    const referer = request.headers.get("Referer");
-    if (referer) {
-      const refUrl = new URL(referer);
-      const baseUrl = new URL(request.url);
-      if (refUrl.origin === baseUrl.origin) redirectTo = refUrl.pathname + refUrl.search;
+  if (!wantsJson) {
+    try {
+      const referer = request.headers.get("Referer");
+      if (referer) {
+        const refUrl = new URL(referer);
+        const baseUrl = new URL(request.url);
+        if (refUrl.origin === baseUrl.origin) {
+          redirectTo = refUrl.pathname + refUrl.search;
+        }
+      }
+    } catch {
+      // use "/"
     }
-  } catch {
-    // use "/"
   }
 
   const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
   const cookies: string[] = [];
   if (theme) {
-    cookies.push(`${THEME_COOKIE_NAME}=${theme}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`);
+    cookies.push(
+      `${THEME_COOKIE_NAME}=${theme}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`,
+    );
   }
   if (style) {
-    cookies.push(`${STYLE_COOKIE_NAME}=${style}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`);
+    cookies.push(
+      `${STYLE_COOKIE_NAME}=${style}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`,
+    );
   }
 
   const headers = new Headers();
   cookies.forEach((c) => headers.append("Set-Cookie", c));
+
+  if (wantsJson) {
+    return data(
+      { ok: true as const, theme, style },
+      cookies.length ? { headers } : undefined,
+    );
+  }
 
   return redirect(redirectTo, cookies.length ? { headers } : undefined);
 }

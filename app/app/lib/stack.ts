@@ -3,6 +3,8 @@ export type StackCategory = {
   category: string;
   tools: string;
   description: string;
+  /** Manual display order (lower = earlier). */
+  position?: number;
 };
 
 /**

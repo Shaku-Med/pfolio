@@ -15,8 +15,8 @@ export type TimelineItem = {
   period: string;
   /** Rail marker ("2023", "Now"). Null items get no marker. */
   markerLabel: string | null;
-  /** Descending sort key; ongoing roles float to the top. */
-  sortKey: number;
+  /** Ascending manual order from admin (lower = earlier). */
+  position: number;
   description?: string;
   image?: string;
 };
@@ -44,7 +44,7 @@ function formatProjectPeriod(iso: string): string {
 }
 
 export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[] {
-  return entries.map((entry) => {
+  return entries.map((entry, index) => {
     const ongoing = /now|present|since/i.test(entry.period);
     const year = startYear(entry.period);
     return {
@@ -55,7 +55,7 @@ export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[]
       meta: [entry.role, entry.company, entry.location].filter(Boolean).join(" · "),
       period: entry.period,
       markerLabel: ongoing ? "Now" : year ? String(year) : null,
-      sortKey: ongoing ? Number.MAX_SAFE_INTEGER : (year ?? -1) * 12,
+      position: typeof entry.position === "number" ? entry.position : index,
       description: entry.description,
       image: resolveImage(entry.logo),
     };
@@ -65,7 +65,7 @@ export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[]
 export function projectsToTimeline(projects: Project[]): TimelineItem[] {
   return projects
     .filter((p): p is Project & { date: string } => Boolean(p.date))
-    .map((p) => {
+    .map((p, index) => {
       const d = new Date(p.date);
       const valid = !Number.isNaN(d.getTime());
       const year = valid ? d.getFullYear() : null;
@@ -77,15 +77,20 @@ export function projectsToTimeline(projects: Project[]): TimelineItem[] {
         meta: p.category,
         period: formatProjectPeriod(p.date),
         markerLabel: year ? String(year) : null,
-        sortKey: valid ? year! * 12 + d.getMonth() : -1,
+        position: typeof p.position === "number" ? p.position : index,
         description: p.description,
         image: resolveImage(p.image),
       };
     });
 }
 
+/** Order by admin position (stable). Experience wins ties over projects. */
 export function sortTimeline(items: TimelineItem[]): TimelineItem[] {
-  return [...items].sort((a, b) => b.sortKey - a.sortKey);
+  return [...items].sort((a, b) => {
+    if (a.position !== b.position) return a.position - b.position;
+    if (a.kind === b.kind) return 0;
+    return a.kind === "experience" ? -1 : 1;
+  });
 }
 
 /** Gentle S-curves between nodes so the spine reads drawn, not ruled. */

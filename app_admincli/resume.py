@@ -120,21 +120,21 @@ def _convert_to_markdown(path: Path) -> str:
     raise RuntimeError(f"Unsupported resume format: {ext or 'unknown'}")
 
 
-def create_resume() -> None:
-    src_str = input("Local resume file path (pdf / docx / md / txt): ").strip()
+def create_resume(path: str | None = None) -> Path | None:
+    src_str = (path or "").strip() or input("Local resume file path (pdf / docx / md / txt): ").strip()
     if not src_str:
         print("No path entered.")
-        return
+        return None
     src = Path(src_str).expanduser()
     if not src.exists():
         print("File not found.")
-        return
+        return None
 
     try:
         markdown = _convert_to_markdown(src)
     except Exception as e:
         print(f"Conversion failed: {e}")
-        return
+        return None
 
     out_dir = _resume_dir()
     out_md = out_dir / "resume.md"
@@ -157,4 +157,5 @@ def create_resume() -> None:
     print("\nOpen the markdown file, review and edit it as needed.")
     print("When you're happy with it, choose 'Resume' ->")
     print("'Upload edited markdown file to Supabase' and provide the path.")
+    return out_md
 

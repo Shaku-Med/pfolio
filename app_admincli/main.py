@@ -17,29 +17,50 @@ from crud import (
     projects_add,
     projects_update,
     projects_delete,
+    get_projects_list,
     experience_list,
     experience_add,
     experience_update,
     experience_delete,
+    get_experience_list,
     stack_list,
     stack_add,
     stack_update,
     stack_delete,
+    get_stack_list,
     blog_list,
     blog_add,
     blog_update,
     blog_delete,
+    get_blog_list,
     gallery_list,
     gallery_add,
     gallery_update,
     gallery_delete,
+    get_gallery_list,
+    move_item,
     resume_set_from_markdown_file,
 )
 from resume import create_resume
-from server import run_server
+from server import DASHBOARD_PORT, choose_dashboard_mode, run_dashboard
+
+
+def choose_cli_surface() -> str | None:
+    print("\nHow do you want to work?\n")
+    print("1. GUI (window — default)")
+    print("2. Terminal CLI (stick to the pain)")
+    print("3. Cancel")
+    while True:
+        choice = input("\nChoice (1/2/3, Enter = 1): ").strip()
+        if choice == "" or choice == "1":
+            return "gui"
+        if choice == "2":
+            return "cli"
+        if choice == "3":
+            return None
+        print("Enter 1, 2, 3, or press Enter for GUI.")
 
 SESSION_EXPIRES_DAYS = 7
-ADMIN_SERVER_PORT = 3001
 
 
 def _session_dir() -> Path:
@@ -190,14 +211,15 @@ def main_menu() -> None:
             print("Invalid choice.")
 
 
-def _entity_menu(name: str, list_fn, add_fn, update_fn, delete_fn) -> None:
+def _entity_menu(name: str, table: str, list_fn, get_list_fn, add_fn, update_fn, delete_fn) -> None:
     while True:
         print(f"\n--- {name} ---")
         print("1. List")
         print("2. Add")
         print("3. Update")
         print("4. Delete")
-        print("5. Back")
+        print("5. Reorder (move up/down)")
+        print("6. Back")
         choice = input("\nChoice: ").strip()
         if choice == "1":
             list_fn()
@@ -208,6 +230,23 @@ def _entity_menu(name: str, list_fn, add_fn, update_fn, delete_fn) -> None:
         elif choice == "4":
             delete_fn()
         elif choice == "5":
+            rows = list_fn()
+            if not rows:
+                continue
+            idx = input("Id to move: ").strip()
+            if not idx:
+                continue
+            way = input("Direction (u=up / d=down): ").strip().lower()
+            direction = -1 if way in ("u", "up") else 1 if way in ("d", "down") else 0
+            if direction == 0:
+                print("Enter u or d.")
+                continue
+            if move_item(table, idx, direction, get_list_fn):
+                print("Moved.")
+                list_fn()
+            else:
+                print("Could not move that.")
+        elif choice == "6":
             return
         else:
             print("Invalid choice.")
@@ -242,15 +281,27 @@ def logged_in_menu() -> None:
         print("7. Logout")
         choice = input("\nChoice: ").strip()
         if choice == "1":
-            _entity_menu("Projects", projects_list, projects_add, projects_update, projects_delete)
+            _entity_menu(
+                "Projects", "projects", projects_list, get_projects_list, projects_add, projects_update, projects_delete
+            )
         elif choice == "2":
-            _entity_menu("Experience", experience_list, experience_add, experience_update, experience_delete)
+            _entity_menu(
+                "Experience",
+                "experience",
+                experience_list,
+                get_experience_list,
+                experience_add,
+                experience_update,
+                experience_delete,
+            )
         elif choice == "3":
-            _entity_menu("Stack", stack_list, stack_add, stack_update, stack_delete)
+            _entity_menu("Stack", "stack", stack_list, get_stack_list, stack_add, stack_update, stack_delete)
         elif choice == "4":
-            _entity_menu("Gallery", gallery_list, gallery_add, gallery_update, gallery_delete)
+            _entity_menu(
+                "Gallery", "gallery", gallery_list, get_gallery_list, gallery_add, gallery_update, gallery_delete
+            )
         elif choice == "5":
-            _entity_menu("Blog", blog_list, blog_add, blog_update, blog_delete)
+            _entity_menu("Blog", "blog_posts", blog_list, get_blog_list, blog_add, blog_update, blog_delete)
         elif choice == "6":
             resume_menu()
         elif choice == "7":
@@ -263,7 +314,7 @@ def logged_in_menu() -> None:
 
 def _choose_mode() -> str:
     print("Pfolio Admin\n")
-    print("1. Start server (http://localhost:3001)")
+    print(f"1. Open the dashboard (http://localhost:{DASHBOARD_PORT})")
     print("2. Use CLI")
     print("3. Exit")
     while True:
@@ -303,8 +354,21 @@ if __name__ == "__main__":
             sys.exit(0)
         if mode == "1":
             try:
-                run_server(ADMIN_SERVER_PORT)
+                dash_mode = choose_dashboard_mode()
+                if dash_mode is None:
+                    print("Cancelled.\n")
+                    continue
+                run_dashboard(dash_mode)
             except KeyboardInterrupt:
-                print("\nServer stopped.")
+                print("\nDashboard stopped.")
             sys.exit(0)
+        surface = choose_cli_surface()
+        if surface is None:
+            print("Cancelled.\n")
+            continue
+        if surface == "gui":
+            from admin_gui import run_admin_gui
+
+            run_admin_gui()
+            continue
         logged_in_menu()
