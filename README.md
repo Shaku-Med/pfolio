@@ -434,3 +434,5 @@ wrapper key, delete the row and redo step 6.
 
 **Typecheck or build errors after pulling.** Run `npm install` at the root, and
 again inside `app_admincli/server/dashboard`.
+
+> Enjoy Your Build. Also, don't forget to make a PR so we'll see what you built too.
