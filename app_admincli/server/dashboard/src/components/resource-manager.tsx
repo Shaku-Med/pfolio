@@ -119,6 +119,9 @@ export function ResourceManager({ resource }: Props) {
   const [values, setValues] = useState<Row>({});
   const [saving, setSaving] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
+  /** Files picked on "New …" before the row exists — uploaded right after create. */
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
+  const [pendingListFiles, setPendingListFiles] = useState<Record<string, File[]>>({});
   const [pendingDelete, setPendingDelete] = useState<Row | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -161,6 +164,8 @@ export function ResourceManager({ resource }: Props) {
     const blank = blankRow(resource);
     setInitial(blank);
     setValues(blank);
+    setPendingFiles({});
+    setPendingListFiles({});
     setDialog({ mode: "new" });
   };
 
@@ -188,15 +193,67 @@ export function ResourceManager({ resource }: Props) {
       if (dialog.mode === "new") {
         const body: Row = {};
         for (const field of resource.fields) {
+          if (field.type === "file" || field.type === "files") continue;
           body[field.name] = normalizeForSave(field, values[field.name]);
         }
         const created = await request<{ id: string }>("POST", `/api/data/${resource.key}`, body);
         toast.success(`Added the ${resource.singular}`);
-        setDialog({ mode: "closed" });
-        if (created?.id) {
-          router.push(`/${resource.key}/${created.id}`);
+
+        const newId = created?.id ? String(created.id) : "";
+        if (newId) {
+          const pendingEntries = Object.entries(pendingFiles);
+          const pendingListEntries = Object.entries(pendingListFiles);
+          if (pendingEntries.length || pendingListEntries.length) {
+            setUploadingField(pendingEntries[0]?.[0] ?? pendingListEntries[0]?.[0] ?? null);
+            try {
+              for (const [column, file] of pendingEntries) {
+                const form = new FormData();
+                form.append("file", file);
+                form.append("resource", resource.key);
+                form.append("column", column);
+                form.append("id", newId);
+                const response = await fetch("/api/upload", { method: "POST", body: form });
+                const payload = (await response.json().catch(() => null)) as
+                  | { endpoint?: string; error?: string }
+                  | null;
+                if (!response.ok || !payload?.endpoint) {
+                  throw new Error(payload?.error ?? `Could not upload ${column}`);
+                }
+              }
+              for (const [column, files] of pendingListEntries) {
+                for (const file of files) {
+                  const form = new FormData();
+                  form.append("file", file);
+                  form.append("resource", resource.key);
+                  form.append("column", column);
+                  form.append("id", newId);
+                  const response = await fetch("/api/upload", { method: "POST", body: form });
+                  const payload = (await response.json().catch(() => null)) as
+                    | { endpoint?: string; error?: string }
+                    | null;
+                  if (!response.ok || !payload?.endpoint) {
+                    throw new Error(payload?.error ?? `Could not upload ${column}`);
+                  }
+                }
+              }
+              toast.success("Cover image uploaded");
+            } catch (uploadError) {
+              toast.error(
+                uploadError instanceof Error
+                  ? uploadError.message
+                  : "Saved, but the image upload failed — open the item to retry",
+              );
+            } finally {
+              setUploadingField(null);
+            }
+          }
+          setPendingFiles({});
+          setPendingListFiles({});
+          setDialog({ mode: "closed" });
+          router.push(`/${resource.key}/${newId}`);
           return;
         }
+        setDialog({ mode: "closed" });
         await load();
       } else if (dialog.mode === "edit") {
         if (changedCount === 0) {
@@ -217,6 +274,51 @@ export function ResourceManager({ resource }: Props) {
   };
 
   const uploadFile = async (columnName: string, file: File, index?: number) => {
+    const field = resource.fields.find((f) => f.name === columnName);
+    if (!field) return;
+
+    // New row: stash locally and show a blob preview until save.
+    if (dialog.mode === "new") {
+      if (field.type === "files") {
+        setPendingListFiles((prev) => {
+          const next = [...(prev[columnName] ?? [])];
+          if (index !== undefined && index >= 0 && index < next.length) {
+            next[index] = file;
+          } else {
+            next.push(file);
+          }
+          return { ...prev, [columnName]: next };
+        });
+        setValues((prev) => {
+          const existing = Array.isArray(prev[columnName])
+            ? [...(prev[columnName] as string[])]
+            : [];
+          const preview = URL.createObjectURL(file);
+          if (index !== undefined && index >= 0 && index < existing.length) {
+            existing[index] = preview;
+          } else {
+            existing.push(preview);
+          }
+          return { ...prev, [columnName]: existing };
+        });
+        toast.message("Image ready — it uploads when you save");
+        return;
+      }
+
+      setPendingFiles((prev) => {
+        const old = prev[columnName];
+        const oldPreview = values[columnName];
+        if (typeof oldPreview === "string" && oldPreview.startsWith("blob:")) {
+          URL.revokeObjectURL(oldPreview);
+        }
+        void old;
+        return { ...prev, [columnName]: file };
+      });
+      setValues((prev) => ({ ...prev, [columnName]: URL.createObjectURL(file) }));
+      toast.message("Image ready — it uploads when you save");
+      return;
+    }
+
     if (dialog.mode !== "edit") return;
     setUploadingField(columnName);
     try {
@@ -248,6 +350,25 @@ export function ResourceManager({ resource }: Props) {
   };
 
   const removeFile = async (columnName: string, index: number) => {
+    if (dialog.mode === "new") {
+      setPendingListFiles((prev) => {
+        const next = [...(prev[columnName] ?? [])];
+        next.splice(index, 1);
+        return { ...prev, [columnName]: next };
+      });
+      setValues((prev) => {
+        const existing = Array.isArray(prev[columnName])
+          ? [...(prev[columnName] as string[])]
+          : [];
+        const removed = existing[index];
+        if (typeof removed === "string" && removed.startsWith("blob:")) {
+          URL.revokeObjectURL(removed);
+        }
+        existing.splice(index, 1);
+        return { ...prev, [columnName]: existing };
+      });
+      return;
+    }
     if (dialog.mode !== "edit") return;
     setUploadingField(columnName);
     try {
@@ -462,7 +583,23 @@ export function ResourceManager({ resource }: Props) {
       <Dialog
         open={dialog.mode !== "closed"}
         onOpenChange={(open) => {
-          if (!open && !saving) setDialog({ mode: "closed" });
+          if (!open && !saving) {
+            for (const value of Object.values(values)) {
+              if (typeof value === "string" && value.startsWith("blob:")) {
+                URL.revokeObjectURL(value);
+              }
+              if (Array.isArray(value)) {
+                for (const item of value) {
+                  if (typeof item === "string" && item.startsWith("blob:")) {
+                    URL.revokeObjectURL(item);
+                  }
+                }
+              }
+            }
+            setPendingFiles({});
+            setPendingListFiles({});
+            setDialog({ mode: "closed" });
+          }
         }}
       >
         <DialogContent className="max-h-[88vh] gap-0 overflow-hidden p-0 sm:max-w-2xl">
@@ -494,15 +631,17 @@ export function ResourceManager({ resource }: Props) {
                   <FieldInput
                     field={field}
                     value={values[field.name]}
-                    canUpload={isEdit}
-                    uploading={uploadingField === field.name}
+                    canUpload={dialog.mode === "new" || dialog.mode === "edit"}
+                    uploading={uploadingField === field.name || (saving && !!pendingFiles[field.name])}
                     onPickFile={(file, index) => void uploadFile(field.name, file, index)}
                     onRemoveFile={(index) => void removeFile(field.name, index)}
                     changed={
-                      !isSameValue(
-                        normalizeForSave(field, initial[field.name]),
-                        normalizeForSave(field, values[field.name]),
-                      )
+                      dialog.mode === "new"
+                        ? !!(pendingFiles[field.name] || (pendingListFiles[field.name]?.length ?? 0) > 0)
+                        : !isSameValue(
+                            normalizeForSave(field, initial[field.name]),
+                            normalizeForSave(field, values[field.name]),
+                          )
                     }
                     onChange={(next) => setValues((prev) => ({ ...prev, [field.name]: next }))}
                   />

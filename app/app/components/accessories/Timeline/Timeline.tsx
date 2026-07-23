@@ -5,6 +5,7 @@ import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { cn } from "~/lib/utils";
 import type { ExperienceEntry } from "~/lib/experience";
 import type { Project } from "~/lib/projects";
+import { TextBlock } from "./TextBlock";
 
 export type TimelineItem = {
   kind: "experience" | "project";
@@ -159,9 +160,10 @@ function TimelineCard({ item }: { item: TimelineItem }) {
           <span className="min-w-0 truncate">{item.meta}</span>
         </p>
         {item.description && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
-            {item.description}
-          </p>
+          <TextBlock
+            text={item.description}
+            className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80"
+          />
         )}
       </div>
       {item.kind === "project" && item.image && (

@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { type BlogPost, formatBlogDate } from "../../lib/blog";
 import { Separator } from "~/components/ui/separator";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
+import { TextBlock } from "./TextBlock";
 
 type BlogCardProps = {
   post: BlogPost;
@@ -50,9 +51,10 @@ export default function BlogCard({ post, to, variant = "compact" }: BlogCardProp
             {post.title}
           </h3>
         </div>
-        <p className="flex-1 text-xs line-clamp-2 leading-relaxed text-muted-foreground sm:text-sm">
-          {post.excerpt}
-        </p>
+        <TextBlock
+          text={post.excerpt}
+          className="flex-1 text-xs line-clamp-2 leading-relaxed text-muted-foreground sm:text-sm"
+        />
         {variant === "compact" && (
           <p className="mt-auto text-[11px] text-muted-foreground/70">
             <time dateTime={post.date}>{formatBlogDate(post.date)}</time>

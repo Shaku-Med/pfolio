@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useLoaderData } from "react-router";
 import MarkdownBody from "../../../components/accessories/MarkdownBody";
+import { TextBlock } from "../../../components/accessories/TextBlock";
 import { getGalleryById } from "../../../lib/database/queries";
 import type { GalleryItem } from "../../../lib/gallery";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
@@ -129,9 +130,11 @@ export default function GalleryIdIndex() {
 
             {item.subtitle && (
               <Reveal delay={0.08}>
-                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                  {item.subtitle}
-                </p>
+                <TextBlock
+                  text={item.subtitle}
+                  paragraphs
+                  className="mt-5 text-lg leading-relaxed text-muted-foreground"
+                />
               </Reveal>
             )}
 

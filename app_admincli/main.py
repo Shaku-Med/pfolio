@@ -41,6 +41,13 @@ from crud import (
     move_item,
     resume_set_from_markdown_file,
     resume_set_from_tex_file,
+    SELECTED_TABLES,
+    SELECTED_TABLE_LABELS,
+    selected_list,
+    selected_add,
+    selected_remove,
+    selected_move,
+    get_available_for_selected,
 )
 from resume import create_resume
 from server import DASHBOARD_PORT, choose_dashboard_mode, run_dashboard
@@ -273,22 +280,99 @@ def resume_menu() -> None:
             print("Invalid choice.")
 
 
+def selected_menu() -> None:
+    tables = list(SELECTED_TABLES)
+    while True:
+        print("\n--- Selected (home teasers) ---")
+        for i, key in enumerate(tables, start=1):
+            print(f"{i}. {SELECTED_TABLE_LABELS[key]}")
+        print(f"{len(tables) + 1}. Back")
+        choice = input("\nChoice: ").strip()
+        if choice == str(len(tables) + 1):
+            return
+        if not choice.isdigit() or not (1 <= int(choice) <= len(tables)):
+            print("Invalid choice.")
+            continue
+        table = tables[int(choice) - 1]
+        _selected_table_menu(table)
+
+
+def _selected_table_menu(table: str) -> None:
+    label = SELECTED_TABLE_LABELS.get(table, table)
+    while True:
+        print(f"\n--- Selected · {label} ---")
+        print("1. List selected")
+        print("2. Add")
+        print("3. Remove")
+        print("4. Reorder (move up/down)")
+        print("5. List available (not selected)")
+        print("6. Back")
+        choice = input("\nChoice: ").strip()
+        if choice == "1":
+            selected_list(table)
+        elif choice == "2":
+            avail = get_available_for_selected(table)
+            if not avail:
+                print("Nothing left to add.")
+                continue
+            print("Available:")
+            for row in avail:
+                print(f"  {row['item_id']}: {row['label']}")
+            selected_add(table)
+        elif choice == "3":
+            rows = selected_list(table)
+            if not rows:
+                continue
+            selected_remove(table)
+        elif choice == "4":
+            rows = selected_list(table)
+            if not rows:
+                continue
+            idx = input("Id to move: ").strip()
+            if not idx:
+                continue
+            way = input("Direction (u=up / d=down): ").strip().lower()
+            direction = -1 if way in ("u", "up") else 1 if way in ("d", "down") else 0
+            if direction == 0:
+                print("Enter u or d.")
+                continue
+            if selected_move(table, idx, direction):
+                print("Moved.")
+                selected_list(table)
+            else:
+                print("Could not move that.")
+        elif choice == "5":
+            avail = get_available_for_selected(table)
+            if not avail:
+                print("Nothing available — everything is already selected.")
+            else:
+                for row in avail:
+                    print(f"  {row['item_id']}: {row['label']}")
+        elif choice == "6":
+            return
+        else:
+            print("Invalid choice.")
+
+
 def logged_in_menu() -> None:
     while True:
         print("\n--- Admin ---")
-        print("1. Projects")
-        print("2. Experience")
-        print("3. Stack")
-        print("4. Gallery")
-        print("5. Blog")
-        print("6. Resume")
-        print("7. Logout")
+        print("1. Selected (home teasers)")
+        print("2. Projects")
+        print("3. Experience")
+        print("4. Stack")
+        print("5. Gallery")
+        print("6. Blog")
+        print("7. Resume")
+        print("8. Logout")
         choice = input("\nChoice: ").strip()
         if choice == "1":
+            selected_menu()
+        elif choice == "2":
             _entity_menu(
                 "Projects", "projects", projects_list, get_projects_list, projects_add, projects_update, projects_delete
             )
-        elif choice == "2":
+        elif choice == "3":
             _entity_menu(
                 "Experience",
                 "experience",
@@ -298,17 +382,17 @@ def logged_in_menu() -> None:
                 experience_update,
                 experience_delete,
             )
-        elif choice == "3":
-            _entity_menu("Stack", "stack", stack_list, get_stack_list, stack_add, stack_update, stack_delete)
         elif choice == "4":
+            _entity_menu("Stack", "stack", stack_list, get_stack_list, stack_add, stack_update, stack_delete)
+        elif choice == "5":
             _entity_menu(
                 "Gallery", "gallery", gallery_list, get_gallery_list, gallery_add, gallery_update, gallery_delete
             )
-        elif choice == "5":
-            _entity_menu("Blog", "blog_posts", blog_list, get_blog_list, blog_add, blog_update, blog_delete)
         elif choice == "6":
-            resume_menu()
+            _entity_menu("Blog", "blog_posts", blog_list, get_blog_list, blog_add, blog_update, blog_delete)
         elif choice == "7":
+            resume_menu()
+        elif choice == "8":
             clear_session()
             print("Logged out.\n")
             return

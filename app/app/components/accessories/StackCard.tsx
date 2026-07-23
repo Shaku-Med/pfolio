@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { parseToolsString, type StackCategory } from "../../lib/stack";
 import { TechTag } from "~/lib/tech/TechTag";
+import { TextBlock } from "./TextBlock";
 
 type StackCardProps = {
   item: StackCategory;
@@ -25,9 +26,10 @@ export default function StackCard({ item, to }: StackCardProps) {
         )}
       </div>
       {item.description && (
-        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-          {item.description}
-        </p>
+        <TextBlock
+          text={item.description}
+          className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground"
+        />
       )}
       <div className="mt-auto flex min-w-0 flex-wrap gap-1.5 pt-3">
         {tools.map((tool) => (

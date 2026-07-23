@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from "react-router";
 import MarkdownBody from "../../../components/accessories/MarkdownBody";
+import { TextBlock } from "../../../components/accessories/TextBlock";
 import { getBlogPostById } from "../../../lib/database/queries";
 import { formatBlogDate, type BlogPost } from "../../../lib/blog";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
@@ -111,9 +112,11 @@ export default function BlogPostPage() {
             {/* Excerpt as lede */}
             {post.excerpt && (
               <Reveal delay={0.08}>
-                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                  {post.excerpt}
-                </p>
+                <TextBlock
+                  text={post.excerpt}
+                  paragraphs
+                  className="mt-5 text-lg leading-relaxed text-muted-foreground"
+                />
               </Reveal>
             )}
 

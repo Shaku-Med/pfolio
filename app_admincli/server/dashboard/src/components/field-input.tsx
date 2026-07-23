@@ -85,14 +85,16 @@ export function FieldInput({
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">Nothing uploaded yet</p>
+              <p className="text-xs text-muted-foreground">
+                {canUpload ? "Pick a jpg, png, or webp — uploads when you save" : "Nothing uploaded yet"}
+              </p>
             )}
             {canUpload ? (
               <>
                 <input
                   id={id}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
                   disabled={uploading}
                   onChange={(e) => {
                     const picked = e.target.files?.[0];

@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { ExperienceEntry } from "../../lib/experience";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
+import { TextBlock } from "./TextBlock";
 
 type ExperienceItemProps = {
   entry: ExperienceEntry;
@@ -42,9 +43,10 @@ export default function ExperienceItem({ entry, to }: ExperienceItemProps) {
         </p>
 
         {entry.description && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
-            {entry.description}
-          </p>
+          <TextBlock
+            text={entry.description}
+            className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80"
+          />
         )}
       </div>
     </div>

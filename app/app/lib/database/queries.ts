@@ -389,23 +389,11 @@ export async function getSelectedBlog(
   limit = 4,
   offset = 0,
 ): Promise<BlogPost[]> {
-  const { data: selected, error: selError } = await db
-    .from("selected_items")
-    .select("item_id")
-    .eq("table_name", "blog_posts")
-    .order("created_at")
-    .range(offset, offset + limit - 1);
-  if (selError || !selected?.length) return [];
-  const ids = (selected as { item_id: string }[]).map((r) => r.item_id);
-  const { data, error } = await db
-    .from("blog_posts")
-    .select(BLOG_LIST_COLUMNS)
-    .in("id", ids);
+  const { data, error } = await db.rpc("get_selected_blog", {
+    p_limit: limit,
+    p_offset: offset,
+  });
   if (error || !data) return [];
-  const order = new Map<string, number>(ids.map((id: string, i: number) => [id, i]));
-  (data as DbBlog[]).sort(
-    (a: DbBlog, b: DbBlog) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)
-  );
   return (data as DbBlog[]).map(mapBlog);
 }
 

@@ -26,6 +26,7 @@ import {
   CommandGroup,
   CommandItem,
 } from "./ui/command";
+import { TextBlock } from "./accessories/TextBlock";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -451,9 +452,11 @@ const Nav: React.FC = () => {
                     <span className="text-sm font-medium">{item.title}</span>
                   </div>
                   {item.summary && (
-                    <span className="line-clamp-1 text-xs text-muted-foreground">
-                      {item.summary}
-                    </span>
+                    <TextBlock
+                      as="span"
+                      text={item.summary}
+                      className="line-clamp-1 text-xs text-muted-foreground"
+                    />
                   )}
                 </CommandItem>
               ))}

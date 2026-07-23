@@ -2,6 +2,7 @@ import { Link, useLoaderData } from "react-router";
 import type { SearchResult } from "../../../lib/database/queries";
 import { searchByTag } from "../../../lib/database/queries";
 import { RailGlyph, Reveal } from "../../../components/accessories/Rail/Rail";
+import { TextBlock } from "../../../components/accessories/TextBlock";
 import { buildPageMeta } from "../../../lib/seo";
 
 const PAGE_SIZE = 20;
@@ -72,9 +73,10 @@ export default function TagPage() {
                     {item.title}
                   </p>
                   {item.summary && (
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      {item.summary}
-                    </p>
+                    <TextBlock
+                      text={item.summary}
+                      className="line-clamp-2 text-xs text-muted-foreground"
+                    />
                   )}
                 </Link>
               </li>

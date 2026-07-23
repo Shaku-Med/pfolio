@@ -5,6 +5,7 @@ import type { StackCategory } from "../../../lib/stack";
 import { parseToolsString } from "../../../lib/stack";
 import { TechTag } from "~/lib/tech/TechTag";
 import { Reveal } from "~/components/accessories/Rail/Rail";
+import { TextBlock } from "~/components/accessories/TextBlock";
 import { buildPageMeta } from "~/lib/seo";
 
 export async function loader({
@@ -59,7 +60,11 @@ export default function StackIdIndex() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           {stack.category}
         </h1>
-        <p className="text-sm text-muted-foreground">{stack.description}</p>
+        <TextBlock
+          text={stack.description}
+          paragraphs
+          className="text-sm text-muted-foreground"
+        />
         <div className="flex flex-wrap gap-1.5 pt-1">
           {tools.map((tool) => (
               <Link to={`/tags/${encodeURIComponent(tool)}`} key={tool}>
@@ -102,9 +107,10 @@ export default function StackIdIndex() {
                         {item.title}
                       </p>
                       {item.summary && (
-                        <p className="line-clamp-2 text-xs text-muted-foreground">
-                          {item.summary}
-                        </p>
+                        <TextBlock
+                          text={item.summary}
+                          className="line-clamp-2 text-xs text-muted-foreground"
+                        />
                       )}
                     </div>
                     {(item.date || item.period) && (

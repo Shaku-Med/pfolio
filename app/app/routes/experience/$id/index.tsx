@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from "react-router";
 import MarkdownBody from "../../../components/accessories/MarkdownBody";
+import { TextBlock } from "../../../components/accessories/TextBlock";
 import { getExperienceById } from "../../../lib/database/queries";
 import type { ExperienceEntry } from "../../../lib/experience";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
@@ -110,9 +111,11 @@ const ExperienceIdIndex = () => {
 
             {entry.description && (
               <Reveal delay={0.08}>
-                <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                  {entry.description}
-                </p>
+                <TextBlock
+                  text={entry.description}
+                  paragraphs
+                  className="mt-5 text-lg leading-relaxed text-muted-foreground"
+                />
               </Reveal>
             )}
 
@@ -133,9 +136,11 @@ const ExperienceIdIndex = () => {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-foreground">
                   Development
                 </h2>
-                <p className="mt-3 text-[0.938rem] leading-[1.85] text-muted-foreground">
-                  {entry.developmentSummary}
-                </p>
+                <TextBlock
+                  text={entry.developmentSummary}
+                  paragraphs
+                  className="mt-3 text-[0.938rem] leading-[1.85] text-muted-foreground"
+                />
               </section>
             )}
 

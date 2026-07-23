@@ -100,8 +100,9 @@ run it.
 2. `admin.sql` creates the single admin account table
 3. Then each remaining `.sql` file in that folder. They are the database
    functions the site calls for lists, search, and detail pages. Run
-   `zz_position_order.sql` last — it adds a stable `position` column used for
-   drag-and-drop ordering in the admin dashboard.
+   `zz_position_order.sql`, then `zz_selected_position.sql` last — they add
+   stable `position` columns for drag-and-drop ordering of content lists and
+   home-page “Selected” teasers in the admin dashboard.
 
 From Project Settings, then API, copy three values. You will need all of them.
 

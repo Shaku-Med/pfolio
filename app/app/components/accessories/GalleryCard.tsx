@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { GalleryItem } from "../../lib/gallery";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
+import { TextBlock } from "./TextBlock";
 
 type GalleryCardProps = {
   item: GalleryItem;
@@ -37,13 +38,14 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
         >
           {item.title}
         </p>
-        <p
-          className={`text-xs font-medium ${
-            item.tone === "dark" ? "text-white/65" : "text-black/60"
-          }`}
-        >
-          {item.subtitle}
-        </p>
+        {item.subtitle && (
+          <TextBlock
+            text={item.subtitle}
+            className={`text-xs font-medium ${
+              item.tone === "dark" ? "text-white/65" : "text-black/60"
+            }`}
+          />
+        )}
       </div>
     </div>
   );

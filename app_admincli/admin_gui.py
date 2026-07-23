@@ -32,13 +32,20 @@ from crud import (
     gallery_delete_by_id,
     gallery_insert,
     gallery_update_by_id,
+    get_available_for_selected,
     get_projects_list,
+    get_selected_rows,
     projects_delete_by_id,
     projects_insert,
     projects_update_by_id,
     resume_upload_from_file,
+    SELECTED_TABLE_LABELS,
+    SELECTED_TABLES,
+    selected_add,
+    selected_remove,
     set_file_for_record,
     set_positions,
+    set_selected_positions,
     stack_delete_by_id,
     stack_insert,
     stack_update_by_id,
@@ -48,6 +55,7 @@ from supabase_client import client
 
 
 NAV_ITEMS = (
+    ("Selected", "selected", "star"),
     ("Projects", "projects", "grid"),
     ("Experience", "experience", "briefcase"),
     ("Stack", "stack", "layers"),
@@ -108,6 +116,8 @@ _ICON_SPECS: dict[str, list[tuple]] = {
     "scroll": [("poly", [(6, 2), (14, 2), (20, 8), (20, 22), (6, 22)], True),
                ("poly", [(14, 2), (14, 8), (20, 8)], False),
                ("line", 9, 12.5, 17, 12.5), ("line", 9, 16.5, 14, 16.5)],
+    "star": [("poly", [(12, 2), (15, 9), (22, 9), (17, 14), (19, 21), (12, 17),
+                       (5, 21), (7, 14), (2, 9), (9, 9)], True)],
     "plus": [("line", 12, 5, 12, 19), ("line", 5, 12, 19, 12)],
     "refresh": [("arc", 12, 12, 8, 300, 200), ("poly", [(20.5, 4), (20.5, 10.5), (14, 10.5)], False)],
     "trash": [("line", 3, 6, 21, 6), ("poly", [(5.5, 6), (6.5, 21), (17.5, 21), (18.5, 6)], False),
@@ -655,6 +665,281 @@ class SectionView(ctk.CTkFrame):
             messagebox.showerror("Delete failed", str(e), parent=self)
 
 
+class SelectedView(ctk.CTkFrame):
+    """Feature home-page items: add/remove + drag/up-down reorder per section."""
+
+    def __init__(self, master):
+        super().__init__(master, fg_color="transparent")
+        self._table = "projects"
+        self._selected: list[dict] = []
+        self._available: list[dict] = []
+        self._sel_widgets: dict[str, ctk.CTkFrame] = {}
+        self._order: list[str] = []
+        self._drag_id: str | None = None
+
+        bar = ctk.CTkFrame(self, fg_color="transparent")
+        bar.pack(fill="x", padx=28, pady=(24, 16))
+        heads = ctk.CTkFrame(bar, fg_color="transparent")
+        heads.pack(side="left", fill="x", expand=True)
+        ctk.CTkLabel(heads, text="Selected", font=_font(22, "bold"), text_color=FG).pack(anchor="w")
+        ctk.CTkLabel(
+            heads,
+            text="Home teasers. Drag selected rows to reorder, or use Up / Down.",
+            font=_font(12),
+            text_color=MUTED_FG,
+        ).pack(anchor="w", pady=(2, 0))
+
+        self._table_var = ctk.StringVar(value=SELECTED_TABLE_LABELS["projects"])
+        menu = ctk.CTkOptionMenu(
+            bar,
+            values=[SELECTED_TABLE_LABELS[k] for k in SELECTED_TABLES],
+            variable=self._table_var,
+            command=self._on_table_change,
+            width=240,
+            height=36,
+            font=_font(13),
+            fg_color=CARD,
+            button_color=ACCENT,
+            button_hover_color=HOVER,
+            text_color=FG,
+            dropdown_fg_color=CARD,
+            dropdown_hover_color=HOVER,
+            dropdown_text_color=FG,
+        )
+        menu.pack(side="right", padx=(10, 0))
+        _ghost_button(bar, "Refresh", self.reload, "refresh", 112).pack(side="right")
+
+        split = ctk.CTkFrame(self, fg_color="transparent")
+        split.pack(fill="both", expand=True, padx=28, pady=(0, 22))
+        split.grid_columnconfigure(0, weight=1, uniform="sel")
+        split.grid_columnconfigure(1, weight=1, uniform="sel")
+        split.grid_rowconfigure(0, weight=1)
+
+        left_shadow = ctk.CTkFrame(split, fg_color=SHADOW, corner_radius=RADIUS_LG)
+        left_shadow.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        left = ctk.CTkFrame(
+            left_shadow, fg_color=CARD, corner_radius=RADIUS_LG, border_width=1, border_color=BORDER
+        )
+        left.pack(fill="both", expand=True, pady=(0, 3))
+        ctk.CTkLabel(left, text="ON THE HOME PAGE", font=_font(10, "bold"), text_color=MUTED_FG).pack(
+            anchor="w", padx=16, pady=(14, 8)
+        )
+        self._sel_body = ctk.CTkScrollableFrame(left, fg_color="transparent")
+        self._sel_body.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+        foot = ctk.CTkFrame(left, fg_color="transparent")
+        foot.pack(fill="x", padx=12, pady=(0, 12))
+        _ghost_button(foot, "Up", lambda: self._nudge(-1), "chevron-up", 88).pack(side="left")
+        _ghost_button(foot, "Down", lambda: self._nudge(1), "chevron-down", 100).pack(
+            side="left", padx=(8, 0)
+        )
+        ctk.CTkButton(
+            foot,
+            text="Remove",
+            image=icon("trash", 16, "on_primary"),
+            compound="left",
+            width=108,
+            height=36,
+            corner_radius=RADIUS,
+            fg_color=DANGER,
+            hover_color=DANGER_HOVER,
+            text_color="#ffffff",
+            font=_font(13),
+            command=self._remove_selected,
+        ).pack(side="right")
+
+        right_shadow = ctk.CTkFrame(split, fg_color=SHADOW, corner_radius=RADIUS_LG)
+        right_shadow.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+        right = ctk.CTkFrame(
+            right_shadow, fg_color=CARD, corner_radius=RADIUS_LG, border_width=1, border_color=BORDER
+        )
+        right.pack(fill="both", expand=True, pady=(0, 3))
+        ctk.CTkLabel(right, text="AVAILABLE TO ADD", font=_font(10, "bold"), text_color=MUTED_FG).pack(
+            anchor="w", padx=16, pady=(14, 8)
+        )
+        self._avail_body = ctk.CTkScrollableFrame(right, fg_color="transparent")
+        self._avail_body.pack(fill="both", expand=True, padx=8, pady=(0, 12))
+
+        self._picked: str | None = None
+        self.reload()
+
+    def _table_key(self) -> str:
+        label = self._table_var.get()
+        for key, name in SELECTED_TABLE_LABELS.items():
+            if name == label:
+                return key
+        return "projects"
+
+    def _on_table_change(self, _value: str) -> None:
+        self.reload()
+
+    def reload(self) -> None:
+        self._table = self._table_key()
+        try:
+            self._selected = get_selected_rows(self._table)
+            self._available = get_available_for_selected(self._table)
+        except Exception as e:
+            messagebox.showerror("Load failed", str(e), parent=self)
+            self._selected = []
+            self._available = []
+        self._order = [str(r["item_id"]) for r in self._selected]
+        self._picked = self._order[0] if self._order else None
+        self._render_selected()
+        self._render_available()
+
+    def _clear(self, body: ctk.CTkScrollableFrame) -> None:
+        for child in body.winfo_children():
+            child.destroy()
+
+    def _render_selected(self) -> None:
+        self._clear(self._sel_body)
+        self._sel_widgets = {}
+        if not self._selected:
+            ctk.CTkLabel(
+                self._sel_body,
+                text="Nothing selected yet.",
+                font=_font(13),
+                text_color=MUTED_FG,
+            ).pack(anchor="w", padx=8, pady=8)
+            return
+        by_id = {str(r["item_id"]): r for r in self._selected}
+        for iid in self._order:
+            row = by_id.get(iid)
+            if not row:
+                continue
+            frame = ctk.CTkFrame(self._sel_body, fg_color="transparent", corner_radius=RADIUS, height=ROW_H)
+            frame.pack(fill="x", padx=2, pady=1)
+            frame.pack_propagate(False)
+            label = ctk.CTkLabel(
+                frame,
+                text=row["label"],
+                font=_font(13),
+                text_color=FG,
+                anchor="w",
+            )
+            label.pack(side="left", fill="x", expand=True, padx=12)
+
+            def bind_all(widget, rid=iid):
+                widget.bind("<ButtonPress-1>", lambda e, i=rid: self._on_press(i, e))
+                widget.bind("<B1-Motion>", lambda e, i=rid: self._on_motion(i, e))
+                widget.bind("<ButtonRelease-1>", lambda e, i=rid: self._on_release(i, e))
+
+            bind_all(frame)
+            bind_all(label)
+            self._sel_widgets[iid] = frame
+            self._paint_row(iid)
+
+    def _render_available(self) -> None:
+        self._clear(self._avail_body)
+        if not self._available:
+            ctk.CTkLabel(
+                self._avail_body,
+                text="Every item is already selected.",
+                font=_font(13),
+                text_color=MUTED_FG,
+            ).pack(anchor="w", padx=8, pady=8)
+            return
+        for row in self._available:
+            frame = ctk.CTkFrame(self._avail_body, fg_color="transparent", corner_radius=RADIUS, height=ROW_H)
+            frame.pack(fill="x", padx=2, pady=1)
+            frame.pack_propagate(False)
+            ctk.CTkLabel(
+                frame, text=row["label"], font=_font(13), text_color=FG, anchor="w"
+            ).pack(side="left", fill="x", expand=True, padx=12)
+            ctk.CTkButton(
+                frame,
+                text="Add",
+                width=72,
+                height=30,
+                corner_radius=RADIUS,
+                fg_color=PRIMARY,
+                hover_color=PRIMARY_HOVER,
+                text_color=PRIMARY_FG,
+                font=_font(12, "bold"),
+                command=lambda iid=row["item_id"]: self._add(iid),
+            ).pack(side="right", padx=8)
+
+    def _paint_row(self, iid: str) -> None:
+        frame = self._sel_widgets.get(iid)
+        if not frame:
+            return
+        frame.configure(fg_color=ACCENT if iid == self._picked else "transparent")
+
+    def _on_press(self, iid: str, _event) -> None:
+        self._picked = iid
+        self._drag_id = iid
+        for rid in self._order:
+            self._paint_row(rid)
+
+    def _on_motion(self, iid: str, event) -> None:
+        if not self._drag_id:
+            return
+        y = event.y_root
+        target = None
+        for rid, widget in self._sel_widgets.items():
+            try:
+                top = widget.winfo_rooty()
+                bottom = top + widget.winfo_height()
+                if top <= y <= bottom:
+                    target = rid
+                    break
+            except Exception:
+                continue
+        if not target or target == self._drag_id:
+            return
+        if target not in self._order or self._drag_id not in self._order:
+            return
+        i = self._order.index(self._drag_id)
+        j = self._order.index(target)
+        self._order[i], self._order[j] = self._order[j], self._order[i]
+        for rid in self._order:
+            w = self._sel_widgets.get(rid)
+            if w:
+                w.pack_forget()
+        for rid in self._order:
+            w = self._sel_widgets.get(rid)
+            if w:
+                w.pack(fill="x", padx=2, pady=1)
+
+    def _on_release(self, _iid: str, _event) -> None:
+        if not self._drag_id:
+            return
+        self._drag_id = None
+        if not set_selected_positions(self._table, self._order):
+            messagebox.showerror("Reorder failed", "Could not save that order.", parent=self)
+            self.reload()
+
+    def _nudge(self, direction: int) -> None:
+        if not self._picked or self._picked not in self._order:
+            messagebox.showinfo("Select a row", "Pick a selected item first.", parent=self)
+            return
+        i = self._order.index(self._picked)
+        j = i + direction
+        if j < 0 or j >= len(self._order):
+            return
+        self._order[i], self._order[j] = self._order[j], self._order[i]
+        if not set_selected_positions(self._table, self._order):
+            messagebox.showerror("Reorder failed", "Could not save that order.", parent=self)
+            self.reload()
+            return
+        self.reload()
+        self._picked = self._order[j]
+        for rid in self._order:
+            self._paint_row(rid)
+
+    def _add(self, item_id: str) -> None:
+        if selected_add(self._table, item_id):
+            self.reload()
+
+    def _remove_selected(self) -> None:
+        if not self._picked:
+            messagebox.showinfo("Select a row", "Pick a selected item first.", parent=self)
+            return
+        if not messagebox.askyesno("Remove?", "Remove this from the home page selection?", parent=self):
+            return
+        if selected_remove(self._table, self._picked):
+            self.reload()
+
+
 class AdminApp(ctk.CTk):
     def __init__(self):
         ctk.set_appearance_mode("system")
@@ -692,6 +977,7 @@ class AdminApp(ctk.CTk):
         self._nav_buttons: dict[str, ctk.CTkButton] = {}
         self._nav_icons: dict[str, str] = {}
         self._nav_cmds = {
+            "selected": self._show_selected,
             "projects": self._show_projects,
             "experience": self._show_experience,
             "stack": self._show_stack,
@@ -757,7 +1043,7 @@ class AdminApp(ctk.CTk):
         self.content.pack(side="left", fill="both", expand=True)
 
         self._current: str | None = None
-        self._navigate("projects", self._show_projects)
+        self._navigate("selected", self._show_selected)
 
     def _toggle_theme(self) -> None:
         self._dark = not self._dark
@@ -792,6 +1078,10 @@ class AdminApp(ctk.CTk):
         view = factory()
         view.pack(fill="both", expand=True)
         view.reload()
+
+    def _show_selected(self) -> None:
+        self._clear_content()
+        SelectedView(self.content).pack(fill="both", expand=True)
 
     def _show_projects(self) -> None:
         def factory():

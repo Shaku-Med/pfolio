@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router";
 import type { Project, ProjectLink } from "../../lib/projects";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { TechTag } from "../../lib/tech/TechTag";
+import { TextBlock } from "./TextBlock";
 
 const linkIcons: Record<NonNullable<ProjectLink["icon"]>, LucideIcon> = {
   doc: FileText,
@@ -55,11 +56,10 @@ export default function ProjectCard({
         <h3 className="text-sm font-semibold leading-snug line-clamp-1 sm:text-base">
           {project.title}
         </h3>
-        <p
+        <TextBlock
+          text={project.description}
           className={`mt-1.5 text-xs text-muted-foreground ${descriptionClamp ? "line-clamp-2" : ""}`}
-        >
-          {project.description}
-        </p>
+        />
         <div className="mt-auto flex flex-wrap gap-1.5 pt-3 text-[11px] text-muted-foreground">
           {tags.map((tag, i) => {
             const tagUrl = `/tags/${encodeURIComponent(tag)}`;

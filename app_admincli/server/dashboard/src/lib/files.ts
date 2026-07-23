@@ -22,6 +22,8 @@ export function fileName(endpoint: string): string {
 
 export function isImage(endpoint: string): boolean {
   const trimmed = endpoint.trim();
+  if (/^blob:/i.test(trimmed)) return true;
+  if (/^data:image\//i.test(trimmed)) return true;
   if (/^https?:\/\//i.test(trimmed)) {
     const ext = fileName(trimmed.split("?")[0] ?? trimmed)
       .split(".")
@@ -37,7 +39,7 @@ export function isImage(endpoint: string): boolean {
 
 export function fileUrl(endpoint: string): string {
   const trimmed = endpoint.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(https?:|blob:|data:)/i.test(trimmed)) return trimmed;
   const path = trimmed.replace(/^\/+/, "");
   return `${siteBaseUrl()}/api/load/image/${path}`;
 }

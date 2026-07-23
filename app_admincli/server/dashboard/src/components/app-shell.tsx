@@ -14,6 +14,7 @@ import {
   Monitor,
   Moon,
   Newspaper,
+  Star,
   Sun,
   Wrench,
 } from "lucide-react";
@@ -56,6 +57,7 @@ import { siteAssetUrl } from "@/lib/files";
 import { cn } from "@/lib/utils";
 
 const NAV = [
+  { href: "/selected", label: "Selected", Icon: Star },
   { href: "/projects", label: "Projects", Icon: Briefcase },
   { href: "/experience", label: "Experience", Icon: Layers },
   { href: "/stack", label: "Stack", Icon: Wrench },

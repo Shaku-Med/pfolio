@@ -1119,3 +1119,183 @@ def resume_set_from_tex_file():
         print("LaTeX source saved to Supabase.")
     else:
         print("Not saved. Needs an existing .tex, .latex or .ltx file under 400k characters.")
+
+
+# ---------------------------------------------------------------------------
+# Selected / featured items (home teasers)
+# ---------------------------------------------------------------------------
+
+SELECTED_TABLES = ("projects", "stack", "gallery", "blog_posts")
+
+SELECTED_TABLE_LABELS = {
+    "projects": "Projects (Selected work)",
+    "stack": "Stack",
+    "gallery": "Gallery",
+    "blog_posts": "Blog",
+}
+
+
+def _selected_label(table: str, row: dict) -> str:
+    if table == "stack":
+        return f"{row.get('category', '')} — {row.get('tools', '')}".strip(" —")
+    return str(row.get("title") or row.get("slug") or row.get("id") or "")
+
+
+def get_selected_rows(table_name: str) -> list[dict]:
+    """Selected rows for a content table, ordered by selected_items.position."""
+    if table_name not in SELECTED_TABLES:
+        return []
+    r = (
+        client.table("selected_items")
+        .select("id, item_id, position")
+        .eq("table_name", table_name)
+        .order("position")
+        .order("id")
+        .execute()
+    )
+    selected = r.data or []
+    if not selected:
+        return []
+    ids = [str(row["item_id"]) for row in selected]
+    content = client.table(table_name).select("*").in_("id", ids).execute()
+    by_id = {str(row["id"]): row for row in (content.data or [])}
+    out = []
+    for row in selected:
+        item = by_id.get(str(row["item_id"]))
+        if not item:
+            continue
+        out.append(
+            {
+                "selected_id": str(row["id"]),
+                "item_id": str(row["item_id"]),
+                "position": row.get("position") or 0,
+                "label": _selected_label(table_name, item),
+                "item": item,
+            }
+        )
+    return out
+
+
+def get_available_for_selected(table_name: str) -> list[dict]:
+    if table_name not in SELECTED_TABLES:
+        return []
+    selected_ids = {row["item_id"] for row in get_selected_rows(table_name)}
+    rows = client.table(table_name).select("*").order("position").order("id").execute()
+    out = []
+    for row in rows.data or []:
+        iid = str(row["id"])
+        if iid in selected_ids:
+            continue
+        out.append({"item_id": iid, "label": _selected_label(table_name, row), "item": row})
+    return out
+
+
+def selected_list(table_name: str) -> list[dict]:
+    rows = get_selected_rows(table_name)
+    label = SELECTED_TABLE_LABELS.get(table_name, table_name)
+    if not rows:
+        print(f"No selected {label.lower()} yet.")
+        return []
+    print(f"Selected — {label}:")
+    for row in rows:
+        print(f"  {row['item_id']}: {row['label']}")
+    return rows
+
+
+def selected_add(table_name: str, item_id: str | None = None) -> bool:
+    if table_name not in SELECTED_TABLES:
+        return False
+    idx = (item_id or input("Item id to feature: ").strip()).strip()
+    if not idx:
+        return False
+    existing = (
+        client.table("selected_items")
+        .select("id")
+        .eq("table_name", table_name)
+        .eq("item_id", idx)
+        .limit(1)
+        .execute()
+    )
+    if existing.data:
+        print("Already selected.")
+        return False
+    check = client.table(table_name).select("id").eq("id", idx).limit(1).execute()
+    if not check.data:
+        print("That id was not found.")
+        return False
+    position = 0
+    try:
+        top = (
+            client.table("selected_items")
+            .select("position")
+            .eq("table_name", table_name)
+            .order("position", desc=True)
+            .limit(1)
+            .execute()
+        )
+        if top.data and isinstance(top.data[0].get("position"), int):
+            position = top.data[0]["position"] + 1
+    except Exception:
+        position = 0
+    r = (
+        client.table("selected_items")
+        .insert({"table_name": table_name, "item_id": idx, "position": position})
+        .execute()
+    )
+    if getattr(r, "error", None):
+        print("Could not add.")
+        return False
+    print("Added to selected.")
+    return True
+
+
+def selected_remove(table_name: str, item_id: str | None = None) -> bool:
+    if table_name not in SELECTED_TABLES:
+        return False
+    idx = (item_id or input("Item id to remove from selected: ").strip()).strip()
+    if not idx:
+        return False
+    r = (
+        client.table("selected_items")
+        .delete()
+        .eq("table_name", table_name)
+        .eq("item_id", idx)
+        .execute()
+    )
+    if getattr(r, "error", None):
+        print("Could not remove.")
+        return False
+    print("Removed from selected.")
+    return True
+
+
+def set_selected_positions(table_name: str, item_ids: list[str]) -> bool:
+    if not item_ids or table_name not in SELECTED_TABLES:
+        return False
+    try:
+        for position, idx in enumerate(item_ids):
+            r = (
+                client.table("selected_items")
+                .update({"position": position})
+                .eq("table_name", table_name)
+                .eq("item_id", idx)
+                .execute()
+            )
+            if getattr(r, "error", None):
+                return False
+        return True
+    except Exception:
+        return False
+
+
+def selected_move(table_name: str, item_id: str, direction: int) -> bool:
+    rows = get_selected_rows(table_name)
+    ids = [row["item_id"] for row in rows]
+    if item_id not in ids:
+        return False
+    i = ids.index(item_id)
+    j = i + direction
+    if j < 0 or j >= len(ids):
+        return False
+    ids[i], ids[j] = ids[j], ids[i]
+    return set_selected_positions(table_name, ids)
