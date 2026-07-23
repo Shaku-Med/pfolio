@@ -139,19 +139,24 @@ function TimelineCard({ item }: { item: TimelineItem }) {
         />
       )}
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-[0.938rem] font-semibold tracking-tight">{item.title}</h3>
+        <div className="flex items-baseline justify-between gap-3">
+          {/* min-w-0 lets a long title wrap instead of forcing the row wider than
+              the grid track; break-words handles unbroken strings (urls, slugs). */}
+          <h3 className="min-w-0 break-words text-[0.938rem] font-semibold tracking-tight">
+            {item.title}
+          </h3>
           <span className="shrink-0 text-xs tabular-nums text-muted-foreground/60">
             {item.period}
           </span>
         </div>
-        <p className="mt-0.5 flex items-center gap-2 text-sm text-muted-foreground">
+        <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
           {item.kind === "project" && (
-            <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               Project
             </span>
           )}
-          <span className="truncate">{item.meta}</span>
+          {/* truncate only ellipses if the flex item may shrink below content width */}
+          <span className="min-w-0 truncate">{item.meta}</span>
         </p>
         {item.description && (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
@@ -268,7 +273,7 @@ export default function Timeline({ items }: { items: TimelineItem[] }) {
         {rows.map((row) => {
           if (row.type === "marker") {
             return (
-              <li key={row.key} className="grid h-10 grid-cols-[2.75rem_1fr]">
+              <li key={row.key} className="grid h-10 grid-cols-[2.75rem_minmax(0,1fr)]">
                 <div className="relative">
                   <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 bg-background px-1 py-0.5 text-[10px] font-medium tabular-nums tracking-wide text-muted-foreground/70">
                     {row.label}
@@ -287,7 +292,7 @@ export default function Timeline({ items }: { items: TimelineItem[] }) {
               key={key}
               data-node-row
               data-key={key}
-              className="grid grid-cols-[2.75rem_1fr]"
+              className="grid grid-cols-[2.75rem_minmax(0,1fr)]"
             >
               <div className="relative">
                 <span
