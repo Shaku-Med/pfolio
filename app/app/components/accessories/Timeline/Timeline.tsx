@@ -152,9 +152,7 @@ function TimelineCard({ item }: { item: TimelineItem }) {
         </div>
         <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
           {item.kind === "project" && (
-            <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Project
-            </span>
+            <span className="shrink-0">Project ·</span>
           )}
           {/* truncate only ellipses if the flex item may shrink below content width */}
           <span className="min-w-0 truncate">{item.meta}</span>

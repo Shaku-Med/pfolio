@@ -20,12 +20,6 @@ export function rateLimit(key: string, max: number, windowMs: number): boolean {
   return bucket.count <= max;
 }
 
-export function clientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim().slice(0, 64);
-  return request.headers.get("x-real-ip")?.slice(0, 64) || "local";
-}
-
 /** Blocks another site from driving the dashboard through the browser. */
 export function isSameOrigin(request: Request): boolean {
   const host = request.headers.get("host");
@@ -48,11 +42,28 @@ export function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
+const MAX_JSON_BYTES = 1024 * 1024;
+
+/** Reads at most 1 MB, even when the client leaves out Content-Length. */
 export async function readJson(request: Request): Promise<Record<string, unknown> | null> {
-  const length = Number(request.headers.get("content-length") ?? "0");
-  if (length > 1024 * 1024) return null;
+  if (Number(request.headers.get("content-length") ?? "0") > MAX_JSON_BYTES) return null;
+  if (!request.body) return null;
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
   try {
-    const parsed = await request.json();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_JSON_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+    const parsed: unknown = JSON.parse(Buffer.concat(chunks).toString("utf8"));
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
     return parsed as Record<string, unknown>;
   } catch {

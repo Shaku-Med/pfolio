@@ -14,7 +14,7 @@ type HeroLogoGlowMarkProps = {
   visible: boolean;
 };
 
-/** Heavy SVG mark — loaded only after the page is ready (separate chunk). */
+/** Heavy SVG mark, loaded only after the page is ready (separate chunk). */
 const HeroLogoGlowMark = ({ visible }: HeroLogoGlowMarkProps) => {
   const reduceMotion = useReducedMotion();
   const uid = useId().replace(/:/g, "");
@@ -33,11 +33,11 @@ const HeroLogoGlowMark = ({ visible }: HeroLogoGlowMarkProps) => {
 
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center px-2 transition-opacity duration-700 ease-out ${
-        visible ? "opacity-100" : "opacity-0"
+      className={`absolute inset-0 flex items-center justify-center px-2 transition-opacity duration-700 ease-out lg:justify-end lg:pr-[3%] ${
+        visible ? "opacity-60 lg:opacity-100" : "opacity-0"
       }`}
     >
-      <div className="relative aspect-square h-auto w-[min(58vw,340px)] max-h-[340px] sm:w-[min(48vw,380px)] sm:max-h-[380px] md:w-[min(42vw,420px)] md:max-h-[420px]">
+      <div className="relative aspect-square h-auto w-[min(58vw,340px)] max-h-[340px] sm:w-[min(48vw,380px)] sm:max-h-[380px] md:w-[min(42vw,420px)] md:max-h-[420px] lg:w-[min(38vw,480px)] lg:max-h-[480px]">
         <div className="absolute inset-[-12%] rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--primary)_22%,transparent)_0%,color-mix(in_oklab,var(--primary)_8%,transparent)_38%,transparent_70%)] opacity-50 blur-xl dark:opacity-40" />
         <div
           className="relative h-full w-full"

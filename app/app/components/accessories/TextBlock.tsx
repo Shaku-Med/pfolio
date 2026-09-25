@@ -3,7 +3,7 @@ import type { ElementType, ReactNode } from "react";
 type Props = {
   text: string;
   className?: string;
-  /** Use for cards with line-clamp — keeps a single element. */
+  /** Use for cards with line clamp so it keeps a single element. */
   as?: ElementType;
   /** Split on blank lines into real paragraphs (detail pages). */
   paragraphs?: boolean;

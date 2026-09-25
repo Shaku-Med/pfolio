@@ -42,6 +42,7 @@ export default [
 
     ]),
     route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
+    route("healthz", "routes/healthz.tsx"),
     route('api', 'routes/api/layout.tsx', [
         route('load', 'routes/api/load/layout.tsx', [
             route('image/*', 'routes/api/load/image/index.tsx'),

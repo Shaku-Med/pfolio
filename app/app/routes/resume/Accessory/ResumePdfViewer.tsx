@@ -8,7 +8,7 @@ type ResumePdfViewerProps = {
 
 export const ResumePdfViewer: React.FC<ResumePdfViewerProps> = ({ pdfUrl }) => {
   const [isFullscreen, setIsFullscreen] = React.useState(false);
-  // Resolved after mount — reading the UA during render would desync SSR.
+  // Resolved after mount, since reading the UA during render would desync SSR.
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -93,7 +93,7 @@ export const ResumePdfViewer: React.FC<ResumePdfViewerProps> = ({ pdfUrl }) => {
           className="fixed inset-0 flex min-h-full min-w-full max-w-none translate-x-0 translate-y-0 flex-col border-0 bg-background p-0 shadow-none [&>button]:hidden"
           style={{ borderRadius: 0, top: 0, left: 0, transform: "none" }}
         >
-          {/* Top bar — sits above the iframe, not floating */}
+          {/* Top bar sits above the iframe, not floating */}
           <div className="flex shrink-0 items-center justify-between border-b border-border/60 px-4 py-3">
             <div className="flex items-center gap-2">
               <button
@@ -124,7 +124,7 @@ export const ResumePdfViewer: React.FC<ResumePdfViewerProps> = ({ pdfUrl }) => {
             </button>
           </div>
 
-          {/* PDF iframe — takes remaining space */}
+          {/* PDF iframe takes remaining space */}
           <iframe
             src={pdfUrl}
             title="Resume full screen"

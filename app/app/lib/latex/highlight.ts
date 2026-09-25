@@ -55,7 +55,7 @@ export function tokenizeLatexLine(line: string): LatexToken[] {
       tokens.push({ kind: rule.kind, value });
       index += value.length;
 
-      // `\begin{center}` / `\end{center}` — colour the environment name too.
+      // `\begin{center}` / `\end{center}` also colour the environment name too.
       if (value === "\\begin" || value === "\\end") {
         const envMatch = ENV_NAME.exec(line.slice(index));
         if (envMatch) {

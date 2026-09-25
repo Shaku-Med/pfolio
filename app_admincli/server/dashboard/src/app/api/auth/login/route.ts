@@ -3,14 +3,16 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/supabase";
 import { decryptWithWrapper } from "@/lib/crypto";
 import { startSession } from "@/lib/session";
-import { clientIp, isSameOrigin, jsonError, rateLimit, readJson } from "@/lib/http";
+import { isSameOrigin, jsonError, rateLimit, readJson } from "@/lib/http";
 
 const MAX_FIELD = 512;
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) return jsonError("Request blocked", 403);
 
-  if (!rateLimit(`login:${clientIp(request)}`, 5, 15 * 60 * 1000)) {
+  // One admin on loopback, so a single global budget. Forwarded headers are
+  // client controlled here and would let a guesser rotate past a per IP limit.
+  if (!rateLimit("login", 5, 15 * 60 * 1000)) {
     return jsonError("Too many attempts. Wait a few minutes and try again.", 429);
   }
 

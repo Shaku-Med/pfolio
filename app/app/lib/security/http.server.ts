@@ -26,10 +26,26 @@ export function rateLimit(key: string, max: number, windowMs: number): boolean {
   return bucket.count <= max;
 }
 
+/**
+ * The app only listens on loopback behind nginx, so X-Real-IP (set by nginx)
+ * is trusted first. Otherwise the rightmost X-Forwarded-For entry is the one
+ * nginx appended; anything left of it came from the client and can be forged.
+ */
 export function clientIp(request: Request): string {
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp.slice(0, 64);
   const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim().slice(0, 64);
-  return request.headers.get("x-real-ip")?.slice(0, 64) || "unknown";
+  const last = forwarded?.split(",").pop()?.trim();
+  return last ? last.slice(0, 64) : "unknown";
+}
+
+/** Returns a 429 response once a client passes `max` requests per minute on `bucket`. */
+export function tooManyRequests(request: Request, bucket: string, max: number): Response | null {
+  if (rateLimit(`${bucket}:${clientIp(request)}`, max, 60 * 1000)) return null;
+  return new Response("Too many requests", {
+    status: 429,
+    headers: { "Retry-After": "60", "Content-Type": "text/plain" },
+  });
 }
 
 /** True when Origin (or, failing that, Referer) matches the request host. */
@@ -68,4 +84,18 @@ export function pageParams(
       ? Math.min(Math.floor(rawOffset), MAX_OFFSET)
       : 0;
   return { limit, offset };
+}
+
+const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
+const MAX_PAGE = 500;
+
+/** Trims, strips control characters, and caps free text from the URL. */
+export function cleanText(value: string | null | undefined, maxLength: number): string {
+  return (value ?? "").replace(CONTROL_CHARS, "").trim().slice(0, maxLength);
+}
+
+/** Parses a 1 based ?page, falling back to 1 for anything invalid. */
+export function pageNumber(url: URL): number {
+  const raw = Number(url.searchParams.get("page"));
+  return Number.isInteger(raw) && raw >= 1 ? Math.min(raw, MAX_PAGE) : 1;
 }

@@ -13,14 +13,14 @@ export default function StackCard({ item, to }: StackCardProps) {
   return (
     <Link
       to={to ?? `/stack/${item.id}`}
-      className="flex h-full w-full min-w-0 flex-col rounded-2xl border border-border/70 bg-background/80 px-4 py-3.5 transition hover:border-primary/50 hover:bg-muted/30"
+      className="flex h-full w-full min-w-0 flex-col rounded-2xl border border-border/70 bg-card/60 p-5 transition duration-300 hover:border-border hover:bg-card"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground/80">
+        <p className="text-base font-semibold tracking-tight">
           {item.category}
         </p>
         {tools.length > 0 && (
-          <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground/60">
+          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
             {tools.length} {tools.length === 1 ? "tool" : "tools"}
           </span>
         )}
@@ -28,10 +28,10 @@ export default function StackCard({ item, to }: StackCardProps) {
       {item.description && (
         <TextBlock
           text={item.description}
-          className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground"
+          className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground"
         />
       )}
-      <div className="mt-auto flex min-w-0 flex-wrap gap-1.5 pt-3">
+      <div className="mt-auto flex min-w-0 flex-wrap gap-x-4 gap-y-2 pt-5">
         {tools.map((tool) => (
           <TechTag key={tool} name={tool} />
         ))}

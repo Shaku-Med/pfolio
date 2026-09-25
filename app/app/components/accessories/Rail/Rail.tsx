@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { motion, useReducedMotion } from "motion/react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "~/lib/utils";
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -27,7 +28,7 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
   );
 }
 
-/** Small rail fragment — the site's signature glyph, drawn in on view. */
+/** Small rail fragment, the site's signature glyph, drawn in on view. */
 export function RailGlyph({ className }: { className?: string }) {
   const reduce = useReducedMotion();
   return (
@@ -60,21 +61,35 @@ export function RailGlyph({ className }: { className?: string }) {
 
 type SectionHeaderProps = {
   title: string;
+  description?: string;
   to?: string;
   linkLabel?: string;
 };
 
-/** Home-section heading: rail glyph, title, optional "View more". */
-export function SectionHeader({ title, to, linkLabel = "View more" }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  description,
+  to,
+  linkLabel = "View all",
+}: SectionHeaderProps) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
-      <h2 className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-        <RailGlyph />
-        {title}
-      </h2>
+    <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <div className="min-w-0 space-y-1.5">
+        <h2 className="flex items-center gap-2.5 text-xl font-semibold tracking-tight sm:text-2xl">
+          <RailGlyph />
+          {title}
+        </h2>
+        {description && (
+          <p className="max-w-xl text-sm text-muted-foreground">{description}</p>
+        )}
+      </div>
       {to && (
-        <Link to={to} className="text-xs font-medium text-primary hover:underline">
+        <Link
+          to={to}
+          className="group inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
           {linkLabel}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </Link>
       )}
     </div>
@@ -83,17 +98,22 @@ export function SectionHeader({ title, to, linkLabel = "View more" }: SectionHea
 
 type PageHeaderProps = {
   title: string;
+  description?: string;
 };
 
-/** Index-page heading: consistent scale + rail glyph. */
-export function PageHeader({ title }: PageHeaderProps) {
+export function PageHeader({ title, description }: PageHeaderProps) {
   return (
     <Reveal>
-      <header className="mb-8">
-        <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <header className="mb-8 space-y-3 pt-4 sm:pt-6">
+        <h1 className="flex items-center gap-3 text-3xl font-semibold tracking-tight sm:text-4xl">
           <RailGlyph className="h-3 w-8" />
           {title}
         </h1>
+        {description && (
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {description}
+          </p>
+        )}
       </header>
     </Reveal>
   );

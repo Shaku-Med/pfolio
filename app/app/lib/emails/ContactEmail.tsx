@@ -1,15 +1,4 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
-import * as React from "react";
+import type { CSSProperties } from "react";
 
 export type ContactEmailProps = {
   name: string;
@@ -19,38 +8,51 @@ export type ContactEmailProps = {
 
 export function ContactEmail({ name, email, message }: ContactEmailProps) {
   return (
-    <Html>
-      <Head />
-      <Preview>New message from {name} via your portfolio</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={topBar} />
-          <Section style={content}>
-            <Heading style={title}>Contact form submission</Heading>
-            <Text style={meta}>From your portfolio</Text>
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{`New message from ${name}`}</title>
+      </head>
+      <body style={main}>
+        <div style={preview}>New message from {name} via your portfolio</div>
+        <table role="presentation" width="100%" cellPadding={0} cellSpacing={0} style={container}>
+          <tbody>
+            <tr>
+              <td style={topBar} />
+            </tr>
+            <tr>
+              <td style={content}>
+                <h1 style={title}>Contact form submission</h1>
+                <p style={meta}>From your portfolio</p>
 
-            <Text style={label}>Name</Text>
-            <Text style={value}>{name}</Text>
+                <p style={label}>Name</p>
+                <p style={value}>{name}</p>
 
-            <Text style={label}>Email</Text>
-            <Link href={`mailto:${email}`} style={link}>
-              {email}
-            </Link>
+                <p style={label}>Email</p>
+                <p style={value}>
+                  <a href={`mailto:${email}`} style={link}>
+                    {email}
+                  </a>
+                </p>
 
-            <Text style={label}>Message</Text>
-            <Text style={messageText}>{message}</Text>
-          </Section>
-
-          <Section style={footer}>
-            <Text style={footerText}>Portfolio contact form</Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
+                <p style={label}>Message</p>
+                <p style={messageText}>{message}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style={footer}>
+                <p style={footerText}>Portfolio contact form</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>
   );
 }
 
-const main: React.CSSProperties = {
+const main: CSSProperties = {
   margin: 0,
   padding: 0,
   width: "100%",
@@ -61,28 +63,30 @@ const main: React.CSSProperties = {
   color: "#111111",
 };
 
-const container: React.CSSProperties = {
-  width: "100%",
-  maxWidth: "100%",
-  margin: 0,
-  padding: 0,
+const preview: CSSProperties = {
+  display: "none",
+  overflow: "hidden",
+  maxHeight: 0,
+  opacity: 0,
 };
 
-const topBar: React.CSSProperties = {
+const container: CSSProperties = {
   width: "100%",
+  borderCollapse: "collapse",
+};
+
+const topBar: CSSProperties = {
   height: "4px",
   backgroundColor: "#111111",
-  margin: 0,
-  padding: 0,
+  fontSize: 0,
+  lineHeight: 0,
 };
 
-const content: React.CSSProperties = {
-  width: "100%",
+const content: CSSProperties = {
   padding: "40px 24px 48px",
-  maxWidth: "100%",
 };
 
-const title: React.CSSProperties = {
+const title: CSSProperties = {
   margin: "0 0 4px",
   fontSize: "22px",
   fontWeight: 600,
@@ -90,51 +94,47 @@ const title: React.CSSProperties = {
   letterSpacing: "-0.01em",
 };
 
-const meta: React.CSSProperties = {
+const meta: CSSProperties = {
   margin: "0 0 32px",
   fontSize: "14px",
   color: "#666666",
 };
 
-const label: React.CSSProperties = {
+const label: CSSProperties = {
   margin: "0 0 6px",
   fontSize: "12px",
   fontWeight: 600,
-  textTransform: "uppercase" as const,
+  textTransform: "uppercase",
   letterSpacing: "0.04em",
   color: "#666666",
 };
 
-const value: React.CSSProperties = {
+const value: CSSProperties = {
   margin: "0 0 24px",
   fontSize: "16px",
   lineHeight: 1.5,
   color: "#111111",
 };
 
-const link: React.CSSProperties = {
-  display: "inline-block",
-  margin: "0 0 24px",
-  fontSize: "16px",
+const link: CSSProperties = {
   color: "#111111",
   textDecoration: "underline",
 };
 
-const messageText: React.CSSProperties = {
+const messageText: CSSProperties = {
   margin: 0,
   fontSize: "16px",
   lineHeight: 1.6,
   color: "#333333",
-  whiteSpace: "pre-wrap" as const,
+  whiteSpace: "pre-wrap",
 };
 
-const footer: React.CSSProperties = {
-  width: "100%",
+const footer: CSSProperties = {
   padding: "24px 24px 32px",
   borderTop: "1px solid #eeeeee",
 };
 
-const footerText: React.CSSProperties = {
+const footerText: CSSProperties = {
   margin: 0,
   fontSize: "12px",
   color: "#888888",

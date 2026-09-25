@@ -9,7 +9,7 @@ export type ExperienceEntry = {
   logo?: string;
   highlights?: string[];
   tags?: string[];
-  /** How development was going – process, pace, team setup. */
+  /** How development was going: process, pace, team setup. */
   developmentSummary?: string;
   /** Challenges and obstacles we faced. */
   challenges?: string[];

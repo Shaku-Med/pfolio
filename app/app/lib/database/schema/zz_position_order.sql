@@ -3,7 +3,7 @@
 --
 -- Adds "position" (0-based, lower = earlier) and switches list RPCs
 -- to ORDER BY "position" ASC instead of period / date / title / id.
--- Note: "position" is reserved in PostgreSQL — always quote the identifier.
+-- Note: "position" is reserved in PostgreSQL, so always quote the identifier.
 
 -- ---------------------------------------------------------------------------
 -- 1. Columns
@@ -106,7 +106,7 @@ CREATE INDEX IF NOT EXISTS gallery_position_idx ON public.gallery ("position", i
 CREATE INDEX IF NOT EXISTS blog_posts_position_idx ON public.blog_posts ("position", id);
 
 -- ---------------------------------------------------------------------------
--- 3. List RPCs — order by position
+-- 3. List RPCs ordered by position
 -- ---------------------------------------------------------------------------
 
 DROP FUNCTION IF EXISTS get_projects(integer, integer);

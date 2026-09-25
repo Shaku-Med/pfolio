@@ -1,17 +1,19 @@
-import { Link, useLoaderData } from "react-router";
+import { data, Link, useLoaderData } from "react-router";
 import type { SearchResult } from "../../../lib/database/queries";
 import { searchByTag } from "../../../lib/database/queries";
-import { RailGlyph, Reveal } from "../../../components/accessories/Rail/Rail";
-import { TextBlock } from "../../../components/accessories/TextBlock";
+import { cleanText, pageNumber, tooManyRequests } from "../../../lib/security/http.server";
+import { PageHeader } from "../../../components/accessories/Rail/Rail";
+import { ResultList } from "../../../components/accessories/ResultList";
 import { buildPageMeta } from "../../../lib/seo";
 
 const PAGE_SIZE = 20;
+const MAX_TAG_LENGTH = 60;
 
-export function meta({ data }: { data: { tag: string } | undefined }) {
+export function meta({ loaderData: data }: { loaderData: { tag: string } | undefined }) {
   const tag = data?.tag ?? "";
   return buildPageMeta({
     title: tag ? `#${tag} | Tags | Mohamed Amara` : "Tags | Mohamed Amara",
-    description: "Items across projects, experience, stack, blog, and gallery that mention this tag.",
+    description: "Everything on this site that mentions this tag.",
     canonicalPath: tag ? `/tags/${encodeURIComponent(tag)}` : "/tags",
   });
 }
@@ -23,90 +25,50 @@ export async function loader({
   request: Request;
   params: Promise<{ tag: string }>;
 }) {
-  const url = new URL(request.url);
-  const page = Number(url.searchParams.get("page") || "1");
-  const { tag } = await params;
-  const decodedTag = decodeURIComponent(tag);
-  const limit = PAGE_SIZE;
-  const offset = (page - 1) * limit;
-  const results = await searchByTag(decodedTag, limit + 1, offset);
-  const hasMore = results.length > limit;
-  const pageResults = hasMore ? results.slice(0, limit) : results;
-  return { tag: decodedTag, results: pageResults as SearchResult[], page, hasMore };
+  const limited = tooManyRequests(request, "search", 40);
+  if (limited) throw limited;
+  const { tag: rawTag } = await params;
+  // Params arrive already decoded, so decoding again would throw on a literal "%".
+  const tag = cleanText(rawTag, MAX_TAG_LENGTH);
+  if (!tag) throw data(null, { status: 404 });
+
+  const page = pageNumber(new URL(request.url));
+  const results = await searchByTag(tag, PAGE_SIZE + 1, (page - 1) * PAGE_SIZE);
+  const hasMore = results.length > PAGE_SIZE;
+  return { tag, results: results.slice(0, PAGE_SIZE) as SearchResult[], page, hasMore };
 }
 
 export default function TagPage() {
   const { tag, results, page, hasMore } = useLoaderData<typeof loader>();
+  const count = results.length + (page - 1) * PAGE_SIZE;
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6 space-y-8">
-      <Reveal>
-        <header className="space-y-3">
-          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            <RailGlyph className="h-3 w-8" />
-            <span>
-              Tag: <span className="text-primary">#{tag}</span>
-            </span>
-          </h1>
-        </header>
-      </Reveal>
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title={`#${tag}`}
+        description={
+          results.length
+            ? `${hasMore ? `${count}+` : count} ${count === 1 ? "place" : "places"} where I've used or written about ${tag}.`
+            : undefined
+        }
+      />
 
-      {results.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          No items found for <span className="font-medium">#{tag}</span>.
+      {results.length === 0 ? (
+        <p className="text-muted-foreground">
+          Nothing is tagged with {tag} yet.{" "}
+          <Link to="/search" className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground">
+            Try a search instead
+          </Link>
+          .
         </p>
-      )}
-
-      {results.length > 0 && (
-        <section className="space-y-4">
-          <ul className="divide-y divide-border/60 rounded-xl border border-border/60 bg-background/80">
-            {results.map((item) => (
-              <li key={`${item.kind}-${item.id}`} className="px-4 py-3 sm:px-5">
-                <Link
-                  to={item.href}
-                  className="flex flex-col gap-1 hover:text-primary"
-                >
-                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                    <span>{item.kind}</span>
-                  </div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {item.title}
-                  </p>
-                  {item.summary && (
-                    <TextBlock
-                      text={item.summary}
-                      className="line-clamp-2 text-xs text-muted-foreground"
-                    />
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Page {page}</span>
-            <div className="flex gap-2">
-              {page > 1 && (
-                <Link
-                  to={`/tags/${encodeURIComponent(tag)}?page=${page - 1}`}
-                  className="rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
-                >
-                  Previous
-                </Link>
-              )}
-              {hasMore && (
-                <Link
-                  to={`/tags/${encodeURIComponent(tag)}?page=${page + 1}`}
-                  className="rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
-                >
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
-        </section>
+      ) : (
+        <ResultList
+          results={results}
+          page={page}
+          hasMore={hasMore}
+          pageHref={(p) => `/tags/${encodeURIComponent(tag)}?page=${p}`}
+        />
       )}
     </main>
   );
 }
-

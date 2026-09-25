@@ -54,9 +54,9 @@ export async function GET(request: Request) {
     .order("id", { ascending: true });
   if (allErr) return jsonError("Could not load candidates", 500);
 
-  const byId = new Map(
-    (allRows ?? []).map((row) => [String(row.id), row as Record<string, unknown>]),
-  );
+  // The select string is built at runtime, so the client cannot infer the row shape.
+  const candidates = (allRows ?? []) as unknown as Record<string, unknown>[];
+  const byId = new Map(candidates.map((row) => [String(row.id), row]));
   const selectedIds = new Set((selectedRows ?? []).map((r) => String(r.item_id)));
 
   const selected = (selectedRows ?? [])
@@ -73,16 +73,13 @@ export async function GET(request: Request) {
     })
     .filter(Boolean);
 
-  const available = (allRows ?? [])
+  const available = candidates
     .filter((row) => !selectedIds.has(String(row.id)))
-    .map((row) => {
-      const item = row as Record<string, unknown>;
-      return {
-        itemId: String(row.id),
-        label: selectedItemLabel(table, item),
-        item,
-      };
-    });
+    .map((item) => ({
+      itemId: String(item.id),
+      label: selectedItemLabel(table, item),
+      item,
+    }));
 
   return NextResponse.json({
     table,

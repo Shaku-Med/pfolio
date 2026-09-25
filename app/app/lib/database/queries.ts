@@ -1,5 +1,6 @@
 import db from "./supabase";
-import type { Project } from "../projects";
+import { cached } from "./cache.server";
+import type { Project, ProjectLink } from "../projects";
 import type { ExperienceEntry } from "../experience";
 import type { StackCategory } from "../stack";
 import type { GalleryItem } from "../gallery";
@@ -38,6 +39,12 @@ type DbExperience = {
   details_md?: string | null;
   position?: number | null;
 };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value: string): boolean {
+  return UUID_RE.test(value);
+}
 
 function normalizePeriodPart(value?: string | null): string | null {
   if (!value) return null;
@@ -119,6 +126,36 @@ type DbResume = {
   updated_at: string;
 };
 
+const LINK_ICONS = new Set(["doc", "video", "external", "article"]);
+
+function safeHttpUrl(value: unknown): string | undefined {
+  if (typeof value !== "string" || value.length > 2048) return undefined;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function parseProjectLinks(raw: unknown): ProjectLink[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const links = raw.flatMap((item): ProjectLink[] => {
+    if (!item || typeof item !== "object") return [];
+    const { url, label, icon } = item as Record<string, unknown>;
+    const href = safeHttpUrl(url);
+    if (!href || typeof label !== "string" || !label.trim()) return [];
+    return [
+      {
+        url: href,
+        label: label.trim().slice(0, 60),
+        ...(typeof icon === "string" && LINK_ICONS.has(icon) && { icon: icon as ProjectLink["icon"] }),
+      },
+    ];
+  });
+  return links.length ? links : undefined;
+}
+
 function mapProject(row: DbProject): Project {
   return {
     id: row.id,
@@ -128,9 +165,9 @@ function mapProject(row: DbProject): Project {
     tags: row.tags ?? [],
     image: row.image,
     imageAlt: row.image_alt,
-    githubUrl: row.github_url ?? undefined,
-    liveUrl: row.live_url ?? undefined,
-    links: (row.links as Project["links"]) ?? undefined,
+    githubUrl: safeHttpUrl(row.github_url),
+    liveUrl: safeHttpUrl(row.live_url),
+    links: parseProjectLinks(row.links),
     date: row.date ?? undefined,
     ...(row.details_md != null && row.details_md !== "" && { detailsMd: row.details_md }),
     ...(typeof row.position === "number" && { position: row.position }),
@@ -203,77 +240,61 @@ function mapBlog(row: DbBlog): BlogPost {
 }
 
 export async function getProjects(limit = 20, offset = 0): Promise<Project[]> {
-  const { data, error } = await db.rpc("get_projects", {
-    p_limit: limit,
-    p_offset: offset,
+  const rows = await cached(`projects:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_projects", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbProject[]).map(mapProject);
   });
-  if (error || !data) return [];
-  return (data as DbProject[]).map(mapProject);
+  return rows ?? [];
 }
 
 /** Fetches a single project by id including details_md. Use only on the project detail page. */
 export async function getProjectById(id: string): Promise<Project | null> {
-  const { data, error } = await db.rpc("get_project_by_id", { p_id: id });
-  if (error || !data || !Array.isArray(data) || data.length === 0) return null;
-  return mapProject(data[0] as DbProject);
-}
-
-export async function getSelectedProjects(
-  limit = 4,
-  offset = 0,
-): Promise<Project[]> {
-  const { data, error } = await db.rpc("get_selected_projects", {
-    p_limit: limit,
-    p_offset: offset,
+  if (!isUuid(id)) return null;
+  return cached(`project:${id}`, async () => {
+    const { data, error } = await db.rpc("get_project_by_id", { p_id: id });
+    if (error || !Array.isArray(data) || data.length === 0) return null;
+    return mapProject(data[0] as DbProject);
   });
-  if (error || !data) return [];
-  return (data as DbProject[]).map(mapProject);
 }
 
-export async function getExperience(
-  limit = 20,
-  offset = 0,
-): Promise<ExperienceEntry[]> {
-  const { data, error } = await db.rpc("get_experience", {
-    p_limit: limit,
-    p_offset: offset,
+export async function getSelectedProjects(limit = 4, offset = 0): Promise<Project[]> {
+  const rows = await cached(`selected-projects:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_selected_projects", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbProject[]).map(mapProject);
   });
-  if (error || !data) return [];
-  return (data as DbExperience[]).map(mapExperience);
+  return rows ?? [];
 }
 
-export async function getExperienceById(
-  id: string,
-): Promise<ExperienceEntry | null> {
-  const { data, error } = await db
-    .from("experience")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return mapExperience(data as DbExperience);
-}
-
-export async function getStack(
-  limit = 20,
-  offset = 0,
-): Promise<StackCategory[]> {
-  const { data, error } = await db.rpc("get_stack", {
-    p_limit: limit,
-    p_offset: offset,
+export async function getExperience(limit = 20, offset = 0): Promise<ExperienceEntry[]> {
+  const rows = await cached(`experience:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_experience", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbExperience[]).map(mapExperience);
   });
-  if (error || !data) return [];
-  return (data as DbStack[]).map(mapStack);
+  return rows ?? [];
+}
+
+export async function getExperienceById(id: string): Promise<ExperienceEntry | null> {
+  if (!isUuid(id)) return null;
+  return cached(`experience-item:${id}`, async () => {
+    const { data, error } = await db.from("experience").select("*").eq("id", id).maybeSingle();
+    return error || !data ? null : mapExperience(data as DbExperience);
+  });
+}
+
+export async function getStack(limit = 20, offset = 0): Promise<StackCategory[]> {
+  const rows = await cached(`stack:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_stack", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbStack[]).map(mapStack);
+  });
+  return rows ?? [];
 }
 
 export async function getStackById(id: string): Promise<StackCategory | null> {
-  const { data, error } = await db
-    .from("stack")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return mapStack(data as DbStack);
+  if (!isUuid(id)) return null;
+  return cached(`stack-item:${id}`, async () => {
+    const { data, error } = await db.from("stack").select("*").eq("id", id).maybeSingle();
+    return error || !data ? null : mapStack(data as DbStack);
+  });
 }
 
 export async function getStackUsage(
@@ -281,66 +302,51 @@ export async function getStackUsage(
   limit = 20,
   offset = 0,
 ): Promise<StackUsageItem[]> {
-  const { data, error } = await db.rpc("get_stack_usage", {
-    p_stack_id: stackId,
-    p_limit: limit,
-    p_offset: offset,
+  if (!isUuid(stackId)) return [];
+  const rows = await cached(`stack-usage:${stackId}:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_stack_usage", {
+      p_stack_id: stackId,
+      p_limit: limit,
+      p_offset: offset,
+    });
+    return error || !data ? null : (data as StackUsageItem[]);
   });
-  if (error || !data) return [];
-  return data as StackUsageItem[];
+  return rows ?? [];
 }
 
-export async function getSelectedStack(
-  limit = 4,
-  offset = 0,
-): Promise<StackCategory[]> {
-  const { data, error } = await db.rpc("get_selected_stack", {
-    p_limit: limit,
-    p_offset: offset,
+export async function getSelectedStack(limit = 4, offset = 0): Promise<StackCategory[]> {
+  const rows = await cached(`selected-stack:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_selected_stack", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbStack[]).map(mapStack);
   });
-  if (error || !data) return [];
-  return (data as DbStack[]).map(mapStack);
+  return rows ?? [];
 }
 
-export async function getGallery(
-  limit = 20,
-  offset = 0,
-): Promise<GalleryItem[]> {
-  const { data, error } = await db.rpc("get_gallery", {
-    p_limit: limit,
-    p_offset: offset,
+export async function getGallery(limit = 20, offset = 0): Promise<GalleryItem[]> {
+  const rows = await cached(`gallery:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_gallery", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbGallery[]).map(mapGallery);
   });
-  if (error || !data) return [];
-  return (data as DbGallery[]).map(mapGallery);
+  return rows ?? [];
 }
 
 export async function getGalleryById(id: string): Promise<GalleryItem | null> {
-  const { data, error } = await db
-    .from("gallery")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return mapGallery(data as DbGallery);
-}
-
-export async function getSelectedGallery(
-  limit = 4,
-  offset = 0,
-): Promise<GalleryItem[]> {
-  const { data, error } = await db.rpc("get_selected_gallery", {
-    p_limit: limit,
-    p_offset: offset,
+  if (!isUuid(id)) return null;
+  return cached(`gallery-item:${id}`, async () => {
+    const { data, error } = await db.from("gallery").select("*").eq("id", id).maybeSingle();
+    return error || !data ? null : mapGallery(data as DbGallery);
   });
-  if (error || !data) return [];
-  return (data as DbGallery[]).map(mapGallery);
 }
 
-export async function searchAll(
-  query: string,
-  limit = 20,
-  offset = 0,
-): Promise<SearchResult[]> {
+export async function getSelectedGallery(limit = 4, offset = 0): Promise<GalleryItem[]> {
+  const rows = await cached(`selected-gallery:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_selected_gallery", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbGallery[]).map(mapGallery);
+  });
+  return rows ?? [];
+}
+
+export async function searchAll(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
   if (!query.trim()) return [];
   const { data, error } = await db.rpc("search_all", {
     p_query: query,
@@ -351,11 +357,7 @@ export async function searchAll(
   return data as SearchResult[];
 }
 
-export async function searchByTag(
-  tag: string,
-  limit = 20,
-  offset = 0,
-): Promise<SearchResult[]> {
+export async function searchByTag(tag: string, limit = 20, offset = 0): Promise<SearchResult[]> {
   const q = tag.trim();
   if (!q) return [];
   const { data, error } = await db.rpc("search_by_tag", {
@@ -371,57 +373,69 @@ export async function searchByTag(
 const BLOG_LIST_COLUMNS =
   "id, slug, title, category, excerpt, date, read_time, tags, cover_image, position";
 
-export async function getBlogPosts(
-  limit = 20,
-  offset = 0,
-): Promise<BlogPost[]> {
-  const { data, error } = await db
-    .from("blog_posts")
-    .select(BLOG_LIST_COLUMNS)
-    .order("position", { ascending: true })
-    .order("id", { ascending: true })
-    .range(offset, offset + limit - 1);
-  if (error || !data) return [];
-  return (data as DbBlog[]).map(mapBlog);
-}
-
-export async function getSelectedBlog(
-  limit = 4,
-  offset = 0,
-): Promise<BlogPost[]> {
-  const { data, error } = await db.rpc("get_selected_blog", {
-    p_limit: limit,
-    p_offset: offset,
+export async function getBlogPosts(limit = 20, offset = 0): Promise<BlogPost[]> {
+  const rows = await cached(`blog:${limit}:${offset}`, async () => {
+    const { data, error } = await db
+      .from("blog_posts")
+      .select(BLOG_LIST_COLUMNS)
+      .order("position", { ascending: true })
+      .order("id", { ascending: true })
+      .range(offset, offset + limit - 1);
+    return error || !data ? null : (data as DbBlog[]).map(mapBlog);
   });
-  if (error || !data) return [];
-  return (data as DbBlog[]).map(mapBlog);
+  return rows ?? [];
 }
 
-/** Fetches a single blog post by id from Supabase. */
+export async function getSelectedBlog(limit = 4, offset = 0): Promise<BlogPost[]> {
+  const rows = await cached(`selected-blog:${limit}:${offset}`, async () => {
+    const { data, error } = await db.rpc("get_selected_blog", { p_limit: limit, p_offset: offset });
+    return error || !data ? null : (data as DbBlog[]).map(mapBlog);
+  });
+  return rows ?? [];
+}
+
 export async function getBlogPostById(id: string): Promise<BlogPost | null> {
-  const { data, error } = await db
-    .from("blog_posts")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return mapBlog(data as DbBlog);
+  if (!isUuid(id)) return null;
+  return cached(`blog-post:${id}`, async () => {
+    const { data, error } = await db.from("blog_posts").select("*").eq("id", id).maybeSingle();
+    return error || !data ? null : mapBlog(data as DbBlog);
+  });
 }
 
 export async function getContact() {
-  const { data, error } = await db.rpc("get_contact");
-  if (error || !data || !Array.isArray(data) || data.length === 0) return null;
-  return data[0] as {
-    id: string;
-    email: string;
-    phone: string | null;
-    links: unknown | null;
-  };
+  return cached("contact", async () => {
+    const { data, error } = await db.rpc("get_contact");
+    if (error || !Array.isArray(data) || data.length === 0) return null;
+    return data[0] as {
+      id: string;
+      email: string;
+      phone: string | null;
+      links: unknown | null;
+    };
+  });
 }
 
 export async function getResume() {
-  const { data, error } = await db.rpc("get_resume");
-  if (error || !data || !Array.isArray(data) || data.length === 0) return null;
-  return data[0] as DbResume;
+  return cached("resume", async () => {
+    const { data, error } = await db.rpc("get_resume");
+    if (error || !Array.isArray(data) || data.length === 0) return null;
+    return data[0] as DbResume;
+  });
 }
 
+const SITEMAP_TABLES = ["projects", "experience", "stack", "gallery", "blog_posts"] as const;
+export type SitemapIds = Record<(typeof SITEMAP_TABLES)[number], string[]>;
+
+export async function getSitemapIds(): Promise<SitemapIds> {
+  const ids = await cached("sitemap", async () => {
+    const results = await Promise.all(SITEMAP_TABLES.map((table) => db.from(table).select("id")));
+    if (results.some((r) => r.error)) return null;
+    return Object.fromEntries(
+      SITEMAP_TABLES.map((table, i) => [
+        table,
+        ((results[i].data ?? []) as { id: string }[]).map((r) => r.id),
+      ]),
+    ) as SitemapIds;
+  });
+  return ids ?? { projects: [], experience: [], stack: [], gallery: [], blog_posts: [] };
+}

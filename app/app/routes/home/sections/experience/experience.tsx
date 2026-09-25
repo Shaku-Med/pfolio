@@ -15,8 +15,12 @@ const ExperienceSection = () => {
   if (!items.length) return null;
 
   return (
-    <section id="experience" className="space-y-4">
-      <SectionHeader title="Timeline" to="/experience" />
+    <section id="experience" className="space-y-8">
+      <SectionHeader
+        title="Experience"
+        description="The roles and projects that shaped how I work."
+        to="/experience"
+      />
       <Timeline items={items} />
     </section>
   );

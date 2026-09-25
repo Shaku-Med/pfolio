@@ -1,96 +1,74 @@
 import { Link } from "react-router";
 import { type BlogPost, formatBlogDate } from "../../lib/blog";
-import { Separator } from "~/components/ui/separator";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
+import { cn } from "~/lib/utils";
 import { TextBlock } from "./TextBlock";
 
 type BlogCardProps = {
   post: BlogPost;
   to?: string;
-  /** Compact style for home section; full style for blog index */
   variant?: "compact" | "full";
 };
 
 export default function BlogCard({ post, to, variant = "compact" }: BlogCardProps) {
-  const cardClassName =
-    "flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80 transition hover:border-primary/40 hover:shadow-sm";
-
   const coverSrc = post.coverImage
     ? post.coverImage.startsWith("http")
       ? post.coverImage
       : `/api/load/image${post.coverImage}`
     : undefined;
+  const showCover = variant === "full" && coverSrc;
+  const tags = variant === "full" ? (post.tags ?? []).filter(Boolean) : [];
 
-  const content = (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {variant === "full" && coverSrc && (
-        <div className="relative aspect-[16/9] shrink-0 overflow-hidden bg-muted">
+  return (
+    <article
+      className={cn(
+        "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/60 transition duration-300",
+        to &&
+          "hover:-translate-y-0.5 hover:border-border hover:bg-card hover:shadow-lg hover:shadow-foreground/5 focus-within:ring-2 focus-within:ring-ring/50",
+      )}
+    >
+      {showCover && (
+        <div className="relative aspect-[16/9] shrink-0 overflow-hidden border-b border-border/60 bg-muted">
           <ImgLoader
             src={coverSrc}
             alt={post.title}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             loading="lazy"
           />
-          <div className="absolute bottom-3 left-3 rounded-full bg-black/50 px-3 py-1.5 text-[11px] text-white/95 shadow-sm backdrop-blur-sm">
-            <time dateTime={post.date}>{formatBlogDate(post.date)}</time>
-            {post.readTime && (
-              <>
-                <span className="mx-1.5 opacity-70">·</span>
-                <span>{post.readTime}</span>
-              </>
-            )}
-          </div>
         </div>
       )}
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-medium uppercase line-clamp-1 tracking-[0.18em] text-primary/80">
-            {post.category}
-          </span>
-          <h3 className="text-sm font-semibold line-clamp-1 leading-snug sm:text-base">
-            {post.title}
-          </h3>
-        </div>
+      <div className="flex flex-1 flex-col p-5">
+        <p className="line-clamp-1 text-xs text-muted-foreground">
+          {post.category}
+          <span className="mx-1.5 text-border">/</span>
+          <time dateTime={post.date}>{formatBlogDate(post.date)}</time>
+        </p>
+        <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug tracking-tight">
+          {to ? (
+            <Link to={to} className="outline-none after:absolute after:inset-0 after:content-['']">
+              {post.title}
+            </Link>
+          ) : (
+            post.title
+          )}
+        </h3>
         <TextBlock
           text={post.excerpt}
-          className="flex-1 text-xs line-clamp-2 leading-relaxed text-muted-foreground sm:text-sm"
+          className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground"
         />
-        {variant === "compact" && (
-          <p className="mt-auto text-[11px] text-muted-foreground/70">
-            <time dateTime={post.date}>{formatBlogDate(post.date)}</time>
-            {post.readTime && (
-              <>
-                <span className="mx-1.5 opacity-70">·</span>
-                <span>{post.readTime}</span>
-              </>
-            )}
-          </p>
-        )}
-        {variant === "full" && post.tags && post.tags.length > 0 && (
-          <>
-            <Separator />
-            <div className="flex flex-wrap gap-1.5">
-              {post.tags.map((tag) => (
-                <Link to={`/tags/${encodeURIComponent(tag)}`} key={tag}>
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] line-clamp-1 font-medium text-muted-foreground">
-                    {tag}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </>
-        )}
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-5 text-xs text-muted-foreground">
+          {post.readTime && <span>{post.readTime}</span>}
+          {tags.map((tag) => (
+            <Link
+              key={tag}
+              to={`/tags/${encodeURIComponent(tag)}`}
+              className="relative z-10 transition-colors hover:text-foreground"
+            >
+              #{tag}
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </article>
   );
-
-  if (to) {
-    return (
-      <Link to={to} className={`block h-full ${cardClassName}`}>
-        {content}
-      </Link>
-    );
-  }
-
-  return <article className={cardClassName}>{content}</article>;
 }

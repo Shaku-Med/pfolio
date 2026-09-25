@@ -39,6 +39,12 @@ export const headers: Route.HeadersFunction = () => ({
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  // A full script-src policy needs per-request nonces for React Router's inline
+  // scripts; these directives are safe without them.
+  "Content-Security-Policy":
+    "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "Cross-Origin-Opener-Policy": "same-origin",
 });
 
 export const meta: Route.MetaFunction = ({ error }) => {

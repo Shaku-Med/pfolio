@@ -153,7 +153,7 @@ export function SelectedManager() {
           <Select
             value={table}
             onValueChange={(value) => {
-              if ((SELECTED_TABLES as readonly string[]).includes(value)) {
+              if (value && (SELECTED_TABLES as readonly string[]).includes(value)) {
                 setTable(value as SelectedTable);
               }
             }}

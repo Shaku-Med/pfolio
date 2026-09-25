@@ -23,6 +23,10 @@ export const loader = async () => {
   return { projects, stack, blog_posts, gallery, experience };
 };
 
+// Home content only changes from the admin tool, so theme switches and form
+// posts should not refetch it.
+export const shouldRevalidate = () => false;
+
 const Layout = () => {
   const { projects, stack, blog_posts, gallery, experience } =
     useLoaderData<typeof loader>();

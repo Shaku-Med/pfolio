@@ -76,8 +76,11 @@ export default function GalleryIndex() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <PageHeader title="Gallery" />
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Gallery"
+        description="Screens and moments from the work, up close."
+      />
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item, i) => (
           <Reveal

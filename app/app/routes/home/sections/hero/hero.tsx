@@ -1,25 +1,35 @@
+import { Fragment } from "react";
 import { Link } from "react-router";
+import { ArrowRight, Mail } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { Separator } from "~/components/ui/separator";
-import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { Reveal } from "~/components/accessories/Rail/Rail";
 import HeroLogoGlow from "~/components/accessories/HeroLogoGlow/HeroLogoGlow";
-import { TechTag } from "../../../../lib/tech/TechTag";
+import { Github, Linkedin } from "~/components/ui/brand-icons";
+import { contact } from "~/lib/contact";
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const stats = [
   { label: "Experience", value: "2+ years" },
   { label: "Projects", value: "5+ shipped" },
-  { label: "Focus", value: "AI/ML & network security" },
+  { label: "Focus", value: "SWE, AI/ML and more" },
 ];
 
-/** Hero stats as stations on a rail line that draws itself in. */
+const stacks = ["React", "TypeScript", "Node", "Go", "Python", "Rust", "C++", "Java", "Kotlin"];
+
+const snapshot = [
+  { label: "Specialties", value: "Whole apps, from database to deploy" },
+  { label: "Currently", value: "Heads down on new side projects" },
+  { label: "Location", value: "US and remote" },
+];
+
+const socialIcons = { github: Github, linkedin: Linkedin } as const;
+
 const StatRail = () => {
   const reduce = useReducedMotion();
   const railPath = "M0 6 C 15 4.5, 30 7.5, 50 6 S 85 4.5, 100 6";
   return (
-    <div className="relative mt-6">
+    <div className="relative">
       <svg
         aria-hidden
         className="absolute inset-x-0 top-0 h-3 w-full"
@@ -27,12 +37,7 @@ const StatRail = () => {
         preserveAspectRatio="none"
         fill="none"
       >
-        <path
-          d={railPath}
-          stroke="var(--border)"
-          strokeWidth="1.5"
-          vectorEffect="non-scaling-stroke"
-        />
+        <path d={railPath} stroke="var(--border)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
       </svg>
       <motion.div
         aria-hidden
@@ -41,12 +46,7 @@ const StatRail = () => {
         animate={reduce ? undefined : { clipPath: "inset(0 0% 0 0)" }}
         transition={{ duration: 1.4, delay: 0.5, ease: EASE }}
       >
-        <svg
-          className="h-full w-full"
-          viewBox="0 0 100 12"
-          preserveAspectRatio="none"
-          fill="none"
-        >
+        <svg className="h-full w-full" viewBox="0 0 100 12" preserveAspectRatio="none" fill="none">
           <path
             d={railPath}
             stroke="var(--primary)"
@@ -56,7 +56,7 @@ const StatRail = () => {
           />
         </svg>
       </motion.div>
-      <dl className="grid grid-cols-3 gap-4 text-xs sm:text-sm">
+      <dl className="grid grid-cols-3 gap-4">
         {stats.map((stat, i) => (
           <div key={stat.label} className="relative pt-6">
             <motion.span
@@ -66,8 +66,8 @@ const StatRail = () => {
               animate={reduce ? undefined : { scale: 1 }}
               transition={{ duration: 0.35, delay: 0.6 + i * 0.25, ease: EASE }}
             />
-            <dt className="text-muted-foreground">{stat.label}</dt>
-            <dd className="font-semibold">{stat.value}</dd>
+            <dt className="text-xs text-muted-foreground">{stat.label}</dt>
+            <dd className="mt-0.5 text-sm font-semibold sm:text-base">{stat.value}</dd>
           </div>
         ))}
       </dl>
@@ -76,113 +76,108 @@ const StatRail = () => {
 };
 
 const HeroSection = () => {
-  const stacks = [
-    "React",
-    "TypeScript",
-    "Node",
-    "Go",
-    "Python",
-    "Rust",
-    "C++",
-    "Java",
-    "Kotlin",
-  ];
-
   return (
-    <section className="relative isolate min-h-[640px] md:min-h-[700px] lg:min-h-[min(78vh,760px)]">
-      <HeroLogoGlow />
-      <div className="relative z-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="space-y-6">
-          <Reveal>
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-primary/80">
-              Hi there, I'm
-            </p>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-              Mohamed Amara
-            </h1>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
-              Full stack dev focused on AI/ML and network security. I ship real
-              products, from social platforms to encryption tools, and make music
-              on the side.
-            </p>
-          </Reveal>
+    <section>
+      <div className="relative isolate flex min-h-[min(calc(100svh-14rem),560px)] items-center">
+        <HeroLogoGlow />
+        <div className="relative z-10 w-full max-w-2xl space-y-8 py-10 lg:max-w-[55%]">
+          <div className="space-y-5">
+            <Reveal>
+              <p className="text-sm text-muted-foreground">Hey, I'm</p>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <h1 className="text-balance text-5xl font-semibold tracking-tighter sm:text-6xl lg:text-7xl">
+                Mohamed Amara
+              </h1>
+            </Reveal>
+            <Reveal delay={0.12}>
+              <p className="max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+                Software engineer working across{" "}
+                <span className="text-foreground">full stack</span>,{" "}
+                <span className="text-foreground">AI/ML</span>, and whatever else
+                the problem needs. I ship real products, from social platforms to
+                encryption tools, and make music on the side. Right now I'm looking
+                for software engineering roles and internships.
+              </p>
+            </Reveal>
+          </div>
+
           <Reveal delay={0.18}>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
               <Link
                 to="/projects"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
               >
                 View projects
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <Link
                 to="/resume"
-                className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                className="text-sm font-medium underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
               >
-                My Resume/CV
+                Read my resume
               </Link>
+              <div className="flex items-center gap-4 text-muted-foreground">
+                {contact.links.map((link) => {
+                  const Icon =
+                    socialIcons[link.label.toLowerCase() as keyof typeof socialIcons];
+                  if (!Icon) return null;
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label}
+                      className="transition-colors hover:text-foreground"
+                    >
+                      <Icon className="h-[18px] w-[18px]" />
+                    </a>
+                  );
+                })}
+                <a
+                  href={`mailto:${contact.email}`}
+                  aria-label="Email me"
+                  className="transition-colors hover:text-foreground"
+                >
+                  <Mail className="h-[18px] w-[18px]" />
+                </a>
+              </div>
             </div>
           </Reveal>
-          <StatRail />
+
+          <Reveal delay={0.24} className="max-w-xl pt-4">
+            <StatRail />
+          </Reveal>
         </div>
-        <Reveal delay={0.15} className="min-w-0">
-          <div className="relative mb-8 flex min-w-0 flex-col gap-4 rounded-2xl border border-border/70 bg-muted/20 p-4 pb-12 shadow-sm">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Snapshot
-              </p>
-              <p className="mt-1 text-sm font-semibold">
-                What I work with, at a glance
-              </p>
-            </div>
-            <Separator />
-            <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
-              <div className="min-w-0 rounded-xl bg-background/80 p-3">
-                <p className="text-[11px] text-muted-foreground">Specialties</p>
-                <p className="mt-1 font-medium">
-                  Whole apps, from database to deploy
-                </p>
-              </div>
-              <div className="min-w-0 rounded-xl bg-background/80 p-3">
-                <p className="text-[11px] text-muted-foreground">Stack</p>
-                <div className="mt-1 flex min-w-0 flex-wrap gap-1.5">
-                  {stacks.map((stack) => (
-                    <Link
-                      key={stack}
-                      to={`/tags/${encodeURIComponent(stack)}`}
-                      className="text-sm font-medium"
-                    >
-                      <TechTag name={stack} />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div className="min-w-0 rounded-xl bg-background/80 p-3">
-                <p className="text-[11px] text-muted-foreground">Currently</p>
-                <p className="mt-1 font-medium">
-                  Heads down on new side projects
-                </p>
-              </div>
-              <div className="min-w-0 rounded-xl bg-background/80 p-3">
-                <p className="text-[11px] text-muted-foreground">Location</p>
-                <p className="mt-1 font-medium">Remote · Worldwide (GMT+2)</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-8 right-5 z-20 h-16 w-16">
-              <ImgLoader
-                src={`/web/icon-512.png`}
-                alt="Portrait of Mohamed Amara"
-                className="h-full w-full rounded-full border-4 border-background object-cover shadow-sm ring-1 ring-border transition-transform duration-300 hover:scale-105"
-                imageClassName="object-cover"
-                shouldShowPreview={true}
-              />
-            </div>
-          </div>
-        </Reveal>
       </div>
+
+      <Reveal delay={0.3}>
+        <dl className="grid grid-cols-1 gap-x-8 gap-y-6 border-t border-border/60 pt-8 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          {snapshot.map((row) => (
+            <div key={row.label} className="space-y-1">
+              <dt className="text-xs text-muted-foreground">{row.label}</dt>
+              <dd className="font-medium">{row.value}</dd>
+            </div>
+          ))}
+          <div className="space-y-1">
+            <dt className="text-xs text-muted-foreground">Stack</dt>
+            <dd className="leading-relaxed">
+              {stacks.map((stack, i) => (
+                <Fragment key={stack}>
+                  <Link
+                    to={`/tags/${encodeURIComponent(stack)}`}
+                    className="font-medium transition-colors hover:text-primary"
+                  >
+                    {stack}
+                  </Link>
+                  {i < stacks.length - 1 && <span className="text-muted-foreground">, </span>}
+                </Fragment>
+              ))}
+            </dd>
+          </div>
+        </dl>
+      </Reveal>
     </section>
   );
 };

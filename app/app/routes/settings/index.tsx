@@ -103,9 +103,9 @@ function SettingsSection({
   return (
     <details
       open={defaultOpen}
-      className="group rounded-xl border border-border/70 bg-background/80"
+      className="group rounded-2xl border border-border/70 bg-card/60"
     >
-      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold marker:content-none [&::-webkit-details-marker]:hidden">
+      <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex items-center justify-between gap-2">
           {title}
           <span className="text-xs font-normal text-muted-foreground group-open:hidden">
@@ -116,7 +116,7 @@ function SettingsSection({
           </span>
         </span>
       </summary>
-      <div className="border-t border-border/60 px-4 py-3">{children}</div>
+      <div className="border-t border-border/60 px-5 py-4">{children}</div>
     </details>
   );
 }
@@ -149,11 +149,14 @@ export default function SettingsIndex() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-14 sm:px-5 sm:py-16 md:px-6 md:py-20 xl:max-w-3xl">
-      <PageHeader title="Settings" />
+    <main className="mx-auto w-full max-w-3xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Settings"
+        description="Pick the look that feels right. Your choice is saved in this browser."
+      />
 
       <div className="space-y-4">
-        <SettingsSection title="Theme (light / dark)">
+        <SettingsSection title="Light or dark">
           <p className="mb-3 text-xs text-muted-foreground">
             Current:{" "}
             <span className="font-medium text-foreground">
@@ -169,8 +172,8 @@ export default function SettingsIndex() {
                 className={cn(
                   "rounded-lg border px-3 py-1.5 text-sm font-medium transition",
                   theme === mode
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:bg-muted",
+                    ? "border-border bg-muted text-foreground"
+                    : "border-border/60 bg-background text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 {THEME_MODE_LABELS[mode]}
@@ -179,7 +182,7 @@ export default function SettingsIndex() {
           </div>
         </SettingsSection>
 
-        <SettingsSection title="Color palette (style)">
+        <SettingsSection title="Color palette">
           <p className="mb-3 text-xs text-muted-foreground">
             Current:{" "}
             <span className="font-medium text-foreground">
@@ -195,8 +198,8 @@ export default function SettingsIndex() {
                 className={cn(
                   "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition",
                   style === s
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:bg-muted",
+                    ? "border-border bg-muted text-foreground"
+                    : "border-border/60 bg-background text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 <StyleSwatches styleKey={s} />
@@ -206,7 +209,7 @@ export default function SettingsIndex() {
           </div>
         </SettingsSection>
 
-        <SettingsSection title="Colors" defaultOpen={false}>
+        <SettingsSection title="Current colors" defaultOpen={false}>
           <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
             {COLOR_VARS.map((name) => (
               <div

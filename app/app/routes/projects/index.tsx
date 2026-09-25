@@ -49,8 +49,11 @@ export default function ProjectsIndex() {
   }, [inView, hasMore, items.length, fetcher.state]);
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <PageHeader title="Projects" />
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Projects"
+        description="Things I've built and shipped, from weekend experiments to tools people actually use."
+      />
 
       {items.length === 0 ? (
         <p className="py-20 text-center text-muted-foreground">

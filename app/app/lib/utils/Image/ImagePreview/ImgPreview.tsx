@@ -558,7 +558,7 @@ export default function ImgPreview({
             Image preview{hasMultiple ? `, ${current + 1} of ${images.length}` : ""}
           </DialogTitle>
 
-          {/* Backdrop — fades with morph */}
+          {/* Backdrop fades with the morph */}
           <motion.div
             aria-hidden
             className="pointer-events-none fixed inset-0 z-[1] bg-black"
@@ -618,7 +618,7 @@ export default function ImgPreview({
             </motion.div>
           )}
 
-          {/* Full-screen stage — canvas is fixed bg; only the image transforms */}
+          {/* Full screen stage: canvas is a fixed bg and only the image transforms */}
           <motion.div
             ref={containerRef}
             className="absolute inset-0 z-[3] flex items-center justify-center overflow-hidden bg-transparent"

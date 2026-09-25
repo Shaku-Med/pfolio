@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
+import { allowMarkdownElement } from "~/lib/markdown";
 import { FileText } from "lucide-react";
 
 type MarkdownPreviewProps = {
@@ -7,7 +7,11 @@ type MarkdownPreviewProps = {
   title?: string;
 };
 
-type MdMarkdownComponent = (props: { source: string; className?: string }) => React.JSX.Element;
+type MdMarkdownComponent = (props: {
+  source: string;
+  className?: string;
+  allowElement?: typeof allowMarkdownElement;
+}) => React.JSX.Element;
 
 export function MarkdownPreview({
   content,
@@ -16,8 +20,6 @@ export function MarkdownPreview({
   const [contentState, setContentState] = useState("");
   const [MdMarkdown, setMdMarkdown] = useState<MdMarkdownComponent | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  if (!content) return null;
 
   useLayoutEffect(() => {
     setContentState(content);
@@ -60,13 +62,16 @@ export function MarkdownPreview({
     });
   }, [MdMarkdown, contentState]);
 
+  if (!content) return null;
+
   return (
     <>
       <div className="space-y-4" ref={containerRef}>
         <div data-color-mode="dark">
           {MdMarkdown && contentState ? (
             <MdMarkdown
-              source={DOMPurify.sanitize(contentState)}
+              source={contentState}
+              allowElement={allowMarkdownElement}
               className="!bg-transparent markdown_pv"
             />
           ) : (

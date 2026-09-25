@@ -4,7 +4,8 @@ import { getResume } from "../../lib/database/queries";
 import { MarkdownPreview } from "../../components/accessories/MarkdownPreview";
 import { ResumePdfViewer } from "./Accessory/ResumePdfViewer";
 import { ResumeSourceView } from "./Accessory/ResumeSourceView";
-import { RailGlyph, Reveal } from "../../components/accessories/Rail/Rail";
+import { Download } from "lucide-react";
+import { PageHeader } from "../../components/accessories/Rail/Rail";
 import { buildPageMeta } from "../../lib/seo";
 
 export function meta() {
@@ -36,16 +37,13 @@ const ResumePage = () => {
   const [mode, setMode] = useState<ResumeMode>("text");
 
   return (
-    <section className="space-y-6">
-      <Reveal>
-        <header className="space-y-2">
-          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            <RailGlyph className="h-3 w-8" />
-            Resume
-          </h1>
-        </header>
-      </Reveal>
+    <section>
+      <PageHeader
+        title="Resume"
+        description="The short version of everything on this site. Read it here, flip to the PDF, or peek at the LaTeX source."
+      />
 
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div className="inline-flex rounded-full border border-border bg-muted/60 p-1 text-xs sm:text-sm">
         {MODES.map((item) => (
           <button
@@ -62,6 +60,17 @@ const ResumePage = () => {
             {item.label}
           </button>
         ))}
+      </div>
+      {resumePdfUrl && (
+        <a
+          href={resumePdfUrl}
+          download
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Download className="h-4 w-4" />
+          Download PDF
+        </a>
+      )}
       </div>
 
       {mode === "text" &&

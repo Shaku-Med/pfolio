@@ -14,13 +14,13 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
       ? item.src
       : `/api/load/image${item.src}`;
   const card = (
-    <div className="relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80">
+    <div className="group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-muted">
       <ImgLoader
         src={src}
         alt={item.title}
         aria-hidden="true"
         className="absolute inset-0"
-        imageClassName="h-full w-full object-cover"
+        imageClassName="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
         loading="lazy"
       />
       <div
@@ -32,7 +32,7 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
       />
       <div className="relative z-10 px-4 pt-4">
         <p
-          className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${
+          className={`text-sm font-semibold tracking-tight ${
             item.tone === "dark" ? "text-white/80" : "text-black/70"
           }`}
         >

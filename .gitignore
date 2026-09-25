@@ -3,3 +3,7 @@ node_modules/
 .tmp_admincli/*
 
 __pycache__/
+.DS_Store
+.env
+.env.*
+!.env.example

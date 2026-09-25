@@ -55,7 +55,7 @@ const NotFound = () => {
           strokeOpacity="0.5"
           strokeWidth="2"
         />
-        {/* Buffer stop — the track ends here. */}
+        {/* Buffer stop: the track ends here. */}
         <motion.g
           initial={reduce ? false : { opacity: 0, x: -6 }}
           animate={reduce ? undefined : { opacity: 1, x: 0 }}

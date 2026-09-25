@@ -1,7 +1,7 @@
 /**
  * Contact info for the contact page.
  * Replace with your details; remove optional fields if you don't want them shown.
- * Form submissions are sent via your own backend (Nodemailer) — see .env for SMTP.
+ * Form submissions are sent via your own backend (Nodemailer). See .env for SMTP.
  */
 export const contact = {
   email: `jujubelt124@gmail.com`,

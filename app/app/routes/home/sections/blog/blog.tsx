@@ -7,8 +7,12 @@ const BlogSection = () => {
   if (!blog_posts.length) return null;
 
   return (
-    <section id="blog" className="space-y-4">
-      <SectionHeader title="Notes & writing" to="/blog" />
+    <section id="blog" className="space-y-8">
+      <SectionHeader
+        title="Notes & writing"
+        description="Short notes on things I've built and learned."
+        to="/blog"
+      />
       <div className="grid gap-3 md:grid-cols-3">
         {blog_posts.map((post, i) => (
           <Reveal key={post.id} delay={Math.min(i * 0.07, 0.28)} className="min-w-0">

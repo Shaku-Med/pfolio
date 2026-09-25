@@ -76,6 +76,23 @@ img {
   caret-color: var(--primary);
 }
 
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 @supports (scrollbar-color: auto) {
   * {
     scrollbar-color: var(--primary) var(--background);

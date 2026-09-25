@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
 import React from "react";
+import { allowMarkdownElement } from "~/lib/markdown";
 
 const proseClasses =
   "prose prose-sm prose-neutral dark:prose-invert max-w-none " +
@@ -14,6 +14,12 @@ const proseClasses =
   "prose-blockquote:border-primary/40 prose-blockquote:italic prose-blockquote:text-muted-foreground " +
   "prose-img:rounded-lg prose-img:border prose-img:border-border/60";
 
+type MarkdownProps = {
+  source: string;
+  className?: string;
+  allowElement?: typeof allowMarkdownElement;
+};
+
 type MarkdownBodyProps = {
   content: string;
   className?: string;
@@ -21,7 +27,7 @@ type MarkdownBodyProps = {
 
 export default function MarkdownBody({ content, className = "" }: MarkdownBodyProps) {
   const [MdMarkdown, setMdMarkdown] = useState<
-    ((props: { source: string; className?: string }) => React.JSX.Element) | null
+    ((props: MarkdownProps) => React.JSX.Element) | null
   >(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,7 +72,8 @@ export default function MarkdownBody({ content, className = "" }: MarkdownBodyPr
     <div ref={containerRef} className={`${proseClasses} ${className}`}>
       {MdMarkdown ? (
         <MdMarkdown
-          source={DOMPurify.sanitize(content)}
+          source={content}
+          allowElement={allowMarkdownElement}
           className="!bg-transparent markdown_pv"
         />
       ) : (

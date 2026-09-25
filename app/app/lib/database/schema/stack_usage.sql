@@ -66,7 +66,7 @@ AS $$
       e.logo AS cover_image,
       NULLIF(
         trim(
-          COALESCE(e.period->>'from', '') || ' – ' || COALESCE(e.period->>'to', '')
+          COALESCE(e.period->>'from', '') || ' to ' || COALESCE(e.period->>'to', '')
         ),
         ''
       ) AS period,

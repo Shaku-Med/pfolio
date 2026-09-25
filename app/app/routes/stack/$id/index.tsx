@@ -1,12 +1,19 @@
-import { Link, useLoaderData } from "react-router";
+import { data, Link, useLoaderData } from "react-router";
 import { getStackById, getStackUsage } from "../../../lib/database/queries";
 import type { StackUsageItem } from "../../../lib/database/queries";
 import type { StackCategory } from "../../../lib/stack";
 import { parseToolsString } from "../../../lib/stack";
-import { TechTag } from "~/lib/tech/TechTag";
 import { Reveal } from "~/components/accessories/Rail/Rail";
 import { TextBlock } from "~/components/accessories/TextBlock";
 import { buildPageMeta } from "~/lib/seo";
+import {
+  DetailHeader,
+  DetailNotFound,
+  DetailShell,
+  TagList,
+} from "~/components/accessories/Detail/Detail";
+
+const MORE_LINK = { to: "/stack", label: "See the full stack" };
 
 export async function loader({
   params,
@@ -15,12 +22,12 @@ export async function loader({
 }) {
   const { id } = await params;
   const stack = await getStackById(id);
-  if (!stack) return null;
+  if (!stack) return data(null, { status: 404 });
   const usage = await getStackUsage(id, 20, 0);
   return { stack, usage };
 }
 
-export function meta({ data }: { data: { stack: StackCategory } | null }) {
+export function meta({ loaderData: data }: { loaderData: { stack: StackCategory } | null }) {
   if (!data?.stack) {
     return buildPageMeta({
       title: "Not found | Mohamed Amara",
@@ -36,15 +43,23 @@ export function meta({ data }: { data: { stack: StackCategory } | null }) {
   });
 }
 
+const KIND_LABEL: Record<StackUsageItem["kind"], string> = {
+  project: "Project",
+  experience: "Experience",
+  blog: "Post",
+};
+
+const KIND_PATH: Record<StackUsageItem["kind"], string> = {
+  project: "/projects",
+  experience: "/experience",
+  blog: "/blog",
+};
+
 export default function StackIdIndex() {
   const data = useLoaderData<typeof loader>();
 
   if (!data?.stack) {
-    return (
-      <main className="mx-auto max-w-6xl px-4 py-2 sm:py-5 md:py-6">
-        <p className="text-muted-foreground">Stack item not found.</p>
-      </main>
-    );
+    return <DetailNotFound what="stack" more={MORE_LINK} />;
   }
 
   const stack = data.stack as StackCategory;
@@ -52,81 +67,58 @@ export default function StackIdIndex() {
   const tools = parseToolsString(stack.tools);
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <section className="space-y-3 border-b border-border/60 pb-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary/80">
-          Stack
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          {stack.category}
-        </h1>
-        <TextBlock
-          text={stack.description}
-          paragraphs
-          className="text-sm text-muted-foreground"
-        />
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {tools.map((tool) => (
-              <Link to={`/tags/${encodeURIComponent(tool)}`} key={tool}>
-                <TechTag name={tool} />
-              </Link>
-          ))}
+    <DetailShell>
+      <DetailHeader
+        eyebrow={`${tools.length} ${tools.length === 1 ? "tool" : "tools"}`}
+        title={stack.category}
+        lede={stack.description}
+      />
+      {tools.length > 0 && (
+        <div className="mt-8">
+          <TagList tags={tools} />
         </div>
-      </section>
+      )}
 
-      <section className="mt-8 space-y-4">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground">
-          Where this shows up
-        </h2>
+      <section className="mt-16">
+        <h2 className="text-xl font-semibold tracking-tight">Where this shows up</h2>
         {usage.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No projects, experience, or posts are linked to this stack yet.
+          <p className="mt-4 text-muted-foreground">
+            Nothing is linked to this part of the stack yet.
           </p>
         ) : (
-          <div className="space-y-3">
-            {usage.map((item, i) => {
-              const href =
-                item.kind === "project"
-                  ? `/projects/${item.id}`
-                  : item.kind === "experience"
-                    ? `/experience/${item.id}`
-                    : `/blog/${item.id}`;
-
-              return (
-                <Reveal key={`${item.kind}-${item.id}`} delay={Math.min(i * 0.05, 0.25)}>
-                <Link
-                  to={href}
-                  className="block rounded-2xl border border-border/70 bg-muted/30 px-4 py-3 transition hover:border-primary/50 hover:bg-primary/5"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0 space-y-1">
-                      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                        {item.kind}
-                      </p>
-                      <p className="truncate text-sm font-semibold text-foreground">
-                        {item.title}
-                      </p>
+          <ul className="mt-6 divide-y divide-border/60 border-y border-border/60">
+            {usage.map((item, i) => (
+              <li key={`${item.kind}-${item.id}`}>
+                <Reveal delay={Math.min(i * 0.05, 0.25)}>
+                  <Link
+                    to={`${KIND_PATH[item.kind]}/${item.id}`}
+                    className="group -mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 rounded-lg px-3 py-5 transition-colors hover:bg-muted/50 sm:grid-cols-[7rem_minmax(0,1fr)_auto]"
+                  >
+                    <span className="text-xs text-muted-foreground sm:text-sm">
+                      {KIND_LABEL[item.kind]}
+                    </span>
+                    <span className="order-first min-w-0 sm:order-none">
+                      <span className="block font-medium">{item.title}</span>
                       {item.summary && (
                         <TextBlock
+                          as="span"
                           text={item.summary}
-                          className="line-clamp-2 text-xs text-muted-foreground"
+                          className="mt-1 line-clamp-2 block text-sm text-muted-foreground"
                         />
                       )}
-                    </div>
+                    </span>
                     {(item.date || item.period) && (
-                      <p className="shrink-0 text-[11px] text-muted-foreground">
+                      <span className="hidden text-sm tabular-nums text-muted-foreground sm:block">
                         {item.date ?? item.period}
-                      </p>
+                      </span>
                     )}
-                  </div>
-                </Link>
+                  </Link>
                 </Reveal>
-              );
-            })}
-          </div>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
-    </main>
+    </DetailShell>
   );
 }
-

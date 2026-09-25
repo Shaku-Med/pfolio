@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS selected_items_table_position_idx
   ON public.selected_items (table_name, "position", id);
 
 -- ---------------------------------------------------------------------------
--- RPCs — order by selection position (not catalog position)
+-- RPCs ordered by selection position (not catalog position)
 -- ---------------------------------------------------------------------------
 
 DROP FUNCTION IF EXISTS get_selected_projects(integer, integer);

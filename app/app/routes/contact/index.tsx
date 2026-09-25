@@ -1,18 +1,43 @@
-import { Loader2, Mail, MessageSquare, Phone, CheckCircle, AlertCircle } from "lucide-react";
+import type { ComponentType } from "react";
+import {
+  AlertCircle,
+  ArrowUpRight,
+  CheckCircle,
+  Globe,
+  Loader2,
+  Mail,
+  MessageSquare,
+  Phone,
+  Send,
+} from "lucide-react";
 import { Form, useActionData, useNavigation } from "react-router";
 import { contact } from "../../lib/contact";
-import { RailGlyph, Reveal } from "../../components/accessories/Rail/Rail";
+import { PageHeader } from "../../components/accessories/Rail/Rail";
+import { Github, Linkedin } from "../../components/ui/brand-icons";
 import { buildPageMeta } from "../../lib/seo";
+import { clientIp, isSameOrigin, rateLimit } from "../../lib/security/http.server";
+import { sendContactEmail } from "../../lib/send-contact-email.server";
 
 export function meta() {
   return buildPageMeta({
     title: "Contact | Mohamed Amara",
-    description: "Get in touch.",
+    description: "Hiring, collaborating, or just curious? Send me a message.",
     canonicalPath: "/contact",
   });
 }
 
-const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/;
+const socialIcons: Record<string, ComponentType<{ className?: string }>> = {
+  github: Github,
+  linkedin: Linkedin,
+};
+
+const inputClassName =
+  "rounded-xl border border-border/70 bg-background px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 disabled:pointer-events-none disabled:opacity-60";
+
+// No separators or quotes, so one field can never expand into several
+// Reply-To addresses.
+const EMAIL_CHAR = String.raw`[^\s@,;:<>"'()[\]\\]`;
+const EMAIL_RE = new RegExp(`^${EMAIL_CHAR}{1,64}@${EMAIL_CHAR}+\\.${EMAIL_CHAR}{2,}$`);
 const GENERIC_ERROR =
   "Couldn't send your message right now. Please try again later or email me directly.";
 
@@ -23,10 +48,6 @@ function field(formData: FormData, key: string): string {
 
 export async function action({ request }: { request: Request }) {
   if (request.method !== "POST") return null;
-
-  const { rateLimit, clientIp, isSameOrigin } = await import(
-    "../../lib/security/http.server"
-  );
 
   if (!isSameOrigin(request)) {
     return { success: false, error: GENERIC_ERROR };
@@ -70,7 +91,6 @@ export async function action({ request }: { request: Request }) {
     return { success: false, error: "Message is too long (4000 characters max)." };
   }
 
-  const { sendContactEmail } = await import("../../lib/send-contact-email.server");
   const result = await sendContactEmail({ name, email, message });
   if (result.ok) return { success: true };
   console.error("Contact email failed:", result.error);
@@ -83,32 +103,37 @@ export default function ContactIndex() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-14 sm:px-5 sm:py-16 md:px-6 md:py-24 xl:max-w-3xl 2xl:max-w-4xl">
-      <Reveal>
-        <header className="space-y-2">
-          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            <RailGlyph className="h-3 w-8" />
-            Get in touch
-          </h1>
-        </header>
-      </Reveal>
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Get in touch"
+        description="Hiring, collaborating, or just curious about something I built? Send a message and it lands straight in my inbox."
+      />
 
-      <div className="mt-10 space-y-10">
-        <section className="space-y-4">
-          <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
-            <MessageSquare className="h-4 w-4 text-primary/80" />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-14">
+        <section className="space-y-4" aria-labelledby="contact-form-title">
+          <h2
+            id="contact-form-title"
+            className="flex items-center gap-2 text-sm font-semibold tracking-tight"
+          >
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
             Send a message
           </h2>
 
           {actionData?.success && (
-            <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">
+            <div
+              role="status"
+              className="flex items-center gap-3 rounded-xl border border-border bg-muted px-4 py-3 text-sm"
+            >
               <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
-              <span>Message sent. I’ll get back to you soon.</span>
+              <span>Message sent. I'll get back to you soon.</span>
             </div>
           )}
 
           {actionData && !actionData.success && actionData.error && (
-            <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div
+              role="alert"
+              className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
               <AlertCircle className="h-5 w-5 shrink-0" />
               <span>{actionData.error}</span>
             </div>
@@ -116,7 +141,7 @@ export default function ContactIndex() {
 
           <Form
             method="post"
-            className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/80 p-4 sm:p-6"
+            className="flex flex-col gap-5 rounded-2xl border border-border/70 bg-card/60 p-5 sm:p-6"
             aria-disabled={isSubmitting}
           >
             <input
@@ -127,122 +152,121 @@ export default function ContactIndex() {
               autoComplete="off"
               aria-hidden
             />
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Name
-                </span>
+                <span className="text-xs font-medium text-muted-foreground">Name</span>
                 <input
                   type="text"
                   name="name"
                   required
+                  maxLength={100}
+                  autoComplete="name"
                   disabled={isSubmitting}
                   placeholder="Your name"
-                  className="rounded-lg border border-border/70 bg-background px-3 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:pointer-events-none disabled:opacity-60"
+                  className={inputClassName}
                 />
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Email
-                </span>
+                <span className="text-xs font-medium text-muted-foreground">Email</span>
                 <input
                   type="email"
                   name="email"
                   required
+                  maxLength={254}
+                  autoComplete="email"
                   disabled={isSubmitting}
-                  placeholder="you@your-domain.com"
-                  className="rounded-lg border border-border/70 bg-background px-3 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:pointer-events-none disabled:opacity-60"
+                  placeholder="you@example.com"
+                  className={inputClassName}
                 />
               </label>
             </div>
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-muted-foreground">
-                Message
-              </span>
+              <span className="text-xs font-medium text-muted-foreground">Message</span>
               <textarea
                 name="message"
                 required
-                rows={5}
+                minLength={10}
+                maxLength={4000}
+                rows={6}
                 disabled={isSubmitting}
-                placeholder="What's on your mind?"
-                className="min-h-[120px] resize-y rounded-lg border border-border/70 bg-background px-3 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:pointer-events-none disabled:opacity-60"
+                placeholder="Tell me a little about what you have in mind."
+                className={`min-h-[140px] resize-y ${inputClassName}`}
               />
             </label>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-70 sm:w-auto"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                  Sending…
-                </>
-              ) : (
-                "Send message"
-              )}
-            </button>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                Your email is only used to reply to you.
+              </p>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-70 sm:w-auto"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    Sending
+                  </>
+                ) : (
+                  <>
+                    Send message
+                    <Send className="h-3.5 w-3.5" aria-hidden />
+                  </>
+                )}
+              </button>
+            </div>
           </Form>
         </section>
 
-        <section className="space-y-4">
-          <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
-            <Mail className="h-4 w-4 text-primary/80" />
-            Email
-          </h2>
-          <a
-            href={`mailto:${contact.email}`}
-            className="block rounded-2xl border border-border/70 bg-background/80 p-4 transition hover:border-primary/40 hover:shadow-sm sm:p-5"
-          >
-            <span className="text-sm font-medium text-foreground">
-              {contact.email}
-            </span>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Click to open your mail client
-            </p>
-          </a>
-        </section>
-
-        {contact.phone ? (
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
-              <Phone className="h-4 w-4 text-primary/80" />
-              Phone
-            </h2>
+        <aside className="space-y-4" aria-label="Other ways to reach me">
+          <h2 className="text-sm font-semibold tracking-tight">Or reach me directly</h2>
+          <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/70 bg-card/60">
             <a
-              href={`tel:${contact.phone.replace(/\s/g, "")}`}
-              className="block rounded-2xl border border-border/70 bg-background/80 p-4 transition hover:border-primary/40 hover:shadow-sm sm:p-5"
+              href={`mailto:${contact.email}`}
+              className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/60"
             >
-              <span className="text-sm font-medium text-foreground">
-                {contact.phone}
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                <Mail className="h-4 w-4" />
               </span>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Click to call
-              </p>
+              <span className="min-w-0">
+                <span className="block text-xs text-muted-foreground">Email</span>
+                <span className="block truncate text-sm font-medium">{contact.email}</span>
+              </span>
             </a>
-          </section>
-        ) : null}
-
-        {contact.links.length > 0 ? (
-          <section className="space-y-4">
-            <h2 className="text-sm font-semibold tracking-tight text-foreground">
-              Elsewhere
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {contact.links.map((link) => (
+            {contact.phone && (
+              <a
+                href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/60"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                  <Phone className="h-4 w-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-xs text-muted-foreground">Phone</span>
+                  <span className="block text-sm font-medium">{contact.phone}</span>
+                </span>
+              </a>
+            )}
+            {contact.links.map((link) => {
+              const Icon = socialIcons[link.label.toLowerCase()] ?? Globe;
+              return (
                 <a
                   key={link.href}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-lg border border-border/70 bg-background/80 px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-primary/40 hover:shadow-sm"
+                  className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/60"
                 >
-                  {link.label}
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0 flex-1 text-sm font-medium">{link.label}</span>
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
-              ))}
-            </div>
-          </section>
-        ) : null}
+              );
+            })}
+          </div>
+        </aside>
       </div>
     </main>
   );

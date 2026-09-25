@@ -1,126 +1,91 @@
-import { Form, Link, useLoaderData } from "react-router";
+import { Form, useLoaderData } from "react-router";
+import { SearchIcon } from "lucide-react";
 import type { SearchResult } from "../../lib/database/queries";
 import { searchAll } from "../../lib/database/queries";
-import { RailGlyph, Reveal } from "../../components/accessories/Rail/Rail";
-import { TextBlock } from "../../components/accessories/TextBlock";
+import { cleanText, pageNumber, tooManyRequests } from "../../lib/security/http.server";
+import { PageHeader } from "../../components/accessories/Rail/Rail";
+import { ResultList } from "../../components/accessories/ResultList";
 import { buildPageMeta } from "../../lib/seo";
 
 const PAGE_SIZE = 20;
+const MAX_QUERY_LENGTH = 120;
 
-export function meta({ data }: { data: { q: string } | undefined }) {
-  const title = data?.q
-    ? `"${data.q}" | Search | Mohamed Amara`
-    : "Search | Mohamed Amara";
+export function meta({ loaderData: data }: { loaderData: { q: string } | undefined }) {
+  const title = data?.q ? `"${data.q}" | Search | Mohamed Amara` : "Search | Mohamed Amara";
   return buildPageMeta({
     title,
     description: "Search across projects, experience, stack, blog, and gallery.",
     canonicalPath: "/search",
+    noindex: Boolean(data?.q),
   });
 }
 
 export async function loader({ request }: { request: Request }) {
+  const limited = tooManyRequests(request, "search", 40);
+  if (limited) throw limited;
   const url = new URL(request.url);
-  const q = (url.searchParams.get("q") || "").trim();
-  const page = Number(url.searchParams.get("page") || "1");
-  const limit = PAGE_SIZE;
-  const offset = (page - 1) * limit;
+  const q = cleanText(url.searchParams.get("q"), MAX_QUERY_LENGTH);
+  const page = pageNumber(url);
 
   if (!q) {
     return { q, results: [] as SearchResult[], page, hasMore: false };
   }
 
-  const results = await searchAll(q, limit + 1, offset);
-  const hasMore = results.length > limit;
-  const pageResults = hasMore ? results.slice(0, limit) : results;
-
-  return { q, results: pageResults, page, hasMore };
+  const results = await searchAll(q, PAGE_SIZE + 1, (page - 1) * PAGE_SIZE);
+  const hasMore = results.length > PAGE_SIZE;
+  return { q, results: results.slice(0, PAGE_SIZE), page, hasMore };
 }
 
 export default function SearchPage() {
   const { q, results, page, hasMore } = useLoaderData<typeof loader>();
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6 space-y-8">
-      <Reveal>
-        <header className="space-y-3">
-          <h1 className="flex items-center gap-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            <RailGlyph className="h-3 w-8" />
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Search"
+        description="Look through everything here: projects, roles, posts, the stack, and the gallery."
+      />
+
+      <Form method="get" role="search" className="max-w-2xl">
+        <div className="flex items-center gap-2 border-b border-border pb-2 transition-colors focus-within:border-foreground">
+          <SearchIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <input
+            type="search"
+            name="q"
+            defaultValue={q}
+            maxLength={MAX_QUERY_LENGTH}
+            placeholder="Search for a project, tool, or topic"
+            className="h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60"
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
             Search
-          </h1>
-          <Form method="get" className="flex gap-2">
-            <input
-              type="search"
-              name="q"
-              defaultValue={q}
-              placeholder='Try: react OR next · "design system" · kind:project · tag:typescript · -blog'
-              className="h-10 flex-1 rounded-full border border-border/70 bg-background px-4 text-sm outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-            />
-            <button
-              type="submit"
-              className="inline-flex h-10 items-center rounded-full bg-primary px-4 text-xs font-medium text-primary-foreground transition hover:bg-primary/90"
-            >
-              Search
-            </button>
-          </Form>
-        </header>
-      </Reveal>
-
-      {q && results.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          No results for <span className="font-medium">&quot;{q}&quot;</span>.
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Tip: wrap words in quotes for an exact match, or try kind:project and
+          tag:typescript to narrow things down.
         </p>
-      )}
+      </Form>
 
-      {results.length > 0 && (
-        <section className="space-y-4">
-          <ul className="divide-y divide-border/60 rounded-xl border border-border/60 bg-background/80">
-            {results.map((item) => (
-              <li key={`${item.kind}-${item.id}`} className="px-4 py-3 sm:px-5">
-                <Link
-                  to={item.href}
-                  className="flex flex-col gap-1 hover:text-primary"
-                >
-                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                    <span>{item.kind}</span>
-                  </div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {item.title}
-                  </p>
-                  {item.summary && (
-                    <TextBlock
-                      text={item.summary}
-                      className="line-clamp-2 text-xs text-muted-foreground"
-                    />
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Page {page}</span>
-            <div className="flex gap-2">
-              {page > 1 && (
-                <Link
-                  to={`/search?q=${encodeURIComponent(q)}&page=${page - 1}`}
-                  className="rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
-                >
-                  Previous
-                </Link>
-              )}
-              {hasMore && (
-                <Link
-                  to={`/search?q=${encodeURIComponent(q)}&page=${page + 1}`}
-                  className="rounded-md border border-border/60 px-2 py-1 hover:bg-muted"
-                >
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
+      <div className="mt-12">
+        {q && results.length === 0 && (
+          <p className="text-muted-foreground">
+            Nothing matched <span className="text-foreground">"{q}"</span>. Try a shorter
+            or broader word.
+          </p>
+        )}
+        {results.length > 0 && (
+          <ResultList
+            results={results}
+            page={page}
+            hasMore={hasMore}
+            pageHref={(p) => `/search?q=${encodeURIComponent(q)}&page=${p}`}
+          />
+        )}
+      </div>
     </main>
   );
 }
-

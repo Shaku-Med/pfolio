@@ -56,7 +56,7 @@ export default function StackIndex() {
 
   if (items.length === 0) {
     return (
-      <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
+      <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
         <h1 className="mb-6 text-xl font-semibold tracking-tight">
           Stack & tooling
         </h1>
@@ -76,8 +76,11 @@ export default function StackIndex() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-2 sm:py-5 md:py-6">
-      <PageHeader title="Stack & tooling" />
+    <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-5 md:px-6">
+      <PageHeader
+        title="Stack & tooling"
+        description="The languages and tools I reach for, and where I've used them."
+      />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item, i) => (
           <Reveal

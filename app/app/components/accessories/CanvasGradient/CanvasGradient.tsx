@@ -5,7 +5,7 @@ type CanvasGradientProps = {
   className?: string;
 };
 
-/** Blob positions (x, y) as 0–1, spread so colors overlap in a liquid way */
+/** Blob positions (x, y) from 0 to 1, spread so colors overlap in a liquid way */
 const BLOB_OFFSETS: [number, number][] = [
   [0.15, 0.25],
   [0.82, 0.72],

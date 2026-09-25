@@ -65,7 +65,7 @@ const TECH_META: Record<string, TechMeta> = {
     icon: "django",
   },
   "machine learning": {
-    label: "Machine-Learning",
+    label: "Machine Learning",
     icon: "machine-learning",
   },
   sql: {
@@ -173,30 +173,23 @@ export const TechTag: React.FC<TechTagProps> = ({ name, className }) => {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium bg-muted/70 text-foreground border-border/60",
+        "inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors",
         className,
       )}
     >
-      {
-        meta.icon && (
-          <>
-            {
-              (!error) && (
-              <span className="inline-flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
-                    <ImgLoader
-                      src={`/languages/${meta.icon}.svg`}
-                      alt=""
-                      className="h-3.5 w-3.5"
-                      loading="lazy"
-                      onError={() => setError(true)}
-                      imageClassName="h-3.5 w-3.5 object-contain"
-                    />
-                  </span>
-            )}
-          </>
-        )
-      }
-      <span className="truncate max-w-[7rem]">{meta.label}</span>
+      {meta.icon && !error && (
+        <span className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true">
+          <ImgLoader
+            src={`/languages/${meta.icon}.svg`}
+            alt=""
+            className="h-3.5 w-3.5"
+            loading="lazy"
+            onError={() => setError(true)}
+            imageClassName="h-3.5 w-3.5 object-contain"
+          />
+        </span>
+      )}
+      <span className="max-w-[9rem] truncate">{meta.label}</span>
     </span>
   );
 };
