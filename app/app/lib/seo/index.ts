@@ -11,7 +11,8 @@ export {
   ICON_192_PATH,
   ICON_512_PATH,
   LOCALE,
-  THEME_COLOR,
+  THEME_COLOR_LIGHT,
+  THEME_COLOR_DARK,
 } from "./constants";
 export {
   buildDefaultMeta,
@@ -19,3 +20,4 @@ export {
   buildPageMeta,
   type PageMetaInput,
 } from "./meta";
+export { homeStructuredData, blogPostStructuredData } from "./structured";

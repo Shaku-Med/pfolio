@@ -5,6 +5,12 @@ import StackSection from "./sections/stack/stack";
 import GallerySection from "./sections/gallery/gallery";
 import BlogSection from "./sections/blog/blog";
 import ContactSection from "./sections/contact/contact";
+import MusicSection from "./sections/music/music";
+import { buildDefaultMeta, homeStructuredData } from "../../lib/seo";
+
+export function meta() {
+  return [...buildDefaultMeta(), homeStructuredData()];
+}
 
 const Home = () => {
   return (
@@ -15,6 +21,7 @@ const Home = () => {
       <GallerySection />
       <BlogSection />
       <StackSection />
+      <MusicSection />
       <ContactSection />
     </main>
   );

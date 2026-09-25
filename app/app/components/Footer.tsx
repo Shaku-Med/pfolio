@@ -16,6 +16,7 @@ const columns = [
     title: "More",
     links: [
       { label: "Blog", to: "/blog" },
+      { label: "Music", to: "/#music" },
       { label: "Resume", to: "/resume" },
       { label: "Search", to: "/search" },
       { label: "Settings", to: "/settings" },
@@ -55,6 +56,9 @@ const Footer = () => {
               ))}
               <a href={`mailto:${contact.email}`} className={linkClassName}>
                 Email
+              </a>
+              <a href="/rss.xml" className={linkClassName}>
+                RSS
               </a>
             </div>
           </div>

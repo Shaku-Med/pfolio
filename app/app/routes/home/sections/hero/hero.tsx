@@ -12,7 +12,7 @@ const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const stats = [
   { label: "Experience", value: "2+ years" },
   { label: "Projects", value: "5+ shipped" },
-  { label: "Focus", value: "SWE, AI/ML and more" },
+  { label: "Focus", value: "Full stack SWE" },
 ];
 
 const stacks = ["React", "TypeScript", "Node", "Go", "Python", "Rust", "C++", "Java", "Kotlin"];
@@ -92,12 +92,10 @@ const HeroSection = () => {
             </Reveal>
             <Reveal delay={0.12}>
               <p className="max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Software engineer working across{" "}
-                <span className="text-foreground">full stack</span>,{" "}
-                <span className="text-foreground">AI/ML</span>, and whatever else
-                the problem needs. I ship real products, from social platforms to
-                encryption tools, and make music on the side. Right now I'm looking
-                for software engineering roles and internships.
+                <span className="text-foreground">Full stack</span> software engineer.
+                I build whole products and ship them for real people, from social
+                platforms to encryption tools, and I make music on the side. Right now I'm looking for software
+                engineering roles and internships.
               </p>
             </Reveal>
           </div>

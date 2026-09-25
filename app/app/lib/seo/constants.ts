@@ -8,7 +8,7 @@ export const BASE_URL =
 export const SITE_NAME = "Mohamed Amara";
 export const DEFAULT_TITLE = "Mohamed Amara";
 export const DEFAULT_DESCRIPTION =
-  "Portfolio of Mohamed Amara: projects, experience, stack, gallery, and blog.";
+  "Mohamed Amara is a full stack software engineer who builds and ships real products. Projects, experience, writing, and music.";
 export const DEFAULT_KEYWORDS = [
   "Mohamed Amara",
   "portfolio",
@@ -22,9 +22,11 @@ export const DEFAULT_KEYWORDS = [
 export const DEFAULT_OG_IMAGE_PATH = "/web/icon-512.png";
 export const FAVICON_PATH = "/favicon.ico";
 export const MANIFEST_PATH = "/manifest.json";
-export const APPLE_TOUCH_ICON_PATH = "/web/icon-192.png";
+export const APPLE_TOUCH_ICON_PATH = "/web/apple-touch-icon.png";
 export const ICON_192_PATH = "/web/icon-192.png";
 export const ICON_512_PATH = "/web/icon-512.png";
 
 export const LOCALE = "en_US";
-export const THEME_COLOR = "#000000";
+// Matches --background in the default palette for each mode.
+export const THEME_COLOR_LIGHT = "#ffffff";
+export const THEME_COLOR_DARK = "#09090b";

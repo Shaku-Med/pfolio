@@ -6,34 +6,24 @@ import {
   DEFAULT_DESCRIPTION,
   DEFAULT_KEYWORDS,
   DEFAULT_OG_IMAGE_PATH,
-  FAVICON_PATH,
-  APPLE_TOUCH_ICON_PATH,
-  MANIFEST_PATH,
-  ICON_192_PATH,
-  ICON_512_PATH,
   LOCALE,
 } from "./constants";
 
 const defaultOgImage = `${BASE_URL}${DEFAULT_OG_IMAGE_PATH}`;
 const canonicalUrl = BASE_URL;
 
-const FAVICON_LINKS: MetaDescriptor[] = [
-  { rel: "icon", href: FAVICON_PATH, type: "image/x-icon", sizes: "any" },
-  { rel: "shortcut icon", href: FAVICON_PATH },
-  { rel: "icon", href: ICON_192_PATH, type: "image/png", sizes: "192x192" },
-  { rel: "icon", href: ICON_512_PATH, type: "image/png", sizes: "512x512" },
-  { rel: "apple-touch-icon", href: APPLE_TOUCH_ICON_PATH },
-  { rel: "manifest", href: MANIFEST_PATH },
-];
+// Icons and the manifest live in root.tsx `links`, so they reach every page.
+// Link tags returned from meta need tagName, or React Router renders <meta>.
+function canonicalLink(href: string): MetaDescriptor {
+  return { tagName: "link", rel: "canonical", href };
+}
 
 export function buildDefaultMeta(): MetaDescriptor[] {
   return [
-    ...FAVICON_LINKS,
     { title: DEFAULT_TITLE },
     { name: "description", content: DEFAULT_DESCRIPTION },
     { name: "keywords", content: DEFAULT_KEYWORDS },
     { name: "author", content: SITE_NAME },
-    { name: "canonical", content: canonicalUrl },
     {
       name: "robots",
       content:
@@ -60,14 +50,12 @@ export function buildDefaultMeta(): MetaDescriptor[] {
     { name: "twitter:description", content: DEFAULT_DESCRIPTION },
     { name: "twitter:image", content: defaultOgImage },
     { name: "twitter:image:alt", content: SITE_NAME },
-    { rel: "canonical", href: canonicalUrl },
-    { rel: "dns-prefetch", href: BASE_URL },
+    canonicalLink(canonicalUrl),
   ];
 }
 
 export function buildErrorMeta(): MetaDescriptor[] {
   return [
-    ...FAVICON_LINKS,
     { title: "Error" },
     { name: "description", content: "Error loading data." },
     { name: "robots", content: "noindex, nofollow" },
@@ -117,7 +105,6 @@ export function buildPageMeta(input: PageMetaInput): MetaDescriptor[] {
     { name: "description", content: description },
     { name: "keywords", content: keywords },
     { name: "author", content: author },
-    { name: "canonical", content: canonical },
     { name: "robots", content: robots },
     ...(noindex ? [] : [{ name: "googlebot", content: robots }]),
     { property: "og:type", content: ogType },
@@ -133,7 +120,7 @@ export function buildPageMeta(input: PageMetaInput): MetaDescriptor[] {
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: image },
     { name: "twitter:image:alt", content: ogImageAlt ?? title },
-    { rel: "canonical", href: canonical },
+    canonicalLink(canonical),
     ...extra,
   ];
 }

@@ -19,9 +19,33 @@ import {
   type ThemeStyle,
 } from "./lib/theme/constants";
 import { buildDefaultMeta, buildErrorMeta } from "./lib/seo";
+import {
+  APPLE_TOUCH_ICON_PATH,
+  FAVICON_PATH,
+  ICON_192_PATH,
+  ICON_512_PATH,
+  MANIFEST_PATH,
+  THEME_COLOR_DARK,
+  THEME_COLOR_LIGHT,
+} from "./lib/seo/constants";
 import NavProgress from "./lib/NavProgress";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: FAVICON_PATH, sizes: "32x32" },
+  { rel: "icon", type: "image/png", sizes: "16x16", href: "/web/favicon-16x16.png" },
+  { rel: "icon", type: "image/png", sizes: "32x32", href: "/web/favicon-32x32.png" },
+  { rel: "icon", type: "image/png", sizes: "48x48", href: "/web/favicon-48x48.png" },
+  { rel: "icon", type: "image/png", sizes: "96x96", href: "/web/favicon-96x96.png" },
+  { rel: "icon", type: "image/png", sizes: "192x192", href: ICON_192_PATH },
+  { rel: "icon", type: "image/png", sizes: "512x512", href: ICON_512_PATH },
+  { rel: "apple-touch-icon", sizes: "180x180", href: APPLE_TOUCH_ICON_PATH },
+  { rel: "manifest", href: MANIFEST_PATH },
+  {
+    rel: "alternate",
+    type: "application/rss+xml",
+    title: "Mohamed Amara's blog",
+    href: "/rss.xml",
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -72,7 +96,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content={THEME_COLOR_LIGHT} />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content={THEME_COLOR_DARK} />
         <link rel="stylesheet" href={`/themes/${style}.css`} data-theme-palette />
         <Meta />
         <Links />

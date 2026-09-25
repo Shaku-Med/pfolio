@@ -3,7 +3,7 @@ import MarkdownBody from "../../../components/accessories/MarkdownBody";
 import { getBlogPostById } from "../../../lib/database/queries";
 import { formatBlogDate, type BlogPost } from "../../../lib/blog";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
-import { BASE_URL, buildPageMeta } from "~/lib/seo";
+import { BASE_URL, blogPostStructuredData, buildPageMeta } from "~/lib/seo";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
 import { useState } from "react";
 import {
@@ -50,6 +50,8 @@ export function meta({ loaderData: data }: { loaderData: { post: BlogPost } | nu
     canonicalPath: `/blog/${post.id}`,
     ogImage,
     ogImageAlt: post.title,
+    ogType: "article",
+    extra: [blogPostStructuredData(post, ogImage)],
   });
 }
 
