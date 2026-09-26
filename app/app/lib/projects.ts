@@ -19,6 +19,8 @@ export type Project = {
   date?: string;
   /** Markdown "more details"; only loaded on the project detail page, not in lists. */
   detailsMd?: string;
+  /** Short demo clip, already resolved to a playable URL. Detail page only. */
+  demoVideo?: string;
   /** Manual display order (lower = earlier). */
   position?: number;
 };

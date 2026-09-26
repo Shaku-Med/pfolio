@@ -23,6 +23,7 @@ export function meta() {
     title: "Gallery | Mohamed Amara",
     description: "Screenshots and visuals from projects.",
     canonicalPath: "/gallery",
+    ogImage: "/og/page/gallery",
   });
 }
 

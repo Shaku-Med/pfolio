@@ -19,7 +19,7 @@ export const DEFAULT_KEYWORDS = [
   "gallery",
   "software",
 ].join(", ");
-export const DEFAULT_OG_IMAGE_PATH = "/web/icon-512.png";
+export const DEFAULT_OG_IMAGE_PATH = "/og/site";
 export const FAVICON_PATH = "/favicon.ico";
 export const MANIFEST_PATH = "/manifest.json";
 export const APPLE_TOUCH_ICON_PATH = "/web/apple-touch-icon.png";

@@ -38,11 +38,7 @@ export function meta({ loaderData: data }: { loaderData: { entry: ExperienceEntr
     });
   }
   const entry = data.entry;
-  const ogImage = entry.logo
-    ? entry.logo.startsWith("http")
-      ? entry.logo
-      : `${BASE_URL}/api/load/image${entry.logo}`
-    : undefined;
+  const ogImage = `/og/experience/${entry.id}`;
   return buildPageMeta({
     title: `${entry.title ?? entry.role ?? entry.company} | Mohamed Amara`,
     description: entry.description ?? undefined,

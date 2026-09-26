@@ -47,6 +47,7 @@ export default [
     route("robots.txt", "routes/robots[.]txt.tsx"),
     route("llms.txt", "routes/llms[.]txt.tsx"),
     route("llms-full.txt", "routes/llms-full[.]txt.tsx"),
+    route("og/:kind/:id?", "routes/og.tsx"),
     route('api', 'routes/api/layout.tsx', [
         route('load', 'routes/api/load/layout.tsx', [
             route('image/*', 'routes/api/load/image/index.tsx'),

@@ -15,6 +15,7 @@ export function meta() {
     title: "Blog | Mohamed Amara",
     description: "Notes on design, engineering, and shipping.",
     canonicalPath: "/blog",
+    ogImage: "/og/page/blog",
   });
 }
 

@@ -43,11 +43,7 @@ export function meta({ loaderData: data }: { loaderData: { item: GalleryItem } |
     });
   }
   const item = data.item;
-  const ogImage = item.src
-    ? item.src.startsWith("http")
-      ? item.src
-      : `${BASE_URL}/api/load/image${item.src}`
-    : undefined;
+  const ogImage = `/og/gallery/${item.id}`;
   return buildPageMeta({
     title: `${item.title} | Gallery | Mohamed Amara`,
     description: item.subtitle ?? undefined,

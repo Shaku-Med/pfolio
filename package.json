@@ -8,7 +8,8 @@
     "dev": "npm run dev -w app",
     "build": "npm run build -w app",
     "start": "npm run start -w app",
-    "typecheck": "npm run typecheck -w app"
+    "typecheck": "npm run typecheck -w app",
+    "test": "npm run test -w app"
   },
   "overrides": {
     "@hono/node-server": "^2.1.1"

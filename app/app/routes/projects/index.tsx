@@ -15,6 +15,7 @@ export function meta() {
     title: "Projects | Mohamed Amara",
     description: "Things I've designed, built, and shipped.",
     canonicalPath: "/projects",
+    ogImage: "/og/page/projects",
   });
 }
 

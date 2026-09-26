@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { cn } from "~/lib/utils";
-import type { ExperienceEntry } from "~/lib/experience";
+import { isOpenRole, type ExperienceEntry } from "~/lib/experience";
 import type { Project } from "~/lib/projects";
 import { TextBlock } from "../TextBlock";
 
@@ -18,6 +18,8 @@ export type TimelineItem = {
   markerLabel: string | null;
   /** Ascending manual order from admin (lower = earlier). */
   position: number;
+  /** The open "your company here" slot, always drawn last. */
+  open?: boolean;
   description?: string;
   image?: string;
 };
@@ -48,6 +50,7 @@ export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[]
   return entries.map((entry, index) => {
     const ongoing = /now|present|since/i.test(entry.period);
     const year = startYear(entry.period);
+    const open = isOpenRole(entry);
     return {
       kind: "experience" as const,
       id: entry.id,
@@ -55,8 +58,9 @@ export function experienceToTimeline(entries: ExperienceEntry[]): TimelineItem[]
       title: entry.title,
       meta: [entry.role, entry.company, entry.location].filter(Boolean).join(" · "),
       period: entry.period,
-      markerLabel: ongoing ? "Now" : year ? String(year) : null,
+      markerLabel: open ? "Next" : ongoing ? "Now" : year ? String(year) : null,
       position: typeof entry.position === "number" ? entry.position : index,
+      open,
       description: entry.description,
       image: resolveImage(entry.logo),
     };
@@ -85,9 +89,10 @@ export function projectsToTimeline(projects: Project[]): TimelineItem[] {
     });
 }
 
-/** Order by admin position (stable). Experience wins ties over projects. */
+/** Order by admin position (stable), open slot last. Experience wins ties over projects. */
 export function sortTimeline(items: TimelineItem[]): TimelineItem[] {
   return [...items].sort((a, b) => {
+    if (Boolean(a.open) !== Boolean(b.open)) return a.open ? 1 : -1;
     if (a.position !== b.position) return a.position - b.position;
     if (a.kind === b.kind) return 0;
     return a.kind === "experience" ? -1 : 1;

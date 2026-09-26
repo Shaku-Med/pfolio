@@ -54,7 +54,7 @@ jobs:
           fi
 
   test:
-    name: Typecheck
+    name: Typecheck and test
     runs-on: ubuntu-latest
     needs: changes
     if: needs.changes.outputs.app == 'true'
@@ -76,6 +76,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Test
+        run: npm test
 
   build:
     name: Build & push image

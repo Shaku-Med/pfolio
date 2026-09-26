@@ -23,6 +23,7 @@ export function meta() {
     title: "Stack | Mohamed Amara",
     description: "Tools and tech I use day to day.",
     canonicalPath: "/stack",
+    ogImage: "/og/page/stack",
   });
 }
 

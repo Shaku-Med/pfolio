@@ -1,87 +1,101 @@
-# Welcome to React Router!
+# Portfolio site
 
-A modern, production-ready template for building full-stack React applications using React Router.
+This folder is the public site at [medzy.brozy.org](https://medzy.brozy.org). It
+reads everything from Supabase, so projects, posts and roles change from the
+admin tool without a redeploy. Setup, Supabase, the image repo and deploys are
+covered in the [root README](../README.md).
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Stack
 
-## Features
+React Router 8 in framework mode with server rendering, React 19, Tailwind CSS 4,
+Vite 8 and TypeScript 7. Data comes from Supabase, images come from a GitHub
+repo through a small proxy, and email goes out through Nodemailer.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## Scripts
 
-## Getting Started
+Run these from this folder, or from the repo root with `npm run <script>`.
 
-### Installation
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Dev server on port 3000 |
+| `npm run build` | Production build into `build/` |
+| `npm start` | Serves the build, reading `.env` |
+| `npm run typecheck` | Generates route types, then checks the whole app |
+| `npm test` | Runs the Vitest suite once |
 
-Install the dependencies:
+## Environment
 
-```bash
-npm install
-```
+Copy `.env.example` to `.env`. The site refuses to start in production without
+`SUPABASE_URL` and `SUPABASE_ANON_KEY`, and it rejects a service role key, since
+the public site should never bypass row level security.
 
-### Development
+| Variable | Used for |
+| --- | --- |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Reading content |
+| `GITHUB_OWNER`, `GITHUB_REPO` | The image and video proxy |
+| `SITE_URL` | Canonical links, the sitemap, feeds and preview cards |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Sending contact form mail |
+| `CONTACT_TO_EMAIL` | Where contact form messages land |
 
-Start the development server with HMR:
-
-```bash
-npm run dev
-```
-
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
+## Layout
 
 ```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+app/
+  routes.ts            every route in one place
+  root.tsx             document shell, icons, security headers
+  routes/              pages, plus data and resource routes
+  components/          shared UI; accessories/ holds cards, the timeline, detail layout
+  lib/
+    database/          Supabase client, queries and the read cache
+    security/          input cleaning, rate limits, URL and email checks
+    og/                preview card rendering
+    seo/               meta tags and structured data
+public/                icons, fonts, themes and the resume PDF
+test/                  Vitest suites
 ```
 
-## Styling
+## Public endpoints
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+Besides the pages, the site serves a few files for search engines, feed readers
+and AI tools. All of them are built from the same data as the pages.
 
----
+| Path | What it is |
+| --- | --- |
+| `/sitemap.xml` | Every page and detail page, for search engines |
+| `/robots.txt` | Crawl rules and the sitemap location |
+| `/rss.xml` | Blog feed |
+| `/llms.txt`, `/llms-full.txt` | Plain text summaries for AI assistants, following [llmstxt.org](https://llmstxt.org) |
+| `/og/<kind>/<id>` | Generated 1200 by 630 link preview cards |
+| `/healthz` | Liveness check for Docker. It never touches the database |
 
-Built with ❤️ using React Router.
+## How data flows
+
+Loaders call the functions in `lib/database/queries.ts`. Public reads are cached
+in memory for five minutes, so repeat visits and crawlers do not hit Supabase
+every time. Admin edits can take up to five minutes to show up. Search and tag
+lookups take user input, so they skip the cache and are rate limited instead.
+
+Images and demo videos live in the GitHub repo named by `GITHUB_OWNER` and
+`GITHUB_REPO`. `/api/load/image/<path>` validates the path, fetches the file and
+serves it with long cache headers. Videos also answer range requests, which
+Safari needs to play them.
+
+## Security notes
+
+Things worth knowing before you change something:
+
+- The contact form checks the origin, rate limits by IP and caps every field.
+- Client IPs come from `X-Real-IP` set by nginx, or the last `X-Forwarded-For`
+  entry. Anything a client can set is ignored.
+- Links stored in the database only render when they are plain http or https.
+- Markdown from the database renders through a tag allow list in `lib/markdown.ts`,
+  so script, iframe, style and form tags never reach the page.
+- Preview cards for static pages use fixed text, so nobody can put their own
+  words on an image served from this domain.
+
+The tests in `test/` cover these helpers, and CI runs them before every deploy.
+
+## Fonts
+
+The preview cards use Inter, bundled in `public/fonts` under the SIL Open Font
+License. The license is in `public/fonts/OFL.txt`.

@@ -10,6 +10,10 @@ import {
 } from "./constants";
 
 const defaultOgImage = `${BASE_URL}${DEFAULT_OG_IMAGE_PATH}`;
+const OG_IMAGE_SIZE: MetaDescriptor[] = [
+  { property: "og:image:width", content: "1200" },
+  { property: "og:image:height", content: "630" },
+];
 const canonicalUrl = BASE_URL;
 
 // Icons and the manifest live in root.tsx `links`, so they reach every page.
@@ -42,8 +46,7 @@ export function buildDefaultMeta(): MetaDescriptor[] {
     { property: "og:image:alt", content: SITE_NAME },
     { property: "og:url", content: canonicalUrl },
     { property: "og:locale", content: LOCALE },
-    { property: "og:image:width", content: "512" },
-    { property: "og:image:height", content: "512" },
+    ...OG_IMAGE_SIZE,
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:site", content: SITE_NAME },
     { name: "twitter:title", content: DEFAULT_TITLE },
@@ -113,6 +116,7 @@ export function buildPageMeta(input: PageMetaInput): MetaDescriptor[] {
     { property: "og:description", content: description },
     { property: "og:image", content: image },
     { property: "og:image:alt", content: ogImageAlt ?? title },
+    ...OG_IMAGE_SIZE,
     { property: "og:url", content: canonical },
     { property: "og:locale", content: LOCALE },
     { name: "twitter:card", content: "summary_large_image" },

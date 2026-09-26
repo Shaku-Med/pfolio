@@ -13,6 +13,7 @@ export function meta() {
     title: "Resume | Mohamed Amara",
     description: "View the latest version of my resume as rich text or as a PDF.",
     canonicalPath: "/resume",
+    ogImage: "/og/page/resume",
   });
 }
 

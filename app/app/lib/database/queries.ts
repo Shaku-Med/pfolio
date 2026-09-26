@@ -1,6 +1,7 @@
 import db from "./supabase";
 import { cached } from "./cache.server";
-import type { Project, ProjectLink } from "../projects";
+import { isUuid, parseProjectLinks, safeHttpUrl, safeVideoSource } from "../security/validate";
+import type { Project } from "../projects";
 import type { ExperienceEntry } from "../experience";
 import type { StackCategory } from "../stack";
 import type { GalleryItem } from "../gallery";
@@ -19,6 +20,7 @@ type DbProject = {
   links: unknown | null;
   date?: string | null;
   details_md?: string | null;
+  demo_video?: string | null;
   position?: number | null;
 };
 
@@ -39,12 +41,6 @@ type DbExperience = {
   details_md?: string | null;
   position?: number | null;
 };
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isUuid(value: string): boolean {
-  return UUID_RE.test(value);
-}
 
 function normalizePeriodPart(value?: string | null): string | null {
   if (!value) return null;
@@ -126,37 +122,8 @@ type DbResume = {
   updated_at: string;
 };
 
-const LINK_ICONS = new Set(["doc", "video", "external", "article"]);
-
-function safeHttpUrl(value: unknown): string | undefined {
-  if (typeof value !== "string" || value.length > 2048) return undefined;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.href : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function parseProjectLinks(raw: unknown): ProjectLink[] | undefined {
-  if (!Array.isArray(raw)) return undefined;
-  const links = raw.flatMap((item): ProjectLink[] => {
-    if (!item || typeof item !== "object") return [];
-    const { url, label, icon } = item as Record<string, unknown>;
-    const href = safeHttpUrl(url);
-    if (!href || typeof label !== "string" || !label.trim()) return [];
-    return [
-      {
-        url: href,
-        label: label.trim().slice(0, 60),
-        ...(typeof icon === "string" && LINK_ICONS.has(icon) && { icon: icon as ProjectLink["icon"] }),
-      },
-    ];
-  });
-  return links.length ? links : undefined;
-}
-
 function mapProject(row: DbProject): Project {
+  const demoVideo = safeVideoSource(row.demo_video);
   return {
     id: row.id,
     category: row.category,
@@ -170,6 +137,7 @@ function mapProject(row: DbProject): Project {
     links: parseProjectLinks(row.links),
     date: row.date ?? undefined,
     ...(row.details_md != null && row.details_md !== "" && { detailsMd: row.details_md }),
+    ...(demoVideo && { demoVideo }),
     ...(typeof row.position === "number" && { position: row.position }),
   };
 }

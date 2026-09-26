@@ -7,7 +7,7 @@ import {
   getResume,
   getStack,
 } from "./database/queries";
-import type { ExperienceEntry } from "./experience";
+import { isOpenRole, type ExperienceEntry } from "./experience";
 import { contact } from "./contact";
 import { music } from "./music";
 import { parseToolsString } from "./stack";
@@ -16,12 +16,6 @@ import { BASE_URL, SITE_NAME } from "./seo";
 const LIST_SIZE = 50;
 const SUMMARY =
   "Mohamed Amara is a full stack software engineer based in the US who builds and ships real products, from social platforms to encryption tools. He is looking for software engineering roles and internships, and also makes music as Medzy Amara.";
-
-// The timeline keeps an open "your company here" slot for recruiters; an
-// assistant should not read it as a real job.
-function isRealRole(entry: ExperienceEntry): boolean {
-  return !/your company here/i.test(entry.company ?? "");
-}
 
 function firstParagraph(text: string | undefined, max = 220): string {
   const first = (text ?? "").replace(/\r\n/g, "\n").trim().split(/\n+/)[0] ?? "";
@@ -55,7 +49,7 @@ const HEADING = /^(#{1,6})\s+(.*)$/;
  * outline. Shifts them so the shallowest one sits one level below `parent`,
  * drops a leading heading that only repeats `title`, and leaves code fences alone.
  */
-function nestMarkdown(markdown: string, parent: number, title: string): string {
+export function nestMarkdown(markdown: string, parent: number, title: string): string {
   const lines = markdown.replace(/\r\n/g, "\n").trim().split("\n");
   const first = lines[0]?.match(HEADING);
   if (first && title.toLowerCase().startsWith(first[2].trim().toLowerCase())) lines.shift();
@@ -89,7 +83,7 @@ async function loadCore() {
     getStack(LIST_SIZE, 0),
     getBlogPosts(LIST_SIZE, 0),
   ]);
-  return { projects, experience: experience.filter(isRealRole), stack, posts };
+  return { projects, experience: experience.filter((entry) => !isOpenRole(entry)), stack, posts };
 }
 
 export async function buildLlmsTxt(): Promise<string> {

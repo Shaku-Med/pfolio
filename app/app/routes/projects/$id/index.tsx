@@ -19,6 +19,7 @@ import type { Project, ProjectLink } from "~/lib/projects";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { useState } from "react";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import DemoVideo from "~/components/accessories/DemoVideo";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 
 const MORE_LINK = { to: "/projects", label: "See all projects" };
@@ -50,11 +51,7 @@ export function meta({ loaderData: data }: { loaderData: { project: Project } | 
     });
   }
   const project = data.project;
-  const ogImage = project.image
-    ? project.image.startsWith("http")
-      ? project.image
-      : `${BASE_URL}/api/load/image${project.image}`
-    : undefined;
+  const ogImage = `/og/project/${project.id}`;
   return buildPageMeta({
     title: `${project.title} | Mohamed Amara`,
     description: project.description,
@@ -82,17 +79,27 @@ export default function ProjectIdIndex() {
       <DetailHeader eyebrow={project.category} title={project.title} lede={lede} />
 
       <DetailCover>
-        <CanvasGradient colors={imgColors} />
-        <ImgLoader
-          src={`/api/load/image${project.image}`}
-          alt={project.imageAlt}
-          loading="eager"
-          className="h-full w-full"
-          imageClassName="object-contain"
-          shouldShowPreview
-          getImgColors
-          onGetImgColorsCallback={setImgColors}
-        />
+        {project.demoVideo ? (
+          <DemoVideo
+            src={project.demoVideo}
+            poster={`/api/load/image${project.image}`}
+            label={`${project.title} demo`}
+          />
+        ) : (
+          <>
+            <CanvasGradient colors={imgColors} />
+            <ImgLoader
+              src={`/api/load/image${project.image}`}
+              alt={project.imageAlt}
+              loading="eager"
+              className="h-full w-full"
+              imageClassName="object-contain"
+              shouldShowPreview
+              getImgColors
+              onGetImgColorsCallback={setImgColors}
+            />
+          </>
+        )}
       </DetailCover>
 
       <DetailBody

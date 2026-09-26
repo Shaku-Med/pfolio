@@ -40,6 +40,7 @@ export function meta({ loaderData: data }: { loaderData: { stack: StackCategory 
     title: `${stack.category} | Stack | Mohamed Amara`,
     description: stack.description ?? undefined,
     canonicalPath: `/stack/${stack.id}`,
+    ogImage: `/og/stack/${stack.id}`,
   });
 }
 

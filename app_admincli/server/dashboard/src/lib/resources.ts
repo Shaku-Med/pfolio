@@ -54,6 +54,13 @@ export const RESOURCES: Resource[] = [
       { name: "tags", label: "Tags", type: "tags", help: "Separate with commas" },
       { name: "image", label: "Cover image", type: "file", help: "Replacing this keeps the same link, so nothing breaks" },
       { name: "image_alt", label: "Image alt text", type: "text", help: "Describes the image for screen readers" },
+      {
+        name: "demo_video",
+        label: "Demo video",
+        type: "text",
+        nullable: true,
+        help: "A short mp4 or webm. Use a path in your image repo, or an https link to the file",
+      },
       { name: "github_url", label: "GitHub URL", type: "url", nullable: true },
       { name: "live_url", label: "Live URL", type: "url", nullable: true },
       { name: "links", label: "Extra links", type: "json", help: 'Array like [{"label":"Demo","url":"https://..."}]' },

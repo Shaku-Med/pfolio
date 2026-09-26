@@ -17,12 +17,14 @@ import { Github, Linkedin } from "../../components/ui/brand-icons";
 import { buildPageMeta } from "../../lib/seo";
 import { clientIp, isSameOrigin, rateLimit } from "../../lib/security/http.server";
 import { sendContactEmail } from "../../lib/send-contact-email.server";
+import { isValidEmail } from "../../lib/security/validate";
 
 export function meta() {
   return buildPageMeta({
     title: "Contact | Mohamed Amara",
     description: "Hiring, collaborating, or just curious? Send me a message.",
     canonicalPath: "/contact",
+    ogImage: "/og/page/contact",
   });
 }
 
@@ -34,10 +36,6 @@ const socialIcons: Record<string, ComponentType<{ className?: string }>> = {
 const inputClassName =
   "rounded-xl border border-border/70 bg-background px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 disabled:pointer-events-none disabled:opacity-60";
 
-// No separators or quotes, so one field can never expand into several
-// Reply-To addresses.
-const EMAIL_CHAR = String.raw`[^\s@,;:<>"'()[\]\\]`;
-const EMAIL_RE = new RegExp(`^${EMAIL_CHAR}{1,64}@${EMAIL_CHAR}+\\.${EMAIL_CHAR}{2,}$`);
 const GENERIC_ERROR =
   "Couldn't send your message right now. Please try again later or email me directly.";
 
@@ -81,7 +79,7 @@ export async function action({ request }: { request: Request }) {
   if (name.length > 100) {
     return { success: false, error: "Name is too long." };
   }
-  if (email.length > 254 || !EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     return { success: false, error: "That email address doesn't look valid." };
   }
   if (message.length < 10) {

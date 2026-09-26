@@ -27,6 +27,7 @@ export function meta() {
     title: "Experience | Mohamed Amara",
     description: "Where I've worked and what I've shipped, on one timeline.",
     canonicalPath: "/experience",
+    ogImage: "/og/page/experience",
   });
 }
 

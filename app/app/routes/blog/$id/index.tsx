@@ -39,11 +39,7 @@ export function meta({ loaderData: data }: { loaderData: { post: BlogPost } | nu
     });
   }
   const post = data.post;
-  const ogImage = post.coverImage
-    ? post.coverImage.startsWith("http")
-      ? post.coverImage
-      : `${BASE_URL}/api/load/image${post.coverImage}`
-    : undefined;
+  const ogImage = `/og/blog/${post.id}`;
   return buildPageMeta({
     title: `${post.title} | Blog | Mohamed Amara`,
     description: post.excerpt ?? undefined,
