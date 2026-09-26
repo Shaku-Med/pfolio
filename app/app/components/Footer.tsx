@@ -60,6 +60,9 @@ const Footer = () => {
               <a href="/rss.xml" className={linkClassName}>
                 RSS
               </a>
+              <a href="/llms.txt" className={linkClassName}>
+                llms.txt
+              </a>
             </div>
           </div>
 

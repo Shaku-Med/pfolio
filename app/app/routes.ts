@@ -44,6 +44,9 @@ export default [
     route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
     route("healthz", "routes/healthz.tsx"),
     route("rss.xml", "routes/rss[.]xml.tsx"),
+    route("robots.txt", "routes/robots[.]txt.tsx"),
+    route("llms.txt", "routes/llms[.]txt.tsx"),
+    route("llms-full.txt", "routes/llms-full[.]txt.tsx"),
     route('api', 'routes/api/layout.tsx', [
         route('load', 'routes/api/load/layout.tsx', [
             route('image/*', 'routes/api/load/image/index.tsx'),
