@@ -23,7 +23,7 @@ const linkIcons: Record<NonNullable<ProjectLink["icon"]>, LucideIcon> = {
 
 const MAX_TAGS = 3;
 const actionClassName =
-  "relative z-10 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
+  "relative z-10 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[0.6875rem] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
 type ProjectCardProps = {
   project: Project;

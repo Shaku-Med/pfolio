@@ -79,7 +79,7 @@ export default function BlogIndex() {
             ))}
           </section>
 
-          <div ref={sentinelRef} className="mt-2 min-h-[1px]">
+          <div ref={sentinelRef} className="mt-2 min-h-[0.0625rem]">
             {fetcher.state === "loading" && <LoadMoreSkeleton />}
           </div>
         </>

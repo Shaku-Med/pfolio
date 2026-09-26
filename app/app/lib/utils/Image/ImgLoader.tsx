@@ -46,7 +46,8 @@ const ImgLoader = ({
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [retryKey, setRetryKey] = useState(0);
-  const [extractedColors, setExtractedColors] = useState<string[]>([]);
+  // Preview background colors are off; the preview uses a frosted backdrop.
+  // const [extractedColors, setExtractedColors] = useState<string[]>([]);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [morphOrigin, setMorphOrigin] = useState<MorphOrigin | null>(null);
@@ -66,7 +67,7 @@ const ImgLoader = ({
     setLoaded(true);
     if (getImgColors && onGetImgColorsCallback && imgRef.current) {
       const colors = getDominantColors(imgRef.current);
-      setExtractedColors(colors);
+      // setExtractedColors(colors);
       onGetImgColorsCallback(colors);
     }
   };
@@ -121,6 +122,7 @@ const ImgLoader = ({
               alt={alt}
               onLoad={handleLoad}
               onError={handleError}
+              data-preview-src={shouldShowPreview ? src : undefined}
               crossOrigin={getImgColors ? "anonymous" : undefined}
               className={cn(
                 "h-full w-full object-cover transition-opacity duration-300",
@@ -141,7 +143,7 @@ const ImgLoader = ({
 
         {shouldShowPreview && loaded && !error && !isPreviewOpen && (
           <div className="pointer-events-none absolute inset-0 flex items-end justify-end bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <span className="m-3 rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/90 backdrop-blur-sm">
+            <span className="m-3 rounded-full bg-black/45 px-2.5 py-1 text-[0.625rem] font-medium uppercase tracking-wider text-white/90 backdrop-blur-sm">
               View
             </span>
           </div>
@@ -161,7 +163,7 @@ const ImgLoader = ({
             index={previewData.index}
             isOpen={isPreviewOpen}
             setIsOpen={setIsPreviewOpen}
-            colors={extractedColors}
+            // colors={extractedColors}
             morphOrigin={morphOrigin}
           />
         )}

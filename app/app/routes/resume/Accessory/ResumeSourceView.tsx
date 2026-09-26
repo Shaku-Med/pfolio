@@ -155,7 +155,7 @@ export const ResumeSourceView = ({ texUrl }: ResumeSourceViewProps) => {
       </div>
 
       <div className="max-h-[70vh] overflow-auto">
-        <pre className="w-fit min-w-full py-3 font-mono text-[12px] leading-relaxed sm:text-[13px]">
+        <pre className="w-fit min-w-full py-3 font-mono text-[0.75rem] leading-relaxed sm:text-[0.8125rem]">
           <code>
             {state.lines.map((line, i) => (
               <span key={i} className="flex">

@@ -14,7 +14,7 @@ export default function GalleryCard({ item, to }: GalleryCardProps) {
       ? item.src
       : `/api/load/image${item.src}`;
   const card = (
-    <div className="group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-muted">
+    <div className="group relative flex h-full min-h-[16.25rem] flex-col overflow-hidden rounded-2xl border border-border/70 bg-muted">
       <ImgLoader
         src={src}
         alt={item.title}

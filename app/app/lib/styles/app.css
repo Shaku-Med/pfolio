@@ -66,6 +66,15 @@ html {
   overflow-x: hidden !important;
 }
 
+/* Past 1536px the layout scales with the viewport instead of floating in a
+   sea of empty space: 100% at 1536px, up to 137.5% around 2560px. Everything
+   sized in rem follows, and it stays relative to the reader's own font size. */
+@media (min-width: 1536px) {
+  html {
+    font-size: clamp(100%, calc(0.625vw + 0.4rem), 137.5%);
+  }
+}
+
 img {
   pointer-events: none !important;
 }

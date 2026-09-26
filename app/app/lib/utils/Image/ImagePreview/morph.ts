@@ -55,3 +55,24 @@ export function loadImageDimensions(
     img.src = src;
   });
 }
+
+/**
+ * Finds the image on the page that shows `src`, so closing can fly back to
+ * whichever photo is current. Only counts it when some of it is on screen.
+ */
+export function findPreviewElement(src: string): HTMLElement | null {
+  const candidates = document.querySelectorAll<HTMLElement>("img[data-preview-src]");
+  for (const el of candidates) {
+    if (el.dataset.previewSrc !== src) continue;
+    const rect = el.getBoundingClientRect();
+    const onScreen =
+      rect.width > 0 &&
+      rect.height > 0 &&
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.top < window.innerHeight &&
+      rect.left < window.innerWidth;
+    if (onScreen) return el;
+  }
+  return null;
+}

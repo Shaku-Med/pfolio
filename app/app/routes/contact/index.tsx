@@ -188,7 +188,7 @@ export default function ContactIndex() {
                 rows={6}
                 disabled={isSubmitting}
                 placeholder="Tell me a little about what you have in mind."
-                className={`min-h-[140px] resize-y ${inputClassName}`}
+                className={`min-h-[8.75rem] resize-y ${inputClassName}`}
               />
             </label>
             <div className="flex flex-wrap items-center justify-between gap-3">

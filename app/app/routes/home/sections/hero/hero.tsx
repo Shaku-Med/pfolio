@@ -61,7 +61,7 @@ const StatRail = () => {
           <div key={stat.label} className="relative pt-6">
             <motion.span
               aria-hidden
-              className="absolute left-0 top-px h-[11px] w-[11px] rounded-full border-2 border-muted-foreground/40 bg-background"
+              className="absolute left-0 top-px h-[0.6875rem] w-[0.6875rem] rounded-full border-2 border-muted-foreground/40 bg-background"
               initial={reduce ? false : { scale: 0 }}
               animate={reduce ? undefined : { scale: 1 }}
               transition={{ duration: 0.35, delay: 0.6 + i * 0.25, ease: EASE }}
@@ -78,7 +78,7 @@ const StatRail = () => {
 const HeroSection = () => {
   return (
     <section>
-      <div className="relative isolate flex min-h-[min(calc(100svh-14rem),560px)] items-center">
+      <div className="relative isolate flex min-h-[min(calc(100svh-14rem),35rem)] items-center">
         <HeroLogoGlow />
         <div className="relative z-10 w-full max-w-2xl space-y-8 py-10 lg:max-w-[55%]">
           <div className="space-y-5">
@@ -129,7 +129,7 @@ const HeroSection = () => {
                       aria-label={link.label}
                       className="transition-colors hover:text-foreground"
                     >
-                      <Icon className="h-[18px] w-[18px]" />
+                      <Icon className="h-[1.125rem] w-[1.125rem]" />
                     </a>
                   );
                 })}
@@ -138,7 +138,7 @@ const HeroSection = () => {
                   aria-label="Email me"
                   className="transition-colors hover:text-foreground"
                 >
-                  <Mail className="h-[18px] w-[18px]" />
+                  <Mail className="h-[1.125rem] w-[1.125rem]" />
                 </a>
               </div>
             </div>

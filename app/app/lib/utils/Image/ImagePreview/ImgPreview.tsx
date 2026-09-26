@@ -19,12 +19,15 @@ import {
   Download,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
-import { motion, useReducedMotion } from "motion/react";
-import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+// Background color generation is off; the preview uses a frosted backdrop instead.
+// import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
 import { useStandalone } from "~/hooks/useStandalone";
 import { useAdaptiveTone, type Tone } from "~/lib/useAdaptiveTone";
-import { getDominantColors } from "~/lib/utils/Image/colors";
+// import { getDominantColors } from "~/lib/utils/Image/colors";
 import {
+  captureMorphOrigin,
+  findPreviewElement,
   getContainedViewportRect,
   loadImageDimensions,
   MORPH_DURATION,
@@ -64,7 +67,7 @@ export default function ImgPreview({
   index: initialIndex,
   isOpen,
   setIsOpen,
-  colors: initialColors = [],
+  // colors: initialColors = [],
   morphOrigin = null,
 }: ImgPreviewProps) {
   const isStandalone = useStandalone();
@@ -76,7 +79,7 @@ export default function ImgPreview({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [imgColors, setImgColors] = useState<string[]>(initialColors);
+  // const [imgColors, setImgColors] = useState<string[]>(initialColors);
   const [morphPhase, setMorphPhase] = useState<"enter" | "idle" | "exit">(
     morphOrigin && !reduceMotion ? "enter" : "idle",
   );
@@ -86,6 +89,10 @@ export default function ImgPreview({
   > | null>(null);
   const storedOrigin = useRef<MorphOrigin | null>(morphOrigin);
   const closingRef = useRef(false);
+  // Closing flies back to whichever photo is current, not the one that opened.
+  const [exitFlight, setExitFlight] = useState<{ from: MorphOrigin; to: MorphOrigin; src: string } | null>(null);
+  const [fadingOut, setFadingOut] = useState(false);
+  const hiddenTarget = useRef<HTMLElement | null>(null);
 
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const dragStart = useRef({ x: 0, y: 0 });
@@ -104,6 +111,20 @@ export default function ImgPreview({
   zoomRef.current = zoom;
   panRef.current = pan;
 
+  // Drag up or down to close, like the Photos app. Only when not zoomed in.
+  const dragY = useMotionValue(0);
+  const dragScale = useTransform(dragY, [-400, 0, 400], [0.86, 1, 0.86]);
+  const dragFade = useTransform(dragY, [-360, 0, 360], [0, 1, 0]);
+  const dismiss = useRef<{ x: number; y: number; t: number; active: boolean } | null>(null);
+  const suppressClick = useRef(false);
+  const [draggingToClose, setDraggingToClose] = useState(false);
+
+  // A plain dark tint over the page. No blur: backdrop-filter is slow or broken
+  // on some devices.
+  const backdropLevel = useMotionValue(0);
+  const backdropStrength = useTransform(() => backdropLevel.get() * dragFade.get());
+  const backdropColor = useTransform(backdropStrength, (v) => `rgba(0, 0, 0, ${(0.72 * v).toFixed(3)})`);
+
   useEffect(() => {
     setCurrent(initialIndex);
   }, [initialIndex]);
@@ -118,13 +139,14 @@ export default function ImgPreview({
     setZoom(1);
     setRotation(0);
     setPan({ x: 0, y: 0 });
-  }, [current]);
+    dragY.set(0);
+  }, [current, dragY]);
 
-  useEffect(() => {
-    if (isOpen && initialColors.length > 0) {
-      setImgColors(initialColors);
-    }
-  }, [isOpen, initialColors]);
+  // useEffect(() => {
+  //   if (isOpen && initialColors.length > 0) {
+  //     setImgColors(initialColors);
+  //   }
+  // }, [isOpen, initialColors]);
 
   const clampZoom = (z: number) => Math.min(Math.max(z, 1), 5);
 
@@ -215,20 +237,151 @@ export default function ImgPreview({
 
   const canMorph = !!morphOrigin && !reduceMotion;
 
+  const revealedOpener = useRef<HTMLElement | null>(null);
+  const restoreHiddenTarget = useCallback(() => {
+    if (hiddenTarget.current) hiddenTarget.current.style.visibility = "";
+    if (revealedOpener.current) revealedOpener.current.style.visibility = "";
+    hiddenTarget.current = null;
+    revealedOpener.current = null;
+  }, []);
+
+  // The photo that opened the preview stays hidden while it is open. When the
+  // preview closes onto a different photo, bring that first one back right away.
+  const revealOpener = useCallback(() => {
+    const openerSrc = images[initialIndex];
+    if (!openerSrc || openerSrc === images[current]) return;
+    const opener = findPreviewElement(openerSrc);
+    if (!opener) return;
+    opener.style.visibility = "visible";
+    revealedOpener.current = opener;
+  }, [images, initialIndex, current]);
+
+  // Close timers can outlive this preview; a stale one must not close the next.
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const finishClose = useCallback(() => {
+    restoreHiddenTarget();
+    if (mounted.current) setIsOpen(false);
+  }, [restoreHiddenTarget, setIsOpen]);
+
+  /** Where the current photo sits on screen right now, drag, zoom and pan included. */
+  const displayedRect = useCallback((): MorphOrigin | null => {
+    const img = imgRef.current;
+    if (!img?.naturalWidth || rotation % 360 !== 0) return null;
+    const base = getContainedViewportRect(img.naturalWidth, img.naturalHeight);
+    const outer = dragScale.get();
+    const size = zoomRef.current * outer;
+    const width = base.width * size;
+    const height = base.height * size;
+    const cx = window.innerWidth / 2 + panRef.current.x * outer;
+    const cy = window.innerHeight / 2 + panRef.current.y * outer + dragY.get();
+    return { top: cy - height / 2, left: cx - width / 2, width, height, borderRadius: 0 };
+  }, [rotation, dragScale, dragY]);
+
+  /** Returns true when a flight back to the page started. */
+  const flyBackToPage = useCallback(() => {
+    const src = images[current];
+    const el = !reduceMotion && src ? findPreviewElement(src) : null;
+    const from = el ? displayedRect() : null;
+    if (!el || !from || !src) return false;
+
+    if (el.style.visibility !== "hidden") {
+      el.style.visibility = "hidden";
+      hiddenTarget.current = el;
+    }
+    revealOpener();
+    setExitFlight({ from, to: captureMorphOrigin(el), src });
+    setMorphPhase("exit");
+    // Animation frames pause in background tabs; never leave the preview stuck open.
+    window.setTimeout(finishClose, MORPH_DURATION * 1000 + 200);
+    return true;
+  }, [images, current, reduceMotion, displayedRect, finishClose, revealOpener]);
+
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
-    if (!canMorph || !storedOrigin.current || !morphTarget) {
-      setIsOpen(false);
+    closingRef.current = true;
+    if (flyBackToPage()) return;
+    if (reduceMotion) {
+      finishClose();
       return;
     }
-    closingRef.current = true;
-    setMorphPhase("exit");
-  }, [canMorph, morphTarget, setIsOpen]);
+    // The photo is not on the page (hidden in "+3" or scrolled away): just fade out.
+    revealOpener();
+    setFadingOut(true);
+    window.setTimeout(finishClose, 180);
+  }, [flyBackToPage, reduceMotion, finishClose, revealOpener]);
+
+  useEffect(() => restoreHiddenTarget, [restoreHiddenTarget]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const visible = !fadingOut && morphPhase !== "exit" && (!canMorph || Boolean(morphTarget));
+    const controls = animate(backdropLevel, visible ? 1 : 0, {
+      duration: reduceMotion ? 0 : MORPH_DURATION,
+      ease: MORPH_EASE,
+    });
+    return () => controls.stop();
+  }, [isOpen, morphPhase, morphTarget, canMorph, reduceMotion, backdropLevel, fadingOut]);
+
+  const beginDismiss = (x: number, y: number) => {
+    dismiss.current = { x, y, t: performance.now(), active: false };
+  };
+
+  /** Returns true once the gesture has become a vertical drag. */
+  const moveDismiss = (x: number, y: number) => {
+    const d = dismiss.current;
+    if (!d) return false;
+    const dx = x - d.x;
+    const dy = y - d.y;
+    if (!d.active) {
+      if (Math.abs(dy) < 8 || Math.abs(dy) <= Math.abs(dx)) return false;
+      d.active = true;
+      setDraggingToClose(true);
+    }
+    dragY.set(dy);
+    return true;
+  };
+
+  /** Returns true when the gesture was a drag, so taps and swipes can ignore it. */
+  const endDismiss = (y: number) => {
+    const d = dismiss.current;
+    dismiss.current = null;
+    if (!d?.active) return false;
+    setDraggingToClose(false);
+    suppressClick.current = true;
+
+    const dy = y - d.y;
+    const velocity = dy / Math.max(1, performance.now() - d.t);
+    if (Math.abs(dy) > 110 || Math.abs(velocity) > 0.6) {
+      closingRef.current = true;
+      if (reduceMotion) {
+        setIsOpen(false);
+        return true;
+      }
+      if (flyBackToPage()) return true;
+      // The photo is not on the page, so it flies off the way it was thrown.
+      const direction = dy < 0 ? -1 : 1;
+      animate(dragY, direction * window.innerHeight, { duration: 0.22, ease: [0.32, 0.72, 0, 1] }).then(finishClose);
+      // Animation frames pause in background tabs; never leave the preview stuck open.
+      window.setTimeout(finishClose, 320);
+    } else {
+      animate(dragY, 0, { type: "spring", stiffness: 420, damping: 36 });
+    }
+    return true;
+  };
 
   useEffect(() => {
     if (!isOpen) return;
     storedOrigin.current = morphOrigin;
     closingRef.current = false;
+    setExitFlight(null);
+    setFadingOut(false);
 
     if (!canMorph) {
       setMorphPhase("idle");
@@ -263,13 +416,10 @@ export default function ImgPreview({
   const onMorphAnimationComplete = useCallback(() => {
     setMorphPhase((phase) => {
       if (phase === "enter") return "idle";
-      if (phase === "exit") {
-        closingRef.current = false;
-        queueMicrotask(() => setIsOpen(false));
-      }
+      if (phase === "exit") queueMicrotask(finishClose);
       return phase;
     });
-  }, [setIsOpen]);
+  }, [finishClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -345,7 +495,13 @@ export default function ImgPreview({
     resetHideTimer();
     if (e.pointerType !== "mouse") return;
     if (pinching.current) return;
-    if (zoomRef.current <= 1) return;
+    if (zoomRef.current <= 1) {
+      if (e.button === 0) {
+        beginDismiss(e.clientX, e.clientY);
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      }
+      return;
+    }
     setDragging(true);
     dragStart.current = { x: e.clientX, y: e.clientY };
     panStart.current = { ...panRef.current };
@@ -354,6 +510,10 @@ export default function ImgPreview({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
+    if (dismiss.current) {
+      moveDismiss(e.clientX, e.clientY);
+      return;
+    }
     if (!dragging || pinching.current) return;
     const nextPan = {
       x: panStart.current.x + (e.clientX - dragStart.current.x),
@@ -364,6 +524,7 @@ export default function ImgPreview({
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
+    if (dismiss.current) endDismiss(e.clientY);
     setDragging(false);
   };
 
@@ -402,7 +563,11 @@ export default function ImgPreview({
           y: e.touches[0].clientY,
         };
         panStart.current = { ...panRef.current };
+      } else {
+        beginDismiss(e.touches[0].clientX, e.touches[0].clientY);
       }
+    } else {
+      dismiss.current = null;
     }
   };
 
@@ -417,6 +582,10 @@ export default function ImgPreview({
       lastPinchMid.current = { x: info.midX, y: info.midY };
       swipeStart.current = null;
     } else if (e.touches.length === 1 && !pinching.current) {
+      if (zoomRef.current <= 1 && moveDismiss(e.touches[0].clientX, e.touches[0].clientY)) {
+        swipeStart.current = null;
+        return;
+      }
       if (zoomRef.current > 1 && dragging) {
         const nextPan = {
           x: panStart.current.x + (e.touches[0].clientX - dragStart.current.x),
@@ -433,6 +602,11 @@ export default function ImgPreview({
     }
 
     setDragging(false);
+
+    if (dismiss.current && e.changedTouches.length === 1 && endDismiss(e.changedTouches[0].clientY)) {
+      swipeStart.current = null;
+      return;
+    }
 
     if (
       swipeStart.current &&
@@ -458,6 +632,10 @@ export default function ImgPreview({
 
   const lastTap = useRef(0);
   const handleClick = (e: React.MouseEvent) => {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
     if ((e as unknown as PointerEvent).pointerType === "touch") return;
 
     const now = Date.now();
@@ -481,6 +659,10 @@ export default function ImgPreview({
 
   const lastTouch = useRef(0);
   const handleTouchEndTap = (e: React.TouchEvent) => {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
     if (e.changedTouches.length !== 1 || pinching.current || gestureWasMultiTouch.current) return;
 
     const now = Date.now();
@@ -503,25 +685,25 @@ export default function ImgPreview({
     handleTouchEndTap(e);
   };
 
-  const handleImageLoad = () => {
-    if (imgRef.current) {
-      setImgColors(getDominantColors(imgRef.current));
-    }
-  };
+  // const handleImageLoad = () => {
+  //   if (imgRef.current) {
+  //     setImgColors(getDominantColors(imgRef.current));
+  //   }
+  // };
 
   const controlsClass = `transition-opacity duration-300 ${
-    showControls && morphPhase === "idle"
+    showControls && morphPhase === "idle" && !draggingToClose
       ? "opacity-100"
       : "opacity-0 pointer-events-none"
   }`;
 
   const stageVisible = morphPhase === "idle";
-  const morphActive =
-    canMorph &&
-    morphOrigin &&
-    morphTarget &&
-    (morphPhase === "enter" || morphPhase === "exit");
-  const morphImageSrc = images[initialIndex] ?? images[current];
+  const flight =
+    morphPhase === "enter" && canMorph && morphOrigin && morphTarget && images[initialIndex]
+      ? { from: morphOrigin, to: { ...morphTarget, borderRadius: 0 }, src: images[initialIndex] }
+      : morphPhase === "exit" && exitFlight
+        ? exitFlight
+        : null;
 
   const adaptTrigger = useMemo(
     () => `${current}|${zoom}|${rotation}|${pan.x}|${pan.y}`,
@@ -561,60 +743,35 @@ export default function ImgPreview({
           {/* Backdrop fades with the morph */}
           <motion.div
             aria-hidden
-            className="pointer-events-none fixed inset-0 z-[1] bg-black"
-            initial={false}
-            animate={{ opacity: morphPhase === "exit" ? 0 : morphTarget ? 0.92 : 0 }}
-            transition={{ duration: MORPH_DURATION, ease: MORPH_EASE }}
+            className="pointer-events-none fixed inset-0 z-[1]"
+            style={{ backgroundColor: backdropColor }}
           />
 
-          {/* Source → fullscreen morph flight */}
-          {morphActive && morphOrigin && morphTarget && morphImageSrc && (
+          {/* Flight between the page and full screen, both ways */}
+          {flight && (
             <motion.div
+              key={`${morphPhase}-${flight.src}`}
               aria-hidden
               className="fixed z-[2] overflow-hidden will-change-[top,left,width,height]"
-              initial={
-                morphPhase === "enter"
-                  ? {
-                      top: morphOrigin.top,
-                      left: morphOrigin.left,
-                      width: morphOrigin.width,
-                      height: morphOrigin.height,
-                      borderRadius: morphOrigin.borderRadius,
-                    }
-                  : {
-                      top: morphTarget.top,
-                      left: morphTarget.left,
-                      width: morphTarget.width,
-                      height: morphTarget.height,
-                      borderRadius: 0,
-                    }
-              }
-              animate={
-                morphPhase === "enter"
-                  ? {
-                      top: morphTarget.top,
-                      left: morphTarget.left,
-                      width: morphTarget.width,
-                      height: morphTarget.height,
-                      borderRadius: 0,
-                    }
-                  : {
-                      top: storedOrigin.current?.top ?? morphOrigin.top,
-                      left: storedOrigin.current?.left ?? morphOrigin.left,
-                      width: storedOrigin.current?.width ?? morphOrigin.width,
-                      height: storedOrigin.current?.height ?? morphOrigin.height,
-                      borderRadius: storedOrigin.current?.borderRadius ?? morphOrigin.borderRadius,
-                    }
-              }
+              initial={{
+                top: flight.from.top,
+                left: flight.from.left,
+                width: flight.from.width,
+                height: flight.from.height,
+                borderRadius: flight.from.borderRadius,
+              }}
+              animate={{
+                top: flight.to.top,
+                left: flight.to.left,
+                width: flight.to.width,
+                height: flight.to.height,
+                borderRadius: flight.to.borderRadius,
+              }}
               transition={{ duration: MORPH_DURATION, ease: MORPH_EASE }}
               onAnimationComplete={onMorphAnimationComplete}
             >
-              <img
-                src={morphImageSrc}
-                alt=""
-                className="h-full w-full object-contain"
-                draggable={false}
-              />
+              {/* cover matches the cropped thumbnail at one end and the exact photo at the other */}
+              <img src={flight.src} alt="" className="h-full w-full object-cover" draggable={false} />
             </motion.div>
           )}
 
@@ -636,33 +793,37 @@ export default function ImgPreview({
               pointerEvents: stageVisible ? "auto" : "none",
             }}
             initial={false}
-            animate={{ opacity: stageVisible ? 1 : 0 }}
+            animate={{ opacity: stageVisible && !fadingOut ? 1 : 0 }}
             transition={{ duration: stageVisible ? 0 : 0.12, ease: MORPH_EASE }}
           >
-            <CanvasGradient colors={imgColors} />
-            <div
+            {/* <CanvasGradient colors={imgColors} /> */}
+            <motion.div
               className="relative z-10 flex h-full w-full items-center justify-center"
-              style={{
-                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotation}deg)`,
-                transition:
-                  dragging || pinching.current
-                    ? "none"
-                    : "transform 150ms ease-out",
-                willChange: "transform",
-              }}
+              style={{ y: dragY, scale: dragScale }}
             >
-              <img
-                ref={imgRef}
-                src={imageSrc}
-                alt=""
-                crossOrigin="anonymous"
-                className="h-full w-full max-h-[100dvh] max-w-[100dvw] select-none object-contain"
-                loading="eager"
-                fetchPriority="high"
-                draggable={false}
-                onLoad={handleImageLoad}
-              />
-            </div>
+              <div
+                className="flex h-full w-full items-center justify-center"
+                style={{
+                  transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotation}deg)`,
+                  transition:
+                    dragging || pinching.current
+                      ? "none"
+                      : "transform 150ms ease-out",
+                  willChange: "transform",
+                }}
+              >
+                <img
+                  ref={imgRef}
+                  src={imageSrc}
+                  alt=""
+                  crossOrigin="anonymous"
+                  className="h-full w-full max-h-[100dvh] max-w-[100dvw] select-none object-contain"
+                  loading="eager"
+                  fetchPriority="high"
+                  draggable={false}
+                />
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Top bar */}

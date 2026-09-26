@@ -37,7 +37,7 @@ const HeroLogoGlowMark = ({ visible }: HeroLogoGlowMarkProps) => {
         visible ? "opacity-60 lg:opacity-100" : "opacity-0"
       }`}
     >
-      <div className="relative aspect-square h-auto w-[min(58vw,340px)] max-h-[340px] sm:w-[min(48vw,380px)] sm:max-h-[380px] md:w-[min(42vw,420px)] md:max-h-[420px] lg:w-[min(38vw,480px)] lg:max-h-[480px]">
+      <div className="relative aspect-square h-auto w-[min(58vw,21.25rem)] max-h-[21.25rem] sm:w-[min(48vw,23.75rem)] sm:max-h-[23.75rem] md:w-[min(42vw,26.25rem)] md:max-h-[26.25rem] lg:w-[min(38vw,30rem)] lg:max-h-[30rem]">
         <div className="absolute inset-[-12%] rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--primary)_22%,transparent)_0%,color-mix(in_oklab,var(--primary)_8%,transparent)_38%,transparent_70%)] opacity-50 blur-xl dark:opacity-40" />
         <div
           className="relative h-full w-full"

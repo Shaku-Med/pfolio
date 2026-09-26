@@ -6,7 +6,6 @@ import type { GalleryItem } from "../../../lib/gallery";
 import ImgLoader from "~/lib/utils/Image/ImgLoader";
 import { BASE_URL, buildPageMeta } from "~/lib/seo";
 import CanvasGradient from "~/components/accessories/CanvasGradient/CanvasGradient";
-import { Reveal } from "~/components/accessories/Rail/Rail";
 import {
   DetailBody,
   DetailCover,
@@ -14,6 +13,7 @@ import {
   DetailNotFound,
   DetailShell,
   PROSE_CLASS,
+  SideSection,
 } from "~/components/accessories/Detail/Detail";
 
 const MORE_LINK = { to: "/gallery", label: "See the gallery" };
@@ -53,7 +53,7 @@ export function meta({ loaderData: data }: { loaderData: { item: GalleryItem } |
   });
 }
 
-const GRID_CAP = 8;
+const GRID_CAP = 6;
 
 export default function GalleryIdIndex() {
   const data = useLoaderData<typeof loader>();
@@ -74,7 +74,7 @@ export default function GalleryIdIndex() {
   return (
     <DetailShell>
       <DetailHeader
-        eyebrow={allImages.length > 1 ? `${allImages.length} images` : "Gallery"}
+        eyebrow={allImages.length > 1 ? `${allImages.length} photos` : "Gallery"}
         title={item.title}
         lede={item.subtitle}
       />
@@ -96,47 +96,56 @@ export default function GalleryIdIndex() {
         />
       </DetailCover>
 
-      {gridTiles.length > 0 && (
-        <Reveal delay={0.1}>
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {gridTiles.map((imageSrc, i) => {
-              const previewIndex = i + 1;
-              const isLast = overflowCount > 0 && i === gridTiles.length - 1;
-              return (
-                <div
-                  key={`${imageSrc}-${previewIndex}`}
-                  className="relative overflow-hidden rounded-xl border border-border/60 bg-muted"
-                >
-                  <ImgLoader
-                    shouldShowPreview
-                    multipleImages={allImages}
-                    multipleCurrentImageIndex={previewIndex}
-                    src={imageSrc}
-                    alt={`${item.title}, image ${previewIndex + 1}`}
-                    loading="lazy"
-                    className="aspect-square w-full"
-                    imageClassName="object-cover"
-                  />
-                  {isLast && (
+      <DetailBody
+        aside={
+          gridTiles.length > 0 ? (
+            <SideSection title={`${thumbnails.length} more ${thumbnails.length === 1 ? "photo" : "photos"}`}>
+              <div className="grid grid-cols-3 gap-2">
+                {gridTiles.map((imageSrc, i) => {
+                  const previewIndex = i + 1;
+                  const isLast = overflowCount > 0 && i === gridTiles.length - 1;
+                  return (
                     <div
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/70 text-xl font-semibold tabular-nums backdrop-blur-sm"
+                      key={`${imageSrc}-${previewIndex}`}
+                      className="relative overflow-hidden rounded-lg border border-border/60 bg-muted"
                     >
-                      +{overflowCount}
+                      <ImgLoader
+                        shouldShowPreview
+                        multipleImages={allImages}
+                        multipleCurrentImageIndex={previewIndex}
+                        src={imageSrc}
+                        alt={`${item.title}, photo ${previewIndex + 1}`}
+                        loading="lazy"
+                        className="aspect-square w-full"
+                        imageClassName="object-cover"
+                      />
+                      {isLast && (
+                        <div
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/70 text-sm font-semibold tabular-nums backdrop-blur-sm"
+                        >
+                          +{overflowCount}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Reveal>
-      )}
-
-      {item.detailsMd && (
-        <DetailBody>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">Click any photo to see it full size.</p>
+            </SideSection>
+          ) : undefined
+        }
+      >
+        {item.detailsMd ? (
           <MarkdownBody content={item.detailsMd} className={PROSE_CLASS} />
-        </DetailBody>
-      )}
+        ) : (
+          <p className="text-muted-foreground">
+            {allImages.length > 1
+              ? "A few photos from this one. Click any of them to see it full size."
+              : "Click the photo to see it full size."}
+          </p>
+        )}
+      </DetailBody>
     </DetailShell>
   );
 }

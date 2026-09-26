@@ -216,7 +216,7 @@ const Nav: React.FC = () => {
               >
                 <SearchIcon className="h-3.5 w-3.5" />
                 <span className="hidden lg:inline">Search</span>
-                <kbd className="rounded border border-border/70 px-1.5 py-0.5 text-[10px] font-normal text-muted-foreground/70">
+                <kbd className="rounded border border-border/70 px-1.5 py-0.5 text-[0.625rem] font-normal text-muted-foreground/70">
                   {modLabel} K
                 </kbd>
               </button>
@@ -241,7 +241,7 @@ const Nav: React.FC = () => {
                 href="https://github.com/Shaku-Med/pfolio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm transition hover:bg-muted lg:inline-flex"
+                className="hidden items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[0.6875rem] font-medium text-foreground shadow-sm transition hover:bg-muted lg:inline-flex"
                 aria-label="View and star this project on GitHub"
               >
                 <Github className="h-3 w-3" />
@@ -361,7 +361,7 @@ const Nav: React.FC = () => {
             >
               <SearchIcon className="h-4 w-4" />
               Search
-              <kbd className="ml-auto rounded border border-border/60 px-1.5 py-0.5 text-[10px] text-muted-foreground/60">
+              <kbd className="ml-auto rounded border border-border/60 px-1.5 py-0.5 text-[0.625rem] text-muted-foreground/60">
                 {modLabel} K
               </kbd>
             </button>
@@ -378,7 +378,7 @@ const Nav: React.FC = () => {
                 href="https://github.com/Shaku-Med/pfolio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm transition hover:bg-muted"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[0.6875rem] font-medium text-foreground shadow-sm transition hover:bg-muted"
                 aria-label="View and star this project on GitHub"
               >
                 <Github className="h-3 w-3" />

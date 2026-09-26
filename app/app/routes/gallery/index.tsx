@@ -93,7 +93,7 @@ export default function GalleryIndex() {
           </Reveal>
         ))}
       </section>
-      <div ref={sentinelRef} className="min-h-[1px] w-full">
+      <div ref={sentinelRef} className="min-h-[0.0625rem] w-full">
         {fetcher.state === "loading" && <LoadMoreSkeleton />}
       </div>
     </main>

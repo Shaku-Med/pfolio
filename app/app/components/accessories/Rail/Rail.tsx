@@ -130,13 +130,13 @@ export function RailList({ items }: RailListProps) {
     <ol className="relative mt-3">
       <span
         aria-hidden
-        className="absolute bottom-3 left-[5px] top-3 w-px bg-border/70"
+        className="absolute bottom-3 left-[0.3125rem] top-3 w-px bg-border/70"
       />
       {items.map((item, i) => (
         <li key={i} className="relative pl-6 pb-3 last:pb-0">
           <span
             aria-hidden
-            className="absolute left-0 top-[0.5rem] h-[11px] w-[11px] rounded-full border-2 border-muted-foreground/40 bg-background"
+            className="absolute left-0 top-[0.5rem] h-[0.6875rem] w-[0.6875rem] rounded-full border-2 border-muted-foreground/40 bg-background"
           />
           <Reveal delay={Math.min(i * 0.06, 0.3)}>
             <p className="text-[0.938rem] leading-[1.85] text-muted-foreground">{item}</p>
