@@ -1,8 +1,23 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/supabase";
-import { findResource, blankRow } from "@/lib/resources";
+import { findResource, blankRow, type Resource, type Row } from "@/lib/resources";
 import { isSameOrigin, jsonError, readJson } from "@/lib/http";
 import { buildPatch, guard, missingRequired, pickRow } from "@/lib/api-helpers";
+
+/** Columns to insert. Skips file fields (uploaded after the row exists) and
+ *  empty optional fields, so a blank demo video or a column that was never
+ *  migrated cannot reject the whole save. */
+function insertRow(resource: Resource, draft: Row): Row {
+  const row: Row = {};
+  for (const field of resource.fields) {
+    if (field.type === "file" || field.type === "files") continue;
+    const value = draft[field.name];
+    if (value == null) continue;
+    if (value === "" && field.nullable) continue;
+    row[field.name] = value;
+  }
+  return row;
+}
 
 type Ctx = { params: Promise<{ resource: string }> };
 
@@ -34,10 +49,11 @@ export async function POST(request: Request, { params }: Ctx) {
   const body = await readJson(request);
   if (!body) return jsonError("Bad request", 400);
 
-  const row = { ...blankRow(resource), ...buildPatch(resource, body) };
-  const missing = missingRequired(resource, row);
+  const draft = { ...blankRow(resource), ...buildPatch(resource, body) };
+  const missing = missingRequired(resource, draft);
   if (missing) return jsonError(`${missing} is required`, 400);
 
+  const row = insertRow(resource, draft);
   const { data: maxRows } = await db()
     .from(resource.table)
     .select("position")
@@ -48,7 +64,10 @@ export async function POST(request: Request, { params }: Ctx) {
   row.position = nextPosition;
 
   const { data, error } = await db().from(resource.table).insert(row).select("id").limit(1);
-  if (error || !data || data.length === 0) return jsonError("Could not save that", 500);
+  if (error || !data || data.length === 0) {
+    console.error("[dashboard] insert failed", resource.table, error);
+    return jsonError(error?.message || "Could not save that", 500);
+  }
 
   return NextResponse.json({ id: data[0].id }, { status: 201 });
 }

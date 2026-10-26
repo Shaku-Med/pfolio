@@ -15,8 +15,10 @@ venv/
 resume_store
 resume_store/*
 
-uploads
-upload
+/uploads
+/uploads/**
+/upload
+/upload/**
 
 .tmp_admincli
 .tmp_admincli/*
