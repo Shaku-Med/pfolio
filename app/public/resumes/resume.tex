@@ -16,7 +16,10 @@
 \usepackage{latexsym}
 \usepackage[hidelinks]{hyperref}
 \usepackage[margin=0.5in]{geometry}
-\input{glyphtounicode}
+\usepackage{iftex}
+\ifPDFTeX
+  \input{glyphtounicode}
+\fi
 
 % ---------- page setup ----------
 \pagestyle{empty}
@@ -30,8 +33,10 @@
   \vspace{-4pt}\scshape\raggedright\large
 }{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
 
-% make the pdf ATS-friendly (selectable, machine-readable text)
-\pdfgentounicode=1
+% make the pdf ATS-friendly (selectable, machine-readable text); XeTeX does this already
+\ifPDFTeX
+  \pdfgentounicode=1
+\fi
 
 % ---------- custom commands ----------
 \newcommand{\resumeItem}[1]{
@@ -85,15 +90,6 @@
 % ---------- experience ----------
 \section{Experience}
 \resumeSubHeadingListStart
-
-  \resumeSubheading
-    {Software Engineer Intern}{Jun 2025 -- Aug 2025}
-    {Electronic Arts}{Remote}
-    \resumeItemListStart
-      \resumeItem{Built Go services for the voice platform behind Apex Legends tournament broadcasts, handling real-time audio routing and player connections across distributed game servers during live events.}
-      \resumeItem{Tracked down race conditions and dropped connections in the WebRTC audio pipeline, cutting voice chat failures during high-traffic tournament windows.}
-      \resumeItem{Wrote integration and load tests covering voice channel lifecycle events (join, leave, mute, reconnect), catching edge cases before they hit production.}
-    \resumeItemListEnd
 
   \resumeSubheading
     {Software Engineering Intern}{Mar 2025 -- May 2025}

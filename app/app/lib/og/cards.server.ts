@@ -26,7 +26,7 @@ const PAGE_CARDS: Record<string, OgCard> = {
   experience: {
     eyebrow: "Experience",
     title: "Where I've worked and what I've shipped",
-    subtitle: "Internships at Electronic Arts, Auristor and CodePath, all on one line.",
+    subtitle: "Internships at Auristor and CodePath, all on one line.",
   },
   stack: {
     eyebrow: "Stack & tooling",

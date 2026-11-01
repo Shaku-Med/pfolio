@@ -15,7 +15,7 @@ const role = (id: string, company: string, period: string, position: number): Ex
 describe("open role slot", () => {
   it("recognizes the placeholder company", () => {
     expect(isOpenRole({ company: "Your company here" })).toBe(true);
-    expect(isOpenRole({ company: "Electronic Arts (EA)" })).toBe(false);
+    expect(isOpenRole({ company: "Auristor" })).toBe(false);
     expect(isOpenRole({})).toBe(false);
   });
 
@@ -23,11 +23,11 @@ describe("open role slot", () => {
     const items = sortTimeline(
       experienceToTimeline([
         role("next", "Your company here", "Since 2025", 0),
-        role("ea", "Electronic Arts (EA)", "2025", 1),
+        role("auristor", "Auristor", "2025", 1),
         role("codepath", "CodePath", "2023", 2),
       ]),
     );
-    expect(items.map((item) => item.id)).toEqual(["ea", "codepath", "next"]);
+    expect(items.map((item) => item.id)).toEqual(["auristor", "codepath", "next"]);
     expect(items.at(-1)?.markerLabel).toBe("Next");
   });
 });
