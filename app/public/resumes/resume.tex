@@ -80,7 +80,7 @@
 \section{Education}
 \resumeSubHeadingListStart
   \resumeSubheading
-    {CUNY College of Staten Island}{Expected May 2027}
+    {CUNY College of Staten Island}{Expected Dec 2027}
     {B.S. in Computer Science}{Staten Island, NY}
   \resumeItemListStart
     \resumeItem{\textbf{Relevant Coursework:} Data Structures \& Algorithms, Network Security, Operating Systems, Digital Logic, Discrete Mathematics}
@@ -117,6 +117,14 @@
 \resumeSubHeadingListStart
 
   \resumeProjectHeading
+    {\textbf{CSI Map} $|$ \emph{TypeScript, Go, Next.js, React Native, PostgreSQL, Docker} $|$ \href{https://csimap.app}{csimap.app} $|$ \href{https://github.com/Shaku-Med/college-maps}{Shaku-Med/college-maps}}{2026}
+    \resumeItemListStart
+      \resumeItem{Built and shipped a campus navigation app for the College of Staten Island, live on the web and the iOS App Store, that turns a room code like 1N-215 into the building, the floor, and turn by turn walking directions.}
+      \resumeItem{Wrote on device A* routing over an OpenStreetMap footpath graph with rerouting, wrong way detection, step free routes, and a speed tracker that tells walking from riding, plus spoken turns from a neural voice that runs on the phone.}
+      \resumeItem{Built a Go API with email code sign in and Postgres sessions and a Go realtime server for live meetup locations, shipped as Docker images through GitHub Actions to my own VPS behind nginx and a Cloudflare Tunnel.}
+    \resumeItemListEnd
+
+  \resumeProjectHeading
     {\textbf{Memories} $|$ \emph{Go, TypeScript, PostgreSQL, FFmpeg, AWS} $|$ \href{https://memories.brozy.org}{memories.brozy.org} $|$ \href{https://github.com/Shaku-Med/free_file}{Shaku-Med/free\_file}}{Ongoing}
     \resumeItemListStart
       \resumeItem{Building a video platform solo: a React Router 7 and TypeScript web app for watch pages, reels, and a creator studio, backed by four services that handle uploading, transcoding, moderation, and search.}
@@ -135,13 +143,6 @@
       \resumeItem{Working on the streaming and rendering path, where frames are compressed per frame with delta and run-length encodings and decoded client side without any browser video codec involved.}
     \resumeItemListEnd
 
-  \resumeProjectHeading
-    {\textbf{HLS Grabber} $|$ \emph{JavaScript, Chrome Extensions, Python, FFmpeg} $|$ \href{https://github.com/Shaku-Med/hls-downloader}{Shaku-Med/hls-downloader}}{2026}
-    \resumeItemListStart
-      \resumeItem{Built a Chrome extension that inspects network traffic per tab, filters the noise down to real media manifests, and saves a stream in one click instead of stitching segments together by hand.}
-      \resumeItem{Wrote the Python native messaging host that runs FFmpeg to write files to disk, an installer that registers it on Windows and Linux, and a job queue so downloads keep running after the popup closes.}
-    \resumeItemListEnd
-
 \resumeSubHeadingListEnd
 
 % ---------- skills ----------
@@ -149,7 +150,7 @@
 \begin{itemize}[leftmargin=0.15in, label={}]
   \small{\item{
     \textbf{Languages:} Python, Go, JavaScript, TypeScript, Java, Kotlin, C++, SQL, PHP \\ \vspace{2pt}
-    \textbf{Frontend:} React, Next.js, React Router 7, Tailwind CSS, Jetpack Compose, HTML5, CSS3 \\ \vspace{2pt}
+    \textbf{Frontend:} React, Next.js, React Native, Expo, React Router 7, Tailwind CSS, Jetpack Compose, HTML5, CSS3 \\ \vspace{2pt}
     \textbf{Backend \& Infra:} FastAPI, Flask, Node.js, Express.js, Docker, Jenkins, nginx, Redis, AWS (EC2, S3), Cloudflare R2 \\ \vspace{2pt}
     \textbf{Tools \& Frameworks:} Git, GitHub Actions, Grafana, WebRTC, FFmpeg, OpenCV, TensorFlow, Supabase, PostgreSQL, Burp Suite
   }}
